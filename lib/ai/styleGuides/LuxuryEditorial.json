@@ -1,0 +1,21 @@
+{
+  "name": "LuxuryEditorial",
+  "tagline": "Haute couture, refined aesthetics, and modern sophistication",
+  "editorialVoice": "Polished, cosmopolitan, curated, effortless elegance",
+  "sentenceStructure": "Sharp vignettes, high-fashion brevity, tactile vocabulary",
+  "vocabulary": [
+    "sculptural drape",
+    "monochrome restraint",
+    "unhurried leisure",
+    "study in light",
+    "analog grain",
+    "deliberate simplicity",
+    "curated nuance"
+  ],
+  "headlinePatterns": [
+    "The Unhurried Season: A Study in {Noun}",
+    "In Residence: An Afternoon with {Subject}",
+    "Elegance in the Negative Space"
+  ],
+  "sampleStory": "A study in subtle contrasts: natural linen against polished terrazzo, afternoon sun slipping past linen louvers. True luxury is not excess, but the discipline of knowing precisely what to leave out."
+}

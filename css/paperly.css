@@ -149,3 +149,48 @@
   animation: paperly-pulse 1.5s infinite ease-in-out;
 }
 
+/* Editorial Pull-Quote Token Styling */
+.editorial-pull-quote {
+  position: relative;
+  font-family: var(--font-quote);
+  font-style: italic;
+  font-size: 1.5rem;
+  line-height: 1.35;
+  color: var(--color-burgundy);
+  padding-left: 20px;
+  border-left: 2px solid var(--color-burgundy);
+  margin: 1.5rem 0;
+}
+
+.editorial-pull-quote::before {
+  content: "“";
+  font-family: var(--font-serif);
+  font-size: 3.5rem;
+  line-height: 1;
+  position: absolute;
+  left: -10px;
+  top: -15px;
+  color: rgba(110, 20, 35, 0.18);
+  pointer-events: none;
+}
+
+/* Theme Toggle Button */
+.paperly-theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  background: var(--color-panel);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.paperly-theme-toggle:hover {
+  border-color: var(--color-burgundy);
+  color: var(--color-ivory);
+}
+
+

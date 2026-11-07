@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -469,12 +469,32 @@
     /* Print Output */
     #pa { display: none; }
     @media print {
+      html, body {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #0c0b0a !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
       body > *:not(#pa) { display: none !important; }
-      #pa { display: block; }
+      #pa {
+        display: block !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
       #pa .pg {
-        box-shadow: none;
-        page-break-after: always;
-        margin: 0;
+        width: 540px !important;
+        height: 720px !important;
+        box-shadow: none !important;
+        page-break-after: always !important;
+        break-after: page !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        margin: 0 !important;
+        position: relative !important;
+        overflow: hidden !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
       }
       @page {
         size: 540px 720px;
@@ -693,6 +713,9 @@
   </div>
 
   <!-- Scripts -->
+  <script src="js/image-store.js"></script>
+  <script src="js/design-tokens.js"></script>
+  <script src="js/auth.js"></script>
   <script src="js/gemini.js"></script>
   <script src="js/templates-data.js"></script>
 
@@ -784,6 +807,15 @@
     const P = () => S.pages[S.cur] || S.pages[0];
     const SE = () => P() ? P().els.find(e => e.id === S.sel) : null;
 
+    function renderEmptySlot(container, el) {
+      container.innerHTML = `
+        <div class="empty-photo-slot" style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1.5px dashed rgba(227,213,189,0.3); background: rgba(24,20,18,0.85); color: #e3d5bd; text-align: center; padding: 10px; cursor: pointer;" title="Click to add photograph">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span style="font-size: 10px; margin-top: 4px; font-weight: 500; letter-spacing: 0.05em; opacity: 0.85;">+ Add Photo</span>
+        </div>
+      `;
+    }
+
     // Node Renderer
     function node(e, live) {
       const d = document.createElement("div");
@@ -796,9 +828,46 @@
 
       if (e.t === "img") {
         s.height = e.h + "px";
-        s.backgroundImage = e.bg;
-        s.backgroundSize = "cover";
-        s.backgroundPosition = "center";
+        s.overflow = "hidden";
+        s.position = "absolute";
+        s.backgroundColor = "#181412";
+
+        let imgSrc = e.src || "";
+        if (!imgSrc && e.bg) {
+          const m = e.bg.match(/url\(["']?([^"']+)["']?\)/);
+          if (m) imgSrc = m[1];
+        }
+
+        if (imgSrc) {
+          const img = document.createElement("img");
+          img.src = imgSrc;
+          img.crossOrigin = "anonymous";
+          img.loading = "eager";
+          img.alt = e.filename || "Editorial photograph";
+          img.style.width = "100%";
+          img.style.height = "100%";
+          img.style.objectFit = e.fit || "cover";
+          img.style.objectPosition = e.position || "center";
+          img.style.display = "block";
+          img.style.pointerEvents = "none";
+
+          img.onerror = () => {
+            if (e.imageId && window.PAPERLY_IMAGE_STORE) {
+              window.PAPERLY_IMAGE_STORE.getImage(e.imageId).then(rec => {
+                if (rec && rec.src) {
+                  img.src = rec.src;
+                } else {
+                  renderEmptySlot(d, e);
+                }
+              }).catch(() => renderEmptySlot(d, e));
+            } else {
+              renderEmptySlot(d, e);
+            }
+          };
+          d.appendChild(img);
+        } else {
+          renderEmptySlot(d, e);
+        }
       } else if (e.t === "line") {
         s.height = e.h + "px";
         s.background = e.color || "#6e1423";
@@ -1263,13 +1332,56 @@
       }
     });
 
-    R.addEventListener("change", ev => {
+    R.addEventListener("change", async ev => {
       if (ev.target.id !== "fi") return;
       const f = ev.target.files[0];
       if (!f) return;
+
+      // Validate file type & size (max 25MB)
+      if (!f.type.startsWith("image/")) {
+        showToast("Please select a valid image file");
+        return;
+      }
+      if (f.size > 25 * 1024 * 1024) {
+        showToast("Image file is too large (max 25MB)");
+        return;
+      }
+
+      if (window.PAPERLY_IMAGE_STORE) {
+        try {
+          const model = await window.PAPERLY_IMAGE_STORE.saveImage(f, {
+            type: "upload",
+            filename: f.name
+          });
+          chg(() => {
+            const el = SE();
+            if (el) {
+              el.src = model.src;
+              el.bg = `url("${model.src}")`;
+              el.imageId = model.id;
+              el.type = "upload";
+              el.filename = model.filename;
+              el.width = model.width;
+              el.height = model.height;
+              el.fit = el.fit || "cover";
+              el.position = el.position || "center";
+            }
+            showToast("Photo saved to persistent library");
+          });
+          return;
+        } catch (err) {
+          console.warn("Image store save failed, using fallback:", err);
+        }
+      }
+
       const r = new FileReader();
       r.onload = () => chg(() => {
-        SE().bg = `url("${r.result}")`;
+        const el = SE();
+        if (el) {
+          el.src = r.result;
+          el.bg = `url("${r.result}")`;
+          el.type = "upload";
+        }
         showToast("Photo updated");
       });
       r.readAsDataURL(f);
@@ -2008,11 +2120,52 @@
       }
     });
 
-    $("#exp").onclick = () => {
+    $("#exp").onclick = async () => {
+      const expBtn = $("#exp");
+      const originalText = expBtn.textContent;
+      expBtn.innerHTML = '<span>✦ Preparing PDF…</span>';
+      expBtn.disabled = true;
+
       const a = $("#pa");
       a.innerHTML = "";
       S.pages.forEach(p => a.appendChild(page(p, false)));
-      window.print();
+
+      try {
+        // 1. Wait for web fonts to load
+        if (document.fonts && document.fonts.ready) {
+          await document.fonts.ready;
+        }
+
+        // 2. Wait for all print images to decode
+        const imgs = Array.from(a.querySelectorAll("img"));
+        await Promise.all(imgs.map(img => {
+          if (img.complete && img.naturalWidth > 0) return Promise.resolve();
+          return new Promise(res => {
+            img.onload = res;
+            img.onerror = res;
+            setTimeout(res, 2000);
+          });
+        }));
+
+        // 3. Set document title for clean PDF filename
+        const oldTitle = document.title;
+        const safeTitle = ($("#pname").value || "PAPERLY-Magazine").replace(/[/\\?%*:|"<>]/g, '-');
+        document.title = `${safeTitle}.pdf`;
+
+        // Small timeout for browser layout flush
+        await new Promise(r => setTimeout(r, 180));
+
+        // 4. Trigger print
+        window.print();
+
+        document.title = oldTitle;
+      } catch (err) {
+        console.error("PDF export prep error:", err);
+        window.print();
+      } finally {
+        expBtn.innerHTML = originalText;
+        expBtn.disabled = false;
+      }
     };
 
     // Keyboard Shortcuts

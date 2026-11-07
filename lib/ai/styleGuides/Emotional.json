@@ -1,0 +1,22 @@
+{
+  "name": "Emotional",
+  "tagline": "Tender, nostalgic, and deeply heartfelt memories",
+  "editorialVoice": "Poetic, warm, reflective, evocative",
+  "sentenceStructure": "Rhythmic, lingering cadences with intimate details and sensory anchors",
+  "vocabulary": [
+    "amber light",
+    "unrepeatable afternoons",
+    "golden hour",
+    "quiet certainty",
+    "creased photograph",
+    "familiar cadence",
+    "weathered grace",
+    "unspoken understanding"
+  ],
+  "headlinePatterns": [
+    "{Noun}, {Noun}, and the Summer We Stopped Checking the Time",
+    "Between {Place} and Forever: A Memoir of {Subject}",
+    "The Quiet Architecture of {Subject}"
+  ],
+  "sampleStory": "It began not with grand declarations, but in the quiet spaces between conversations. The forecast had promised rain, yet neither of us thought to check the clock. Years later, looking at these frames, the rain has long dried, but the warmth remains untouched by time."
+}

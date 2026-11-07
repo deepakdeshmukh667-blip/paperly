@@ -1,0 +1,21 @@
+{
+  "name": "Funny",
+  "tagline": "Witty, self-deprecating, and hilariously true tales",
+  "editorialVoice": "Humorous, clever, fast-paced, anecdotal",
+  "sentenceStructure": "Comic timing, abrupt contrasts, playful hyperbole",
+  "vocabulary": [
+    "culinary catastrophe",
+    "zero navigational sense",
+    "survival rate: 100%",
+    "comedy of errors",
+    "unsolicited advice",
+    "legendary disaster",
+    "laugh until crying"
+  ],
+  "headlinePatterns": [
+    "How We Survived {Event}: A Definitive Guide",
+    "Mistakes Were Made, But the {Noun} Was Great",
+    "The Night the {Noun} Broke: A Tragicomedy"
+  ],
+  "sampleStory": "The itinerary promised a scenic two-hour drive. Seven hours later, we had crossed three borders without a map, burnt the only dinner option, and were laughing so hard we couldn't pitch the tent. Five stars; would get lost again."
+}

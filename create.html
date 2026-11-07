@@ -960,6 +960,9 @@
   </footer>
 
   <!-- Scripts -->
+  <script src="js/image-store.js"></script>
+  <script src="js/design-tokens.js"></script>
+  <script src="js/auth.js"></script>
   <script src="js/gemini.js"></script>
   <script src="js/templates-data.js"></script>
   <script>
@@ -1208,16 +1211,32 @@
       if (e.target.files) handleImageFiles(e.target.files);
     });
 
-    function handleImageFiles(files) {
-      Array.from(files).forEach(file => {
-        if (!file.type.startsWith('image/')) return;
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          wizardData.photos.push(event.target.result);
-          renderPhotoGallery();
-        };
-        reader.readAsDataURL(file);
-      });
+    async function handleImageFiles(files) {
+      for (const file of Array.from(files)) {
+        if (!file.type.startsWith('image/')) continue;
+        if (file.size > 25 * 1024 * 1024) {
+          alert(`Image "${file.name}" exceeds 25MB limit. Please select a smaller file.`);
+          continue;
+        }
+        try {
+          if (window.PAPERLY_IMAGE_STORE) {
+            const model = await PAPERLY_IMAGE_STORE.saveImage(file);
+            wizardData.photos.push(model.src);
+            wizardData.photoModels = wizardData.photoModels || [];
+            wizardData.photoModels.push(model);
+          } else {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+              wizardData.photos.push(event.target.result);
+              renderPhotoGallery();
+            };
+            reader.readAsDataURL(file);
+          }
+        } catch (err) {
+          console.error("Failed to store image in IndexedDB:", err);
+        }
+        renderPhotoGallery();
+      }
     }
 
     function renderPhotoGallery() {
@@ -1227,8 +1246,8 @@
         const thumb = document.createElement('div');
         thumb.className = 'photo-thumb';
         thumb.innerHTML = `
-          <img src="${src}" alt="Photo ${idx + 1}">
-          <button type="button" class="photo-delete-btn" onclick="removePhoto(${idx})">×</button>
+          <img src="${src}" alt="Photo ${idx + 1}" loading="lazy">
+          <button type="button" class="photo-delete-btn" onclick="removePhoto(${idx})" title="Remove photo">×</button>
         `;
         gallery.appendChild(thumb);
       });
@@ -1236,6 +1255,9 @@
 
     function removePhoto(idx) {
       wizardData.photos.splice(idx, 1);
+      if (wizardData.photoModels && wizardData.photoModels[idx]) {
+        wizardData.photoModels.splice(idx, 1);
+      }
       renderPhotoGallery();
     }
 
@@ -1325,30 +1347,41 @@
         if (titleEl) {
           titleEl.text = titleText;
           titleEl.content = titleText;
+          titleEl.y = 40;
           // Smart Auto-Scale: If title is long, scale font size so it never covers faces
-          if (titleText.length > 30) {
-            titleEl.size = 28;
-            titleEl.h = 68;
+          if (titleText.length > 32) {
+            titleEl.size = 26;
+            titleEl.h = 60;
           } else if (titleText.length > 20) {
-            titleEl.size = 34;
+            titleEl.size = 32;
             titleEl.h = 62;
+          } else {
+            titleEl.size = 40;
+            titleEl.h = 64;
           }
+        }
+
+        // Subtitle / issue line
+        const issueEl = p1Els.find(e => (e.t === 'text' || e.type === 'text') && e.size <= 11 && e.y < 120);
+        if (issueEl && titleEl) {
+          issueEl.y = titleEl.y + titleEl.h + 6;
         }
 
         if (wizardData.photos.length > 0) {
           const coverImgEl = p1Els.find(e => e.t === 'img' || e.type === 'img');
           if (coverImgEl) {
+            const pModel = wizardData.photoModels && wizardData.photoModels[0];
             coverImgEl.bg = `url("${wizardData.photos[0]}")`;
             coverImgEl.src = wizardData.photos[0];
-            // Push cover photo down if title is long so title NEVER covers faces
-            if (titleEl) {
-              const safeY = titleEl.y + (titleEl.h || 60) + 16;
-              if (coverImgEl.y < safeY) {
-                const bottom = coverImgEl.y + coverImgEl.h;
-                coverImgEl.y = safeY;
-                coverImgEl.h = Math.max(260, bottom - safeY);
-              }
-            }
+            coverImgEl.type = 'upload';
+            coverImgEl.fit = 'cover';
+            coverImgEl.position = 'center';
+            if (pModel) coverImgEl.imageId = pModel.id;
+
+            // Push cover photo down below title + issue line so faces are NEVER blocked
+            const safeTop = (issueEl ? issueEl.y + issueEl.h : (titleEl ? titleEl.y + titleEl.h : 110)) + 14;
+            coverImgEl.y = Math.max(coverImgEl.y, safeTop);
+            coverImgEl.h = Math.min(coverImgEl.h, 570 - coverImgEl.y);
           }
         }
 
@@ -1362,45 +1395,85 @@
           if (tagEl) {
             tagEl.text = (wizardData.category || "EDITORIAL").toUpperCase() + " · DISPATCH";
             tagEl.content = tagEl.text;
+            tagEl.y = 36;
+            tagEl.h = 18;
           }
 
           // 2. Headline element (Playfair / serif, size 24-38)
-          const headlineEl = p2Els.find(e => (e.t === 'text' || e.type === 'text') && e.size >= 24 && e.size <= 40);
+          const headlineEl = p2Els.find(e => (e.t === 'text' || e.type === 'text') && e.size >= 22 && e.size <= 40);
           if (headlineEl) {
             const hText = headline || "Monsoon, Coffee, and One Broken Umbrella";
             headlineEl.text = hText;
             headlineEl.content = hText;
+            headlineEl.y = 56;
             if (hText.length > 28) {
-              headlineEl.size = 26;
-              headlineEl.h = 56;
-            }
-            // Ensure headline is strictly below tag
-            if (tagEl) {
-              headlineEl.y = tagEl.y + (tagEl.h || 20) + 8;
+              headlineEl.size = 24;
+              headlineEl.h = 58;
+            } else {
+              headlineEl.size = 28;
+              headlineEl.h = 50;
             }
           }
 
-          // 3. Body story element: target the actual body paragraph (Inter font, size <= 15, y >= 140)
-          const bodyEl = p2Els.find(e => (e.t === 'text' || e.type === 'text') && e.size <= 15 && e.size >= 11 && (e.y >= 140 || e.h >= 90) && e !== tagEl);
+          // Line accent below headline
+          const lineEl = p2Els.find(e => (e.t === 'line' || e.type === 'line') && e.y < 160);
+          if (lineEl && headlineEl) {
+            lineEl.y = headlineEl.y + headlineEl.h + 8;
+          }
+
+          // 3. Body story element: target the actual body paragraph (Inter font, size <= 15, x >= 300)
+          const bodyEl = p2Els.find(e => (e.t === 'text' || e.type === 'text') && e.size <= 15 && e.size >= 11 && (e.x >= 280 || e.y >= 140) && e !== tagEl);
           if (bodyEl) {
             bodyEl.text = story;
             bodyEl.content = story;
+            bodyEl.x = 315;
+            bodyEl.y = 185;
+            bodyEl.w = 190;
+            bodyEl.h = 240;
           }
 
-          // 4. Inner photo for Page 2
-          if (wizardData.photos.length > 1) {
-            const innerImg = p2Els.find(e => e.t === 'img' || e.type === 'img');
-            if (innerImg) {
-              innerImg.bg = `url("${wizardData.photos[1]}")`;
-              innerImg.src = wizardData.photos[1];
+          // 4. Inner photos for Page 2: assign both photo slots safely
+          const p2Imgs = p2Els.filter(e => e.t === 'img' || e.type === 'img');
+          if (p2Imgs.length > 0) {
+            // First photo slot on spread
+            if (wizardData.photos.length > 1) {
+              const m1 = wizardData.photoModels && wizardData.photoModels[1];
+              p2Imgs[0].src = wizardData.photos[1];
+              p2Imgs[0].bg = `url("${wizardData.photos[1]}")`;
+              p2Imgs[0].type = 'upload';
+              if (m1) p2Imgs[0].imageId = m1.id;
             }
+            p2Imgs[0].x = 36;
+            p2Imgs[0].y = 145;
+            p2Imgs[0].w = 260;
+            p2Imgs[0].h = 270;
+          }
+          if (p2Imgs.length > 1) {
+            // Second photo slot on spread
+            if (wizardData.photos.length > 2) {
+              const m2 = wizardData.photoModels && wizardData.photoModels[2];
+              p2Imgs[1].src = wizardData.photos[2];
+              p2Imgs[1].bg = `url("${wizardData.photos[2]}")`;
+              p2Imgs[1].type = 'upload';
+              if (m2) p2Imgs[1].imageId = m2.id;
+            }
+            p2Imgs[1].x = 36;
+            p2Imgs[1].y = 435;
+            p2Imgs[1].w = 160;
+            p2Imgs[1].h = 245;
           }
 
           // 5. Pull quote on Page 2
           const quoteEl = p2Els.find(e => (e.t === 'text' || e.type === 'text') && (e.italic || (e.font && e.font.includes('Garamond'))));
-          if (quoteEl && dedication) {
-            quoteEl.text = `“${dedication.replace(/^["'“]+|["'”]+$/g, '')}”`;
-            quoteEl.content = quoteEl.text;
+          if (quoteEl) {
+            if (dedication) {
+              quoteEl.text = `“${dedication.replace(/^["'“]+|["'”]+$/g, '')}”`;
+              quoteEl.content = quoteEl.text;
+            }
+            quoteEl.x = 216;
+            quoteEl.y = 455;
+            quoteEl.w = 290;
+            quoteEl.h = 210;
           }
         }
 
@@ -1417,14 +1490,17 @@
           }
 
           // Assign remaining uploaded photos to images on page 3 & beyond
-          let photoIdx = 2;
+          let photoIdx = wizardData.photos.length > 2 ? 3 : 1;
           for (let pi = 2; pi < templatePages.length; pi++) {
             const p = templatePages[pi];
             const pEls = getEls(p);
             pEls.filter(e => e.t === 'img' || e.type === 'img').forEach(img => {
               if (photoIdx < wizardData.photos.length) {
+                const pm = wizardData.photoModels && wizardData.photoModels[photoIdx];
                 img.bg = `url("${wizardData.photos[photoIdx]}")`;
                 img.src = wizardData.photos[photoIdx];
+                img.type = 'upload';
+                if (pm) img.imageId = pm.id;
                 photoIdx++;
               }
             });

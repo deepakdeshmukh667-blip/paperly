@@ -1,0 +1,21 @@
+{
+  "name": "Cute",
+  "tagline": "Playful, charming, and endearing micro-moments",
+  "editorialVoice": "Delightful, cozy, affectionate, vibrant",
+  "sentenceStructure": "Lively, short, punchy with sweet observations and endearing nicknames",
+  "vocabulary": [
+    "sunshine pocket",
+    "little triumphs",
+    "messy hair",
+    "snort-laughs",
+    "warm croissants",
+    "confetti mornings",
+    "pink-cheeked smiles"
+  ],
+  "headlinePatterns": [
+    "A Pocketful of {Noun}: The Everyday Adventures of {Subject}",
+    "Tiny Moments, Giant Smiles",
+    "Little Sunbeams & Big Dreams"
+  ],
+  "sampleStory": "Two cups of lukewarm cocoa, an overturned box of paints, and a laugh so contagious the entire kitchen paused. These are the days small hands leave giant impressions on our hearts."
+}

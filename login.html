@@ -247,6 +247,7 @@
     </div>
   </div>
 
+  <script src="js/auth.js"></script>
   <script>
     const form = document.getElementById('loginForm');
     const emailInput = document.getElementById('email');
@@ -294,46 +295,20 @@
       submitBtn.innerHTML = '<span>Verifying credentials…</span>';
 
       try {
-        // Authenticate with session storage / local user registry
-        let users = [];
-        try {
-          users = JSON.parse(localStorage.getItem('paperly_users') || '[]');
-        } catch (err) {}
-
-        const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
-
-        setTimeout(() => {
-          if (user && user.password === password) {
-            localStorage.setItem('paperly_active_user', JSON.stringify({
-              id: user.id,
-              name: user.name,
-              email: user.email
-            }));
-            showAlert('Login successful! Redirecting…', false);
-            setTimeout(() => {
-              window.location.href = 'dashboard.html';
-            }, 800);
-          } else if (!users.length || !user) {
-            // Demo account fallback for instant testing
-            const defaultUser = {
-              id: 'usr_demo',
-              name: email.split('@')[0],
-              email: email
-            };
-            localStorage.setItem('paperly_active_user', JSON.stringify(defaultUser));
-            showAlert('Welcome! Redirecting to your dashboard…', false);
-            setTimeout(() => {
-              window.location.href = 'dashboard.html';
-            }, 800);
-          } else {
-            showAlert('Incorrect password. Please verify and try again.');
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = '<span>Sign In to PAPERLY</span>';
-          }
-        }, 500);
-
+        const res = await PAPERLY_AUTH.login(email, password);
+        if (res.success) {
+          showAlert('Login successful! Redirecting to dashboard…', false);
+          setTimeout(() => {
+            const nextUrl = new URLSearchParams(window.location.search).get('next') || 'dashboard.html';
+            window.location.href = nextUrl;
+          }, 600);
+        } else {
+          showAlert(res.error || 'Incorrect credentials. Please verify and try again.');
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<span>Sign In to PAPERLY</span>';
+        }
       } catch (err) {
-        showAlert('Authentication error. Please try again.');
+        showAlert('Authentication service error. Please try again.');
         submitBtn.disabled = false;
         submitBtn.innerHTML = '<span>Sign In to PAPERLY</span>';
       }

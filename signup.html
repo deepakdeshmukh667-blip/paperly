@@ -252,6 +252,7 @@
     </div>
   </div>
 
+  <script src="js/auth.js"></script>
   <script>
     const form = document.getElementById('signupForm');
     const nameInput = document.getElementById('name');
@@ -319,48 +320,23 @@
       submitBtn.disabled = true;
       submitBtn.innerHTML = '<span>Creating your account…</span>';
 
-      setTimeout(() => {
-        try {
-          let users = [];
-          try {
-            users = JSON.parse(localStorage.getItem('paperly_users') || '[]');
-          } catch (err) {}
-
-          const existing = users.find(u => u.email.toLowerCase() === email.toLowerCase());
-          if (existing) {
-            showAlert('An account with this email address already exists. Please log in.');
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = '<span>Create Your Account</span>';
-            return;
-          }
-
-          const newUser = {
-            id: 'usr_' + Date.now(),
-            name,
-            email,
-            password,
-            createdAt: new Date().toISOString()
-          };
-
-          users.push(newUser);
-          localStorage.setItem('paperly_users', JSON.stringify(users));
-          localStorage.setItem('paperly_active_user', JSON.stringify({
-            id: newUser.id,
-            name: newUser.name,
-            email: newUser.email
-          }));
-
+      try {
+        const res = await PAPERLY_AUTH.signup(name, email, password);
+        if (res.success) {
           showAlert('Account created successfully! Welcome to PAPERLY.', false);
           setTimeout(() => {
             window.location.href = 'dashboard.html';
-          }, 800);
-
-        } catch (err) {
-          showAlert('Failed to save user account. Please try again.');
+          }, 600);
+        } else {
+          showAlert(res.error || 'Failed to create account. Please try again.');
           submitBtn.disabled = false;
           submitBtn.innerHTML = '<span>Create Your Account</span>';
         }
-      }, 500);
+      } catch (err) {
+        showAlert('Registration service error. Please try again.');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<span>Create Your Account</span>';
+      }
     });
   </script>
 </body>

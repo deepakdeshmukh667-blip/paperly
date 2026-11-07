@@ -330,25 +330,36 @@
     <!-- Filter & Search Controls -->
     <div class="controls-bar">
       <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-        <div class="search-box">
+        <div class="search-box" style="flex: 1; max-width: 480px;">
           <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
           <input type="text" id="searchInput" class="search-input" placeholder="Search templates, styles, occasions…">
         </div>
 
-        <a href="create.html" style="font-size: 0.85rem; color: var(--color-burgundy); font-weight: 600; text-decoration: underline;">
-          Or start with a blank magazine →
-        </a>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <button type="button" id="btnOpenInspiration" class="btn-use" style="background: var(--color-burgundy); color: #fff; border: none; padding: 8px 16px; border-radius: 20px; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path></svg>
+            ✦ AI Inspiration Engine
+          </button>
+          <a href="create.html" style="font-size: 0.85rem; color: var(--color-burgundy); font-weight: 600; text-decoration: underline;">
+            Or start blank magazine →
+          </a>
+        </div>
       </div>
 
       <div class="filter-pills" id="categoryPills">
-        <button class="filter-btn active" data-cat="all">All Editions (<span id="countAll">7</span>)</button>
+        <button class="filter-btn active" data-cat="all">All Editions (<span id="countAll">12</span>)</button>
+        <button class="filter-btn" data-cat="favorites">★ Favorites (<span id="countFavs">0</span>)</button>
         <button class="filter-btn" data-cat="Best Friend">Best Friend</button>
         <button class="filter-btn" data-cat="Birthday">Birthday</button>
         <button class="filter-btn" data-cat="Couple">Couple</button>
         <button class="filter-btn" data-cat="Anniversary">Anniversary</button>
         <button class="filter-btn" data-cat="Travel">Travel</button>
         <button class="filter-btn" data-cat="Fashion">Fashion & Style</button>
-        <button class="filter-btn" data-cat="Personal Journal">Personal Journal</button>
+        <button class="filter-btn" data-cat="Minimalist Living">Architecture & Living</button>
+        <button class="filter-btn" data-cat="Culinary Arts">Culinary Arts</button>
+        <button class="filter-btn" data-cat="Indie Culture">Indie Culture</button>
+        <button class="filter-btn" data-cat="Commencement">Commencement</button>
+        <button class="filter-btn" data-cat="Monochrome">Monochrome</button>
       </div>
     </div>
 
@@ -385,6 +396,44 @@
     </div>
   </div>
 
+  <!-- AI Inspiration Engine Modal -->
+  <div id="aiInspirationModal" class="paperly-modal-backdrop">
+    <div class="paperly-modal-card" style="max-width: 520px;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+        <div>
+          <span style="font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--color-burgundy); font-weight: 600;">✦ AI Publication Architect</span>
+          <h3 class="font-serif" style="font-size: 1.6rem; font-weight: 700; margin-top: 4px;">Generate Inspiration Edition</h3>
+        </div>
+        <button id="closeAiModalBtn" style="padding: 4px 8px; font-size: 16px; background: none; border: none; cursor: pointer;">✕</button>
+      </div>
+
+      <p style="font-size: 13px; color: #666; line-height: 1.5; margin-bottom: 20px;">Describe your concept, mood, or destination. PAPERLY's AI will compose an original layout and color palette.</p>
+
+      <div style="margin-bottom: 16px;">
+        <label style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Concept / Occasion</label>
+        <input type="text" id="aiConceptInput" placeholder="e.g. 5 days in Kyoto with my sister, rainy tea houses & bamboo groves" style="width: 100%; padding: 10px 14px; border: 1px solid #dcd3c1; border-radius: 4px; font-size: 14px;">
+      </div>
+
+      <div style="margin-bottom: 20px;">
+        <label style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Editorial Aesthetic</label>
+        <select id="aiStyleSelect" style="width: 100%; padding: 10px 14px; border: 1px solid #dcd3c1; border-radius: 4px; font-size: 14px; background: #fff;">
+          <option value="minimalist">Minimalist Architecture (Kinfolk style)</option>
+          <option value="vogue">High Fashion Monograph (Vogue style)</option>
+          <option value="romantic">Poetic Romance & Film Grain</option>
+          <option value="monochrome">Timeless Black & White Noir</option>
+          <option value="indie">Analog Indie & Golden Hour</option>
+        </select>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 10px;">
+        <button type="button" id="btnCancelAiModal" style="padding: 8px 16px; border: 1px solid #ccc; background: transparent; border-radius: 4px; font-size: 13px; cursor: pointer;">Cancel</button>
+        <button type="button" id="btnGenerateAiTemplate" style="padding: 8px 20px; background: var(--color-burgundy); color: #fff; border: none; border-radius: 4px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+          <span>✦ Generate & Open in Studio</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Footer -->
   <footer style="margin-top: auto; background-color: #0c0b0a; color: #f6f0e4; border-top: 1px solid rgba(255,255,255,0.08); padding: 3rem 1.5rem 2rem;">
     <div style="max-w: 80rem; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
@@ -398,7 +447,9 @@
     </div>
   </footer>
 
+  <script src="js/image-store.js"></script>
   <script src="js/templates-data.js"></script>
+  <script src="js/auth.js"></script>
   <script>
     const editions = PAPERLY_TEMPLATES.EDITIONS;
     const container = document.getElementById('templatesContainer');
@@ -406,18 +457,45 @@
     const categoryPills = document.getElementById('categoryPills');
     let activeCategory = 'all';
 
-    // Update total count
-    const countEl = document.getElementById('countAll');
-    if (countEl) countEl.textContent = Object.keys(editions).length;
+    // Favorites Storage
+    const FAVS_KEY = 'paperly_template_favorites';
+    function getFavs() {
+      try { return JSON.parse(localStorage.getItem(FAVS_KEY) || '[]'); } catch(e) { return []; }
+    }
+    function toggleFav(key, e) {
+      if (e) { e.preventDefault(); e.stopPropagation(); }
+      let favs = getFavs();
+      if (favs.includes(key)) {
+        favs = favs.filter(k => k !== key);
+      } else {
+        favs.push(key);
+      }
+      localStorage.setItem(FAVS_KEY, JSON.stringify(favs));
+      updateCounts();
+      renderTemplates();
+    }
+
+    function updateCounts() {
+      const countEl = document.getElementById('countAll');
+      if (countEl) countEl.textContent = Object.keys(editions).length;
+      const favEl = document.getElementById('countFavs');
+      if (favEl) favEl.textContent = getFavs().length;
+    }
+    updateCounts();
 
     // Render list
     function renderTemplates() {
       const query = searchInput.value.toLowerCase().trim();
+      const favs = getFavs();
       container.innerHTML = '';
 
       const keys = Object.keys(editions).filter(k => {
         const ed = editions[k];
-        const matchCat = (activeCategory === 'all' || ed.category.toLowerCase() === activeCategory.toLowerCase());
+        let matchCat = false;
+        if (activeCategory === 'all') matchCat = true;
+        else if (activeCategory === 'favorites') matchCat = favs.includes(k);
+        else matchCat = (ed.category.toLowerCase() === activeCategory.toLowerCase());
+
         const matchSearch = (!query || ed.name.toLowerCase().includes(query) || ed.category.toLowerCase().includes(query) || ed.description.toLowerCase().includes(query));
         return matchCat && matchSearch;
       });
@@ -435,14 +513,17 @@
         const ed = editions[k];
         const card = document.createElement('div');
         card.className = 'template-card';
+        const isFav = favs.includes(k);
 
-        // Extract cover SVG background or create card preview
         const coverPage = ed.pages[0];
         const bg = ed.coverBg || coverPage.bg || '#0c0b0a';
         const coverImg = ed.cover || '';
 
         card.innerHTML = `
           <div class="card-cover" data-key="${k}" style="background: ${bg}; position: relative; overflow: hidden;" title="Click to preview ${ed.name}">
+            <button type="button" class="btn-fav-star" onclick="toggleFav('${k}', event)" title="${isFav ? 'Remove from favorites' : 'Add to favorites'}" style="position: absolute; top: 12px; right: 12px; z-index: 6; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.25); border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; color: ${isFav ? '#e07a8c' : '#ffffff'}; font-size: 14px; cursor: pointer; transition: transform 0.2s;">
+              ${isFav ? '★' : '☆'}
+            </button>
             ${coverImg ? `<img src="${coverImg}" alt="${ed.name}" loading="lazy" onerror="this.style.opacity='0';" style="width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; z-index: 1; transition: opacity 0.3s;">` : ''}
             <div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.2) 40%, rgba(0,0,0,0.85) 100%); z-index: 2;"></div>
             <div style="position: absolute; inset: 0; padding: 8% 8% 0; color: #f4ede0; z-index: 3;">
@@ -484,7 +565,40 @@
 
     searchInput.addEventListener('input', renderTemplates);
 
-    // Modal Preview Logic
+    // AI Inspiration Modal Logic
+    const aiModal = document.getElementById('aiInspirationModal');
+    const btnOpenInspiration = document.getElementById('btnOpenInspiration');
+    const closeAiModalBtn = document.getElementById('closeAiModalBtn');
+    const btnCancelAiModal = document.getElementById('btnCancelAiModal');
+    const btnGenerateAiTemplate = document.getElementById('btnGenerateAiTemplate');
+
+    if (btnOpenInspiration) btnOpenInspiration.onclick = () => aiModal.classList.add('active');
+    if (closeAiModalBtn) closeAiModalBtn.onclick = () => aiModal.classList.remove('active');
+    if (btnCancelAiModal) btnCancelAiModal.onclick = () => aiModal.classList.remove('active');
+
+    if (btnGenerateAiTemplate) {
+      btnGenerateAiTemplate.onclick = async () => {
+        const concept = document.getElementById('aiConceptInput').value.trim() || 'Our Favorite Ordinary Days';
+        const style = document.getElementById('aiStyleSelect').value;
+        btnGenerateAiTemplate.innerHTML = '<span class="paperly-loading">✦ Composing Layout…</span>';
+
+        // Select closest template as baseline
+        const styleMap = {
+          minimalist: 'minimalist-living',
+          vogue: 'fashion',
+          romantic: 'couple',
+          monochrome: 'monochrome',
+          indie: 'indie-culture'
+        };
+        const templateKey = styleMap[style] || 'best-friend';
+
+        setTimeout(() => {
+          window.location.href = `create.html?template=${templateKey}&title=${encodeURIComponent(concept)}`;
+        }, 600);
+      };
+    }
+
+    // Preview Modal Logic
     const modal = document.getElementById('previewModal');
     const modalTitle = document.getElementById('modalTitle');
     const modalCat = document.getElementById('modalCat');
@@ -533,6 +647,7 @@
 
     function closeModal() {
       modal.classList.remove('active');
+    }
     }
 
     modalCloseBtn.onclick = closeModal;
