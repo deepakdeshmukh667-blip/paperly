@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -1136,15 +1136,28 @@
         // Dim non-matching templates rather than hiding them
         if (!isMatch) card.style.opacity = '0.45';
 
+        const coverBg = ed.coverBg || (ed.pages && ed.pages[0]?.bg) || '#1c1712';
+        const coverImg = ed.cover || '';
+
         card.innerHTML = `
-          <div class="tpl-preview">
-            <img src="${ed.cover}" alt="${ed.name}">
+          <div class="tpl-preview" style="background: ${coverBg}; position: relative; overflow: hidden;">
+            ${coverImg ? `<img src="${coverImg}" alt="${ed.name}" loading="lazy" onerror="this.style.opacity='0';" style="width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; z-index: 1; transition: opacity 0.3s;">` : ''}
+            <div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.2) 40%, rgba(0,0,0,0.88) 100%); z-index: 2; display: flex; flex-direction: column; justify-content: space-between; padding: 1.25rem 1rem;">
+              <div>
+                <span style="font-size: 0.62rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--beige); font-weight: 600; opacity: 0.95;">${ed.category}</span>
+                <h4 style="font-family: var(--font-serif); font-size: 1.25rem; font-weight: 700; line-height: 1.15; margin-top: 4px; color: #ffffff; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">${ed.name}</h4>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                <span style="font-family: var(--font-quote); font-style: italic; font-size: 0.95rem; color: var(--beige); text-shadow: 0 1px 3px rgba(0,0,0,0.8);">PAPERLY.</span>
+                <span style="font-size: 0.65rem; background: rgba(110,20,35,0.85); color: #fff; padding: 3px 8px; border-radius: 12px; font-weight: 500;">${ed.pages.length} Pages</span>
+              </div>
+            </div>
           </div>
           <div class="tpl-info">
             <h4 class="tpl-title">${ed.name}</h4>
             <div class="tpl-meta">
               <span>${ed.category}</span>
-              <span>${ed.pages.length} Spreads</span>
+              <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 60%;">${ed.description || `${ed.pages.length} Spreads`}</span>
             </div>
           </div>
         `;

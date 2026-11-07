@@ -406,6 +406,10 @@
     const categoryPills = document.getElementById('categoryPills');
     let activeCategory = 'all';
 
+    // Update total count
+    const countEl = document.getElementById('countAll');
+    if (countEl) countEl.textContent = Object.keys(editions).length;
+
     // Render list
     function renderTemplates() {
       const query = searchInput.value.toLowerCase().trim();
@@ -434,20 +438,23 @@
 
         // Extract cover SVG background or create card preview
         const coverPage = ed.pages[0];
-        const bg = coverPage.bg || '#0c0b0a';
+        const bg = ed.coverBg || coverPage.bg || '#0c0b0a';
+        const coverImg = ed.cover || '';
 
         card.innerHTML = `
-          <div class="card-cover" data-key="${k}" style="background: ${bg}; position: relative;" title="Click to preview ${ed.name}">
-            <div style="position: absolute; inset: 0; padding: 8% 8% 0; color: ${bg === '#0c0b0a' ? '#f4ede0' : '#0c0b0a'}; z-index: 2;">
-              <p class="font-serif" style="font-size: 1.35rem; font-weight: 700; line-height: 1.1;">${ed.name}</p>
-              <p style="font-size: 0.65rem; opacity: 0.7; margin-top: 3px; letter-spacing: 0.1em;">${ed.category.toUpperCase()} EDITION</p>
+          <div class="card-cover" data-key="${k}" style="background: ${bg}; position: relative; overflow: hidden;" title="Click to preview ${ed.name}">
+            ${coverImg ? `<img src="${coverImg}" alt="${ed.name}" loading="lazy" onerror="this.style.opacity='0';" style="width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; z-index: 1; transition: opacity 0.3s;">` : ''}
+            <div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.2) 40%, rgba(0,0,0,0.85) 100%); z-index: 2;"></div>
+            <div style="position: absolute; inset: 0; padding: 8% 8% 0; color: #f4ede0; z-index: 3;">
+              <p class="font-serif" style="font-size: 1.35rem; font-weight: 700; line-height: 1.1; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">${ed.name}</p>
+              <p style="font-size: 0.65rem; color: #e3d5bd; opacity: 0.95; margin-top: 3px; letter-spacing: 0.12em;">${ed.category.toUpperCase()} EDITION</p>
             </div>
-            <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 1;">
-              <div style="width: 80px; height: 80px; border-radius: 50%; border: 1px dashed rgba(110,20,35,0.4); display: flex; align-items: center; justify-content: center;">
-                <span style="font-family: var(--font-quote); font-size: 1.1rem; font-style: italic; color: #6e1423;">PAPERLY.</span>
+            <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 3;">
+              <div style="width: 80px; height: 80px; border-radius: 50%; border: 1px dashed rgba(227,213,189,0.5); display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.3); backdrop-filter: blur(2px);">
+                <span style="font-family: var(--font-quote); font-size: 1.1rem; font-style: italic; color: #e3d5bd;">PAPERLY.</span>
               </div>
             </div>
-            <div style="position: absolute; bottom: 10px; right: 12px; background: rgba(0,0,0,0.65); color: #fff; font-size: 10px; padding: 2px 7px; border-radius: 10px; z-index: 3;">
+            <div style="position: absolute; bottom: 10px; right: 12px; background: rgba(0,0,0,0.75); color: #fff; font-size: 10px; padding: 2px 8px; border-radius: 10px; z-index: 4; border: 1px solid rgba(255,255,255,0.15);">
               ${ed.pages.length} Pages
             </div>
           </div>

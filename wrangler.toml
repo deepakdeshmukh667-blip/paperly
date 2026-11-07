@@ -1,0 +1,36 @@
+name = "paperly-backend"
+main = "worker/index.js"
+compatibility_date = "2024-04-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Assets binding for serving frontend static files
+[assets]
+directory = "./"
+binding = "ASSETS"
+
+# Cloudflare D1 Relational SQL Database
+[[d1_databases]]
+binding = "DB"
+database_name = "paperly-d1"
+database_id = "local-d1-placeholder"
+migrations_dir = "migrations"
+
+# Cloudflare R2 Object Storage (Private user photos & assets)
+[[r2_buckets]]
+binding = "R2_BUCKET"
+bucket_name = "paperly-uploads"
+
+# Cloudflare KV (Session cache & temporary state)
+[[kv_namespaces]]
+binding = "KV_CACHE"
+id = "local-kv-placeholder"
+
+# Cloudflare Workers AI Binding
+[ai]
+binding = "AI"
+
+[vars]
+ENVIRONMENT = "development"
+APP_NAME = "PAPERLY"
+APP_URL = "http://localhost:3000"
+JWT_SECRET = "paperly-dev-secret-key-change-in-production-only"
