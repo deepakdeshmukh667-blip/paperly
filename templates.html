@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Explore Magazine Templates — PAPERLY.</title>
+  <meta name="description" content="Discover curated digital magazine templates for birthdays, best friends, couples, anniversaries, travel journals, and fashion editorials.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230c0b0a'/><text x='35' y='68' font-family='Georgia,serif' font-size='56' font-weight='bold' fill='%23f6f0e4'>P</text><circle cx='68' cy='63' r='6' fill='%236e1423'/></svg>">
+  <meta name="theme-color" content="#6e1423">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="css/paperly.css">
+
+  <style>
+    *, ::after, ::before { box-sizing: border-box; margin: 0; padding: 0; }
+    html {
+      scroll-behavior: smooth;
+      font-family: var(--font-sans);
+      line-height: 1.5;
+    }
+    body {
+      background-color: var(--color-ivory);
+      color: var(--color-black);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; cursor: pointer; background: transparent; border: none; }
+
+    /* Header */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      border-bottom: 1px solid var(--color-border-light);
+      background-color: rgba(246, 240, 228, 0.96);
+      backdrop-filter: blur(10px);
+    }
+    .header-nav {
+      max-width: 80rem;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+    }
+    .logo {
+      font-family: var(--font-serif);
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      font-size: 0.875rem;
+      list-style: none;
+    }
+    .nav-links a.active {
+      padding-bottom: 0.25rem;
+      border-bottom: 2px solid var(--color-burgundy);
+      font-weight: 600;
+    }
+
+    /* Template Page Hero */
+    .hero-banner {
+      max-width: 80rem;
+      margin: 0 auto;
+      padding: 3.5rem 1.5rem 2rem;
+    }
+    .hero-title {
+      font-family: var(--font-serif);
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 700;
+      line-height: 1.15;
+    }
+    .hero-sub {
+      font-size: 1.05rem;
+      color: rgba(12, 11, 10, 0.7);
+      margin-top: 0.75rem;
+      max-width: 38rem;
+    }
+
+    /* Search & Filter Toolbar */
+    .controls-bar {
+      max-width: 80rem;
+      margin: 0 auto 2.5rem;
+      padding: 0 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+    .search-box {
+      position: relative;
+      max-width: 24rem;
+    }
+    .search-input {
+      width: 100%;
+      padding: 0.65rem 1rem 0.65rem 2.25rem;
+      background: #fff;
+      border: 1px solid rgba(0, 0, 0, 0.15);
+      border-radius: 4px;
+      font-size: 0.875rem;
+      color: var(--color-black);
+    }
+    .search-input:focus {
+      outline: 2px solid var(--color-burgundy);
+      border-color: transparent;
+    }
+    .search-icon {
+      position: absolute;
+      left: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 1rem;
+      height: 1rem;
+      color: #888;
+      pointer-events: none;
+    }
+
+    .filter-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .filter-btn {
+      padding: 0.45rem 1rem;
+      font-size: 0.8rem;
+      font-weight: 500;
+      border: 1px solid rgba(0, 0, 0, 0.15);
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.6);
+      transition: all 0.15s ease;
+    }
+    .filter-btn:hover {
+      border-color: var(--color-burgundy);
+      color: var(--color-burgundy);
+    }
+    .filter-btn.active {
+      background: var(--color-burgundy);
+      color: #fff;
+      border-color: var(--color-burgundy);
+    }
+
+    /* Templates Grid */
+    .templates-grid {
+      max-width: 80rem;
+      margin: 0 auto;
+      padding: 0 1.5rem 5rem;
+      display: grid;
+      grid-template-columns: repeat(1, 1fr);
+      gap: 2rem;
+    }
+    @media (min-width: 640px) {
+      .templates-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (min-width: 1024px) {
+      .templates-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    /* Template Card */
+    .template-card {
+      background: #fff;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 4px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04);
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .template-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    }
+    .card-cover {
+      position: relative;
+      aspect-ratio: 3/4;
+      overflow: hidden;
+      background: #111;
+      cursor: pointer;
+    }
+    .card-info {
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    .card-category {
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--color-burgundy);
+      font-weight: 600;
+    }
+    .card-title {
+      font-family: var(--font-serif);
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin: 0.25rem 0 0.5rem;
+    }
+    .card-desc {
+      font-size: 0.85rem;
+      color: rgba(12, 11, 10, 0.7);
+      line-height: 1.5;
+      margin-bottom: 1.25rem;
+      flex: 1;
+    }
+    .card-actions {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(0, 0, 0, 0.06);
+    }
+
+    .btn-preview {
+      flex: 1;
+      padding: 0.55rem;
+      font-size: 0.8rem;
+      font-weight: 500;
+      border: 1px solid #0c0b0a;
+      border-radius: 2px;
+      text-align: center;
+      transition: all 0.15s ease;
+    }
+    .btn-preview:hover {
+      background: #0c0b0a;
+      color: #fff;
+    }
+    .btn-use {
+      flex: 1.2;
+      padding: 0.55rem;
+      font-size: 0.8rem;
+      font-weight: 500;
+      background: var(--color-burgundy);
+      color: #fff;
+      border-radius: 2px;
+      text-align: center;
+      transition: background 0.15s ease;
+    }
+    .btn-use:hover {
+      background: #8a2434;
+    }
+
+    /* Modal */
+    .preview-modal-dialog {
+      max-width: 760px;
+      padding: 24px;
+    }
+    .preview-spread-viewer {
+      display: flex;
+      gap: 16px;
+      overflow-x: auto;
+      padding: 16px 0;
+      scroll-snap-type: x mandatory;
+    }
+    .preview-page-frame {
+      flex: none;
+      width: 270px;
+      height: 360px;
+      background: #f4ede0;
+      border: 1px solid rgba(0, 0, 0, 0.15);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      scroll-snap-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .mobile-menu-btn { display: block; }
+    }
+    @media (min-width: 769px) {
+      .mobile-menu-btn { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="header-nav">
+      <a href="index.html" class="logo">
+        PAPERLY<span style="color: var(--color-burgundy);">.</span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="templates.html" class="active">Explore Templates</a></li>
+        <li><a href="index.html#how-it-works">How It Works</a></li>
+        <li><a href="login.html">Login</a></li>
+        <li>
+          <a href="studio.html" style="display:inline-flex; align-items:center; gap:6px; padding:0.5rem 1.25rem; font-size:0.85rem; font-weight:500; background:#0c0b0a; color:#f6f0e4; border-radius:2px;">
+            Create Your Magazine
+          </a>
+        </li>
+      </ul>
+
+      <button id="menuBtn" class="mobile-menu-btn" aria-label="Toggle navigation menu" style="padding: 6px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg>
+      </button>
+    </div>
+
+    <!-- Mobile Drawer -->
+    <div id="mobDrawer" style="display: none; flex-direction: column; gap: 12px; padding: 16px 24px; border-top: 1px solid rgba(0,0,0,0.08); background: #f6f0e4;">
+      <a href="index.html">Home</a>
+      <a href="templates.html" style="color: var(--color-burgundy); font-weight: 600;">Explore Templates</a>
+      <a href="index.html#how-it-works">How It Works</a>
+      <a href="login.html">Login</a>
+      <a href="signup.html">Create Account</a>
+      <a href="studio.html" style="background:#0c0b0a; color:#fff; text-align:center; padding:10px; border-radius:2px;">Launch Studio</a>
+    </div>
+  </header>
+
+  <main>
+    <!-- Banner -->
+    <div class="hero-banner">
+      <span style="font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--color-burgundy); font-weight: 600;">The Library</span>
+      <h1 class="hero-title">Explore Editorial Templates</h1>
+      <p class="hero-sub">Choose from carefully designed publication layouts for milestones, friendships, travels, and quiet seasons. Each template is 100% customizable.</p>
+    </div>
+
+    <!-- Filter & Search Controls -->
+    <div class="controls-bar">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div class="search-box">
+          <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="text" id="searchInput" class="search-input" placeholder="Search templates, styles, occasions…">
+        </div>
+
+        <a href="studio.html" style="font-size: 0.85rem; color: var(--color-burgundy); font-weight: 600; text-decoration: underline;">
+          Or start with a blank magazine →
+        </a>
+      </div>
+
+      <div class="filter-pills" id="categoryPills">
+        <button class="filter-btn active" data-cat="all">All Editions (<span id="countAll">6</span>)</button>
+        <button class="filter-btn" data-cat="Best Friend">Best Friend</button>
+        <button class="filter-btn" data-cat="Birthday">Birthday</button>
+        <button class="filter-btn" data-cat="Couple">Couple</button>
+        <button class="filter-btn" data-cat="Anniversary">Anniversary</button>
+        <button class="filter-btn" data-cat="Travel">Travel</button>
+        <button class="filter-btn" data-cat="Fashion">Fashion & Style</button>
+      </div>
+    </div>
+
+    <!-- Templates Grid -->
+    <div class="templates-grid" id="templatesContainer">
+      <!-- Populated via JavaScript -->
+    </div>
+  </main>
+
+  <!-- Template Preview Modal -->
+  <div id="previewModal" class="paperly-modal-backdrop">
+    <div class="paperly-modal-card preview-modal-dialog">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+        <div>
+          <span id="modalCat" style="font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-burgundy); font-weight: 600;">Edition</span>
+          <h3 id="modalTitle" class="font-serif" style="font-size: 1.6rem; font-weight: 700;">Template Title</h3>
+        </div>
+        <button id="closeModalBtn" style="padding: 4px 8px; font-size: 16px;">✕</button>
+      </div>
+
+      <p id="modalDesc" style="font-size: 13px; color: #555; line-height: 1.5; margin-bottom: 16px;">Description</p>
+
+      <div class="preview-spread-viewer" id="modalSpreads">
+        <!-- Renders scaled down thumbnails of each page in the edition -->
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 14px; border-top: 1px solid rgba(0,0,0,0.08);">
+        <span id="modalPagesCount" style="font-size: 12px; color: #777;">4 Pages Included</span>
+        <div style="display: flex; gap: 8px;">
+          <button id="modalCloseBtn" style="border: 1px solid #ccc; padding: 7px 14px; border-radius: 2px;">Close</button>
+          <a id="modalUseBtn" href="#" class="btn-use" style="padding: 7px 18px; border-radius: 2px; text-decoration: none;">Use This Template →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer style="margin-top: auto; background-color: #0c0b0a; color: #f6f0e4; border-top: 1px solid rgba(255,255,255,0.08); padding: 3rem 1.5rem 2rem;">
+    <div style="max-w: 80rem; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <p class="font-serif" style="font-size: 1.5rem; font-weight: 700;">PAPERLY<span style="color: var(--color-burgundy);">.</span></p>
+        <p style="font-size: 0.8rem; color: #d9c9ad; margin-top: 4px;">Stories, reimagined for the digital age.</p>
+      </div>
+      <div style="font-size: 0.8rem; color: #9b9082;">
+        © 2026 PAPERLY. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/templates-data.js"></script>
+  <script>
+    const editions = PAPERLY_TEMPLATES.EDITIONS;
+    const container = document.getElementById('templatesContainer');
+    const searchInput = document.getElementById('searchInput');
+    const categoryPills = document.getElementById('categoryPills');
+    let activeCategory = 'all';
+
+    // Render list
+    function renderTemplates() {
+      const query = searchInput.value.toLowerCase().trim();
+      container.innerHTML = '';
+
+      const keys = Object.keys(editions).filter(k => {
+        const ed = editions[k];
+        const matchCat = (activeCategory === 'all' || ed.category.toLowerCase() === activeCategory.toLowerCase());
+        const matchSearch = (!query || ed.name.toLowerCase().includes(query) || ed.category.toLowerCase().includes(query) || ed.description.toLowerCase().includes(query));
+        return matchCat && matchSearch;
+      });
+
+      if (!keys.length) {
+        container.innerHTML = `
+          <div style="grid-column: 1/-1; text-align: center; padding: 4rem 1rem;">
+            <p class="font-serif" style="font-size: 1.5rem; color: #333;">No templates found</p>
+            <p style="font-size: 0.9rem; color: #777; margin-top: 0.5rem;">Try adjusting your search query or selecting another category.</p>
+          </div>`;
+        return;
+      }
+
+      keys.forEach(k => {
+        const ed = editions[k];
+        const card = document.createElement('div');
+        card.className = 'template-card';
+
+        // Extract cover SVG background or create card preview
+        const coverPage = ed.pages[0];
+        const bg = coverPage.bg || '#0c0b0a';
+
+        card.innerHTML = `
+          <div class="card-cover" data-key="${k}" style="background: ${bg}; position: relative;" title="Click to preview ${ed.name}">
+            <div style="position: absolute; inset: 0; padding: 8% 8% 0; color: ${bg === '#0c0b0a' ? '#f4ede0' : '#0c0b0a'}; z-index: 2;">
+              <p class="font-serif" style="font-size: 1.35rem; font-weight: 700; line-height: 1.1;">${ed.name}</p>
+              <p style="font-size: 0.65rem; opacity: 0.7; margin-top: 3px; letter-spacing: 0.1em;">${ed.category.toUpperCase()} EDITION</p>
+            </div>
+            <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 1;">
+              <div style="width: 80px; height: 80px; border-radius: 50%; border: 1px dashed rgba(110,20,35,0.4); display: flex; align-items: center; justify-content: center;">
+                <span style="font-family: var(--font-quote); font-size: 1.1rem; font-style: italic; color: #6e1423;">PAPERLY.</span>
+              </div>
+            </div>
+            <div style="position: absolute; bottom: 10px; right: 12px; background: rgba(0,0,0,0.65); color: #fff; font-size: 10px; padding: 2px 7px; border-radius: 10px; z-index: 3;">
+              ${ed.pages.length} Pages
+            </div>
+          </div>
+          <div class="card-info">
+            <span class="card-category">${ed.category}</span>
+            <h3 class="card-title">${ed.name}</h3>
+            <p class="card-desc">${ed.description}</p>
+            <div class="card-actions">
+              <button class="btn-preview" data-preview="${k}">Preview Edition</button>
+              <a href="studio.html?template=${k}" class="btn-use">Use Template</a>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // Category Filtering
+    categoryPills.addEventListener('click', e => {
+      const btn = e.target.closest('.filter-btn');
+      if (!btn) return;
+      categoryPills.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeCategory = btn.dataset.cat;
+      renderTemplates();
+    });
+
+    searchInput.addEventListener('input', renderTemplates);
+
+    // Modal Preview Logic
+    const modal = document.getElementById('previewModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalCat = document.getElementById('modalCat');
+    const modalDesc = document.getElementById('modalDesc');
+    const modalSpreads = document.getElementById('modalSpreads');
+    const modalUseBtn = document.getElementById('modalUseBtn');
+    const modalCloseBtn = document.getElementById('modalCloseBtn');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+
+    function openModal(key) {
+      const ed = editions[key];
+      if (!ed) return;
+
+      modalTitle.textContent = ed.name;
+      modalCat.textContent = `${ed.category} Edition`;
+      modalDesc.textContent = ed.description;
+      modalUseBtn.href = `studio.html?template=${key}`;
+      document.getElementById('modalPagesCount').textContent = `${ed.pages.length} Pages Included · Fully Editable`;
+
+      modalSpreads.innerHTML = '';
+      ed.pages.forEach((p, idx) => {
+        const frame = document.createElement('div');
+        frame.className = 'preview-page-frame';
+        frame.style.background = p.bg;
+
+        let titleText = `Page ${idx + 1}`;
+        const firstText = p.els.find(e => e.t === 'text');
+        if (firstText && firstText.text) {
+          titleText = firstText.text;
+        }
+
+        frame.innerHTML = `
+          <div style="padding: 18px; color: ${p.bg === '#0c0b0a' ? '#f4ede0' : '#111'};">
+            <span style="font-size: 9px; letter-spacing: 0.1em; opacity: 0.6; text-transform: uppercase;">Page ${idx + 1}</span>
+            <p class="font-serif" style="font-size: 15px; font-weight: 700; margin-top: 6px; line-height: 1.2;">${titleText}</p>
+          </div>
+          <div style="position: absolute; bottom: 8px; right: 10px; font-size: 9px; opacity: 0.5;">
+            PAPERLY.
+          </div>
+        `;
+        modalSpreads.appendChild(frame);
+      });
+
+      modal.classList.add('active');
+    }
+
+    function closeModal() {
+      modal.classList.remove('active');
+    }
+
+    modalCloseBtn.onclick = closeModal;
+    closeModalBtn.onclick = closeModal;
+    modal.onclick = e => { if (e.target === modal) closeModal(); };
+
+    container.addEventListener('click', e => {
+      const prevBtn = e.target.closest('[data-preview]');
+      const cover = e.target.closest('.card-cover');
+      if (prevBtn) {
+        openModal(prevBtn.dataset.preview);
+      } else if (cover) {
+        openModal(cover.dataset.key);
+      }
+    });
+
+    // Mobile menu toggle
+    const menuBtn = document.getElementById('menuBtn');
+    const mobDrawer = document.getElementById('mobDrawer');
+    if (menuBtn && mobDrawer) {
+      menuBtn.addEventListener('click', () => {
+        mobDrawer.style.display = mobDrawer.style.display === 'flex' ? 'none' : 'flex';
+      });
+    }
+
+    // Check query params (e.g. ?category=Travel)
+    const urlParams = new URLSearchParams(window.location.search);
+    const catParam = urlParams.get('category');
+    if (catParam) {
+      activeCategory = catParam;
+      const targetBtn = Array.from(categoryPills.querySelectorAll('.filter-btn')).find(b => b.dataset.cat.toLowerCase() === catParam.toLowerCase());
+      if (targetBtn) {
+        categoryPills.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        targetBtn.classList.add('active');
+      }
+    }
+
+    renderTemplates();
+  </script>
+</body>
+</html>

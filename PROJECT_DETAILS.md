@@ -133,3 +133,4 @@ Open `index.html` or `studio.html` directly in any modern browser.
 ## 7. License & Rights
 © 2026 PAPERLY. All rights reserved.
 Stories, reimagined for the digital age.
+

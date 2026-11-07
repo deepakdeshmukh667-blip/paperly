@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Create Your Account — PAPERLY.</title>
+  <meta name="description" content="Create your free PAPERLY account to transform your moments into personal digital magazines.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230c0b0a'/><text x='35' y='68' font-family='Georgia,serif' font-size='56' font-weight='bold' fill='%23f6f0e4'>P</text><circle cx='68' cy='63' r='6' fill='%236e1423'/></svg>">
+  <meta name="theme-color" content="#6e1423">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="css/paperly.css">
+
+  <style>
+    *, ::after, ::before { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { min-height: 100vh; }
+    body {
+      background-color: var(--color-ivory);
+      color: var(--color-black);
+      font-family: var(--font-sans);
+      display: flex;
+      flex-direction: column;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; cursor: pointer; }
+
+    header {
+      padding: 1.25rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+      background: rgba(246, 240, 228, 0.95);
+    }
+    .logo {
+      font-family: var(--font-serif);
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .auth-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 1.25rem;
+    }
+    .auth-card {
+      width: 100%;
+      max-width: 480px;
+      background: #fff;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.08);
+      border-radius: 4px;
+      padding: 2.5rem 2.25rem;
+    }
+
+    .auth-title {
+      font-family: var(--font-serif);
+      font-size: 2rem;
+      font-weight: 700;
+      margin-top: 0.25rem;
+    }
+    .auth-sub {
+      font-size: 0.9rem;
+      color: rgba(12, 11, 10, 0.65);
+      margin-top: 0.5rem;
+      line-height: 1.5;
+    }
+
+    .form-group {
+      margin-top: 1.15rem;
+    }
+    .form-label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 0.35rem;
+    }
+    .input-wrapper {
+      position: relative;
+    }
+    .form-input {
+      width: 100%;
+      padding: 0.75rem 0.85rem;
+      border: 1px solid rgba(0, 0, 0, 0.2);
+      border-radius: 4px;
+      font-size: 0.9rem;
+      color: #111;
+      background: #fafafa;
+      transition: all 0.15s ease;
+    }
+    .form-input:focus {
+      outline: none;
+      border-color: var(--color-burgundy);
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(110, 20, 35, 0.1);
+    }
+    .toggle-pw {
+      position: absolute;
+      right: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      font-size: 0.75rem;
+      color: #666;
+      cursor: pointer;
+    }
+
+    .terms-row {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1.25rem;
+      font-size: 0.8rem;
+      color: #555;
+      align-items: flex-start;
+    }
+    .terms-row input { margin-top: 3px; }
+    .terms-row a {
+      color: var(--color-burgundy);
+      text-decoration: underline;
+    }
+
+    .btn-submit {
+      width: 100%;
+      margin-top: 1.5rem;
+      padding: 0.85rem;
+      background: #0c0b0a;
+      color: #f6f0e4;
+      border: 1px solid #0c0b0a;
+      border-radius: 2px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    .btn-submit:hover {
+      background: var(--color-burgundy);
+      border-color: var(--color-burgundy);
+    }
+    .btn-submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .alert-box {
+      margin-top: 1rem;
+      padding: 0.75rem 1rem;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      display: none;
+    }
+    .alert-error {
+      background: rgba(110, 20, 35, 0.08);
+      border: 1px solid rgba(110, 20, 35, 0.25);
+      color: var(--color-burgundy);
+    }
+    .alert-success {
+      background: rgba(46, 125, 50, 0.1);
+      border: 1px solid rgba(46, 125, 50, 0.3);
+      color: #2e7d32;
+    }
+
+    .auth-footer {
+      margin-top: 1.75rem;
+      text-align: center;
+      font-size: 0.85rem;
+      color: #666;
+    }
+    .auth-footer a {
+      color: var(--color-burgundy);
+      font-weight: 600;
+    }
+    .auth-footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <a href="index.html" class="logo">
+      PAPERLY<span style="color: var(--color-burgundy);">.</span>
+    </a>
+    <a href="index.html" style="font-size: 0.85rem; color: #555;">← Return to Home</a>
+  </header>
+
+  <!-- Signup Card -->
+  <div class="auth-container">
+    <div class="auth-card">
+      <span style="font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--color-burgundy); font-weight: 600;">Get Started</span>
+      <h1 class="auth-title">Create Account</h1>
+      <p class="auth-sub">Join PAPERLY to begin turning your moments into beautifully designed digital magazines.</p>
+
+      <div id="alertBox" class="alert-box"></div>
+
+      <form id="signupForm" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="name">Full Name</label>
+          <div class="input-wrapper">
+            <input type="text" id="name" class="form-input" placeholder="Ananya Sharma" required autocomplete="name">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="email">Email Address</label>
+          <div class="input-wrapper">
+            <input type="email" id="email" class="form-input" placeholder="you@example.com" required autocomplete="email">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">Password (minimum 8 characters)</label>
+          <div class="input-wrapper">
+            <input type="password" id="password" class="form-input" placeholder="••••••••" required autocomplete="new-password">
+            <button type="button" class="toggle-pw" id="togglePw">Show</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="confirmPassword">Confirm Password</label>
+          <div class="input-wrapper">
+            <input type="password" id="confirmPassword" class="form-input" placeholder="••••••••" required autocomplete="new-password">
+          </div>
+        </div>
+
+        <div class="terms-row">
+          <input type="checkbox" id="agreeTerms" required>
+          <label for="agreeTerms">
+            I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
+          </label>
+        </div>
+
+        <button type="submit" class="btn-submit" id="submitBtn">
+          <span>Create Your Account</span>
+          <svg style="width: 14px; height: 14px;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </button>
+      </form>
+
+      <div class="auth-footer">
+        Already have an account? <a href="login.html">Sign In</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('signupForm');
+    const nameInput = document.getElementById('name');
+    const emailInput = document.getElementById('email');
+    const pwInput = document.getElementById('password');
+    const confirmPwInput = document.getElementById('confirmPassword');
+    const togglePw = document.getElementById('togglePw');
+    const agreeCheckbox = document.getElementById('agreeTerms');
+    const alertBox = document.getElementById('alertBox');
+    const submitBtn = document.getElementById('submitBtn');
+
+    togglePw.addEventListener('click', () => {
+      if (pwInput.type === 'password') {
+        pwInput.type = 'text';
+        confirmPwInput.type = 'text';
+        togglePw.textContent = 'Hide';
+      } else {
+        pwInput.type = 'password';
+        confirmPwInput.type = 'password';
+        togglePw.textContent = 'Show';
+      }
+    });
+
+    function showAlert(msg, isError = true) {
+      alertBox.textContent = msg;
+      alertBox.className = `alert-box ${isError ? 'alert-error' : 'alert-success'}`;
+      alertBox.style.display = 'block';
+    }
+
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      alertBox.style.display = 'none';
+
+      const name = nameInput.value.trim();
+      const email = emailInput.value.trim();
+      const password = pwInput.value;
+      const confirmPw = confirmPwInput.value;
+
+      if (!name) {
+        showAlert('Please enter your full name.');
+        nameInput.focus();
+        return;
+      }
+      if (!email || !email.includes('@')) {
+        showAlert('Please enter a valid email address.');
+        emailInput.focus();
+        return;
+      }
+      if (!password || password.length < 8) {
+        showAlert('Password must be at least 8 characters long.');
+        pwInput.focus();
+        return;
+      }
+      if (password !== confirmPw) {
+        showAlert('Passwords do not match. Please verify.');
+        confirmPwInput.focus();
+        return;
+      }
+      if (!agreeCheckbox.checked) {
+        showAlert('Please accept the Terms of Service to proceed.');
+        agreeCheckbox.focus();
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span>Creating your account…</span>';
+
+      setTimeout(() => {
+        try {
+          let users = [];
+          try {
+            users = JSON.parse(localStorage.getItem('paperly_users') || '[]');
+          } catch (err) {}
+
+          const existing = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+          if (existing) {
+            showAlert('An account with this email address already exists. Please log in.');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<span>Create Your Account</span>';
+            return;
+          }
+
+          const newUser = {
+            id: 'usr_' + Date.now(),
+            name,
+            email,
+            password,
+            createdAt: new Date().toISOString()
+          };
+
+          users.push(newUser);
+          localStorage.setItem('paperly_users', JSON.stringify(users));
+          localStorage.setItem('paperly_active_user', JSON.stringify({
+            id: newUser.id,
+            name: newUser.name,
+            email: newUser.email
+          }));
+
+          showAlert('Account created successfully! Welcome to PAPERLY.', false);
+          setTimeout(() => {
+            window.location.href = 'studio.html';
+          }, 800);
+
+        } catch (err) {
+          showAlert('Failed to save user account. Please try again.');
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<span>Create Your Account</span>';
+        }
+      }, 500);
+    });
+  </script>
+</body>
+</html>
