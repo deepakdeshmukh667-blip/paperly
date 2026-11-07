@@ -81,3 +81,4 @@ CREATE INDEX IF NOT EXISTS idx_projects_user ON magazine_projects(user_id);
 CREATE INDEX IF NOT EXISTS idx_pages_project ON magazine_pages(project_id);
 CREATE INDEX IF NOT EXISTS idx_images_user ON uploaded_images(user_id);
 CREATE INDEX IF NOT EXISTS idx_templates_cat ON magazine_templates(category);
+

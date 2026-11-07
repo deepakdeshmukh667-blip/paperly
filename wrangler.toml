@@ -34,3 +34,4 @@ ENVIRONMENT = "development"
 APP_NAME = "PAPERLY"
 APP_URL = "http://localhost:3000"
 JWT_SECRET = "paperly-dev-secret-key-change-in-production-only"
+

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * PAPERLY — Magazine Starter Editions & Page Presets
  * Pre-designed luxury editorial layouts for all signature and special editions.
  * Inspired by Vogue, Kinfolk, Cereal, The New Yorker, and Architectural Digest.

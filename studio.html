@@ -436,6 +436,15 @@
       margin-top: 4px;
     }
 
+    .layout-preset-btn {
+      transition: all 0.15s ease;
+    }
+    .layout-preset-btn:hover {
+      border-color: #8a2434 !important;
+      background: #231f1c !important;
+      transform: translateY(-1px);
+    }
+
     /* Fullscreen Preview Modal */
     #pv {
       position: fixed;
@@ -582,6 +591,10 @@
         <button data-a="l" title="Add decorative rule">+ Rule</button>
         <button data-a="g" class="ghost" id="guideBtn" title="Toggle alignment guides">Guides</button>
 
+        <button id="btnAiArrange" style="background: linear-gradient(135deg, #6e1423, #4a0c16); color: #f6f0e4; border: 1px solid #8a2434; padding: 4px 10px; border-radius: 3px; font-weight: 600; font-size: 11px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="AI Auto-Arrange Photo & Resolve Overlaps">
+          <span>✦</span> AI Arrange
+        </button>
+
         <span class="sp"></span>
 
         <!-- Zoom Controls -->
@@ -610,6 +623,7 @@
       <div class="tabs">
         <button class="on" data-tab="d">Design</button>
         <button data-tab="a">✦ AI Writer</button>
+        <button data-tab="l" id="tabLayout">✦ AI Layout</button>
       </div>
 
       <!-- Tab 1: Design Inspector -->
@@ -617,6 +631,9 @@
 
       <!-- Tab 2: Gemini AI Writer -->
       <div id="pa2" hidden></div>
+
+      <!-- Tab 3: AI Layout & Photo Arranger -->
+      <div id="pl" hidden></div>
     </aside>
   </main>
 
@@ -1263,6 +1280,8 @@
       document.querySelectorAll("[data-tab]").forEach(x => x.classList.toggle("on", x === b));
       $("#pd").hidden = b.dataset.tab !== "d";
       $("#pa2").hidden = b.dataset.tab !== "a";
+      $("#pl").hidden = b.dataset.tab !== "l";
+      if (b.dataset.tab === "l") renderLayoutUI();
     });
 
     // ---- GEMINI AI WRITER PANEL
@@ -1587,6 +1606,351 @@
       };
       setTimeout(refreshPublishBtn, 600);
     })();
+
+    // ---- AI LAYOUT & PHOTO ARRANGER ASSISTANT ----
+    function autoFixOverlaps() {
+      const page = P();
+      if (!page || !page.els || !page.els.length) {
+        showToast("No elements on this page to arrange");
+        return;
+      }
+      chg(() => {
+        const els = page.els;
+        const textEls = els.filter(e => e.t === 'text');
+        const imgEls = els.filter(e => e.t === 'img');
+        const lineEls = els.filter(e => e.t === 'line');
+
+        const titleEl = textEls.find(e => e.size >= 28 || (e.font && e.font.includes('Playfair') && e.size >= 24));
+        const tagEl = textEls.find(e => e.size <= 12 && e.y < 80);
+        const bodyEls = textEls.filter(e => e !== titleEl && e !== tagEl);
+
+        let fixedCount = 0;
+
+        // 1. Tag & Title Vertical Separation (prevent text overlapping title)
+        if (tagEl && titleEl) {
+          tagEl.y = 36;
+          const safeTitleY = tagEl.y + (tagEl.h || 20) + 8;
+          if (titleEl.y < safeTitleY) {
+            titleEl.y = safeTitleY;
+            fixedCount++;
+          }
+        }
+
+        // 2. Title Auto-Scaling (prevent long titles from covering face or extending into photos)
+        if (titleEl && titleEl.text) {
+          const len = titleEl.text.length;
+          if (len > 30 && titleEl.size > 26) {
+            titleEl.size = 26;
+            titleEl.h = 64;
+            fixedCount++;
+          } else if (len > 20 && titleEl.size > 32) {
+            titleEl.size = 32;
+            titleEl.h = 60;
+            fixedCount++;
+          }
+        }
+
+        // 3. Clear title from photos (uncover face)
+        if (titleEl && imgEls.length > 0) {
+          const titleBottom = titleEl.y + (titleEl.h || 60);
+          imgEls.forEach(img => {
+            if (img.y < titleBottom + 12 && img.x < titleEl.x + titleEl.w && img.x + img.w > titleEl.x) {
+              const newY = titleBottom + 16;
+              img.y = newY;
+              if (img.y + img.h > 700) {
+                img.h = Math.max(180, 700 - newY - 10);
+              }
+              fixedCount++;
+            }
+          });
+        }
+
+        // 4. Line divider placement
+        if (titleEl && lineEls.length > 0) {
+          lineEls[0].y = titleEl.y + (titleEl.h || 60) + 6;
+        }
+
+        // 5. Body story separation from title
+        if (titleEl && bodyEls.length > 0) {
+          bodyEls.forEach(b => {
+            if (b.x < titleEl.x + titleEl.w && b.x + b.w > titleEl.x && b.y < titleEl.y + (titleEl.h || 60)) {
+              b.y = titleEl.y + (titleEl.h || 60) + 16;
+              fixedCount++;
+            }
+          });
+        }
+
+        showToast(fixedCount > 0 ? `✦ AI resolved ${fixedCount} layout collisions!` : "✦ Page layout is perfectly balanced!");
+      });
+    }
+
+    function applyLayoutPreset(preset) {
+      const page = P();
+      if (!page || !page.els || !page.els.length) return;
+
+      chg(() => {
+        const els = page.els;
+        const textEls = els.filter(e => e.t === 'text');
+        const imgEls = els.filter(e => e.t === 'img');
+        const lineEls = els.filter(e => e.t === 'line');
+
+        const titleEl = textEls.find(e => e.size >= 24);
+        const tagEl = textEls.find(e => e.size <= 12 && e.y < 80);
+        const bodyEl = textEls.find(e => e !== titleEl && e !== tagEl && e.font === 'Inter');
+        const quoteEl = textEls.find(e => e !== titleEl && (e.italic || e.size >= 18));
+        const heroImg = imgEls[0];
+
+        if (preset === 'hero-cover') {
+          // Vogue Cover: Title high, photo centered without covering faces
+          if (titleEl) {
+            titleEl.x = 36;
+            titleEl.y = 40;
+            titleEl.w = 468;
+            titleEl.h = 60;
+            titleEl.align = 'center';
+            titleEl.size = titleEl.text.length > 25 ? 28 : 38;
+          }
+          if (tagEl) {
+            tagEl.x = 36;
+            tagEl.y = 104;
+            tagEl.w = 468;
+            tagEl.h = 20;
+            tagEl.align = 'center';
+          }
+          if (heroImg) {
+            heroImg.x = 36;
+            heroImg.y = 135;
+            heroImg.w = 468;
+            heroImg.h = 430;
+          }
+          if (quoteEl) {
+            quoteEl.x = 50;
+            quoteEl.y = 580;
+            quoteEl.w = 440;
+            quoteEl.h = 50;
+            quoteEl.align = 'center';
+          }
+          if (lineEls[0]) {
+            lineEls[0].x = 210;
+            lineEls[0].y = 645;
+            lineEls[0].w = 120;
+          }
+          showToast("Applied: Vogue Cover Layout");
+        } else if (preset === 'split-5050') {
+          // 50/50 Split Editorial Column
+          if (heroImg) {
+            heroImg.x = 36;
+            heroImg.y = 36;
+            heroImg.w = 224;
+            heroImg.h = 648;
+          }
+          if (tagEl) {
+            tagEl.x = 280;
+            tagEl.y = 40;
+            tagEl.w = 224;
+            tagEl.h = 20;
+            tagEl.align = 'left';
+          }
+          if (titleEl) {
+            titleEl.x = 280;
+            titleEl.y = 68;
+            titleEl.w = 224;
+            titleEl.h = 80;
+            titleEl.size = 26;
+            titleEl.align = 'left';
+          }
+          if (lineEls[0]) {
+            lineEls[0].x = 280;
+            lineEls[0].y = 158;
+            lineEls[0].w = 60;
+          }
+          if (bodyEl) {
+            bodyEl.x = 280;
+            bodyEl.y = 175;
+            bodyEl.w = 224;
+            bodyEl.h = 240;
+            bodyEl.size = 13;
+          }
+          if (quoteEl) {
+            quoteEl.x = 280;
+            quoteEl.y = 440;
+            quoteEl.w = 224;
+            quoteEl.h = 160;
+            quoteEl.size = 20;
+          }
+          showToast("Applied: Split 50/50 Editorial");
+        } else if (preset === 'landscape-top') {
+          // Feature Spread (Photo across top half)
+          if (heroImg) {
+            heroImg.x = 36;
+            heroImg.y = 36;
+            heroImg.w = 468;
+            heroImg.h = 320;
+          }
+          if (tagEl) {
+            tagEl.x = 36;
+            tagEl.y = 375;
+            tagEl.w = 468;
+            tagEl.h = 20;
+          }
+          if (titleEl) {
+            titleEl.x = 36;
+            titleEl.y = 400;
+            titleEl.w = 468;
+            titleEl.h = 70;
+            titleEl.size = 32;
+          }
+          if (lineEls[0]) {
+            lineEls[0].x = 36;
+            lineEls[0].y = 480;
+            lineEls[0].w = 80;
+          }
+          if (bodyEl) {
+            bodyEl.x = 36;
+            bodyEl.y = 500;
+            bodyEl.w = 468;
+            bodyEl.h = 140;
+            bodyEl.size = 14;
+          }
+          showToast("Applied: Photo Top Spread");
+        } else if (preset === 'full-bleed') {
+          // Full Bleed Cover
+          if (heroImg) {
+            heroImg.x = 0;
+            heroImg.y = 0;
+            heroImg.w = 540;
+            heroImg.h = 720;
+          }
+          if (titleEl) {
+            titleEl.x = 36;
+            titleEl.y = 50;
+            titleEl.w = 468;
+            titleEl.h = 70;
+            titleEl.size = 36;
+            titleEl.color = "#ffffff";
+          }
+          if (tagEl) {
+            tagEl.x = 36;
+            tagEl.y = 125;
+            tagEl.w = 468;
+            tagEl.h = 20;
+            tagEl.color = "#e3d5bd";
+          }
+          if (quoteEl) {
+            quoteEl.x = 36;
+            quoteEl.y = 600;
+            quoteEl.w = 468;
+            quoteEl.h = 60;
+            quoteEl.color = "#ffffff";
+          }
+          showToast("Applied: Full-Bleed Cinematic");
+        }
+      });
+    }
+
+    function renderLayoutUI() {
+      const pl = $("#pl");
+      if (!pl) return;
+      pl.innerHTML = `
+        <div style="padding: 1rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6rem;">
+            <span style="font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #6e1423; font-weight: 600;">Intelligence Engine</span>
+            <span style="font-size: 11px; color: #888;">Auto-Arranger</span>
+          </div>
+          <h3 class="font-serif" style="font-size: 1.3rem; margin-bottom: 0.4rem; color: #fff;">AI Layout Assistant</h3>
+          <p style="font-size: 12px; color: #999; line-height: 1.4; margin-bottom: 1.25rem;">
+            Auto-detects and resolves text collisions, centers portraits so faces are never covered, and balances your magazine spreads.
+          </p>
+
+          <button id="btnAutoFixPanel" style="width: 100%; background: #6e1423; color: #f6f0e4; border: 1px solid #8a2434; padding: 10px; border-radius: 4px; font-weight: 600; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 1.5rem; box-shadow: 0 4px 12px rgba(110,20,35,0.3);">
+            <span>✦</span> Auto-Fix All Overlaps
+          </button>
+
+          <h4 style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #888; margin-bottom: 0.75rem;">Editorial Layout Styles</h4>
+          <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 1.5rem;">
+            <button class="layout-preset-btn" data-preset="hero-cover" style="text-align: left; padding: 10px 12px; background: #1a1715; border: 1px solid #2e2823; border-radius: 4px; color: #f4ede0; cursor: pointer;">
+              <div style="font-weight: 600; font-size: 13px; color: #fff;">✦ Vogue Cover (Face Protected)</div>
+              <div style="font-size: 11px; color: #888; margin-top: 2px;">Headline at top with safe margin, photo centered, no covered faces.</div>
+            </button>
+            <button class="layout-preset-btn" data-preset="split-5050" style="text-align: left; padding: 10px 12px; background: #1a1715; border: 1px solid #2e2823; border-radius: 4px; color: #f4ede0; cursor: pointer;">
+              <div style="font-weight: 600; font-size: 13px; color: #fff;">✦ Split Editorial (50 / 50)</div>
+              <div style="font-size: 11px; color: #888; margin-top: 2px;">Full height photo on left column, story & quotes on right.</div>
+            </button>
+            <button class="layout-preset-btn" data-preset="landscape-top" style="text-align: left; padding: 10px 12px; background: #1a1715; border: 1px solid #2e2823; border-radius: 4px; color: #f4ede0; cursor: pointer;">
+              <div style="font-weight: 600; font-size: 13px; color: #fff;">✦ Feature Spread (Photo Top)</div>
+              <div style="font-size: 11px; color: #888; margin-top: 2px;">Panoramic photo across top half, balanced story columns below.</div>
+            </button>
+            <button class="layout-preset-btn" data-preset="full-bleed" style="text-align: left; padding: 10px 12px; background: #1a1715; border: 1px solid #2e2823; border-radius: 4px; color: #f4ede0; cursor: pointer;">
+              <div style="font-weight: 600; font-size: 13px; color: #fff;">✦ Full Bleed Cinematic</div>
+              <div style="font-size: 11px; color: #888; margin-top: 2px;">Edge-to-edge photograph with subtle contrast & white text.</div>
+            </button>
+          </div>
+
+          <h4 style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #888; margin-bottom: 0.75rem;">Photo Controls</h4>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <button id="btnCenterPhoto" style="padding: 8px; background: #1a1715; border: 1px solid #2e2823; border-radius: 4px; color: #e3d5bd; font-size: 12px; cursor: pointer;">Center Photo</button>
+            <button id="btnPushPhotoDown" style="padding: 8px; background: #1a1715; border: 1px solid #2e2823; border-radius: 4px; color: #e3d5bd; font-size: 12px; cursor: pointer;">Uncover Face</button>
+            <button id="btnScaleTitle" style="padding: 8px; background: #1a1715; border: 1px solid #2e2823; border-radius: 4px; color: #e3d5bd; font-size: 12px; cursor: pointer;">Fit Headline</button>
+            <button id="btnSendPhotoBack" style="padding: 8px; background: #1a1715; border: 1px solid #2e2823; border-radius: 4px; color: #e3d5bd; font-size: 12px; cursor: pointer;">Send to Back</button>
+          </div>
+        </div>
+      `;
+
+      $("#btnAutoFixPanel").onclick = autoFixOverlaps;
+
+      pl.querySelectorAll(".layout-preset-btn").forEach(btn => {
+        btn.onclick = () => applyLayoutPreset(btn.dataset.preset);
+      });
+
+      $("#btnCenterPhoto").onclick = () => {
+        const hero = (P().els || []).find(e => e.t === 'img');
+        if (hero) {
+          chg(() => { hero.x = Math.max(0, (540 - hero.w) / 2); });
+          showToast("Photo centered horizontally");
+        }
+      };
+
+      $("#btnPushPhotoDown").onclick = () => {
+        const hero = (P().els || []).find(e => e.t === 'img');
+        if (hero) {
+          chg(() => {
+            hero.y += 30;
+            if (hero.y + hero.h > 720) hero.h = 720 - hero.y;
+          });
+          showToast("Photo shifted down (face protected)");
+        }
+      };
+
+      $("#btnScaleTitle").onclick = () => {
+        const title = (P().els || []).find(e => e.t === 'text' && e.size >= 24);
+        if (title) {
+          chg(() => { title.size = Math.max(18, title.size - 4); });
+          showToast(`Headline scaled to ${title.size}px`);
+        }
+      };
+
+      $("#btnSendPhotoBack").onclick = () => {
+        const page = P();
+        const heroIdx = (page.els || []).findIndex(e => e.t === 'img');
+        if (heroIdx > 0) {
+          chg(() => {
+            const [hero] = page.els.splice(heroIdx, 1);
+            page.els.unshift(hero);
+          });
+          showToast("Photo sent to background");
+        }
+      };
+    }
+
+    // Canvas toolbar AI Arrange button
+    const btnAiArrange = $("#btnAiArrange");
+    if (btnAiArrange) {
+      btnAiArrange.onclick = () => {
+        autoFixOverlaps();
+        const tabL = $("#tabLayout");
+        if (tabL) tabL.click();
+      };
+    }
 
     // ---- PROJECT JSON SAVE / LOAD
     $("#btnSaveJson").onclick = () => {

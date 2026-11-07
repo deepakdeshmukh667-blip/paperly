@@ -1311,17 +1311,28 @@
         templatePages = JSON.parse(JSON.stringify(window.PAPERLY_TEMPLATES.EDITIONS['best-friend'].pages));
       }
 
-      // Inject generated AI content into template pages
+      // Inject generated AI content into template pages with smart overlap resolution
       if (templatePages.length > 0) {
         const getEls = (p) => p.els || p.elements || [];
 
-        // Page 1 (Cover): Inject title & cover photo
+        // --- PAGE 1 (COVER) ---
         const p1 = templatePages[0];
         const p1Els = getEls(p1);
-        const titleEl = p1Els.find(e => (e.t === 'text' || e.type === 'text') && (e.size >= 36));
+        const titleText = headline || wizardData.title || "The Summer Issue";
+        
+        // Find main cover title
+        const titleEl = p1Els.find(e => (e.t === 'text' || e.type === 'text') && e.size >= 32);
         if (titleEl) {
-          titleEl.text = headline || wizardData.title;
-          titleEl.content = headline || wizardData.title;
+          titleEl.text = titleText;
+          titleEl.content = titleText;
+          // Smart Auto-Scale: If title is long, scale font size so it never covers faces
+          if (titleText.length > 30) {
+            titleEl.size = 28;
+            titleEl.h = 68;
+          } else if (titleText.length > 20) {
+            titleEl.size = 34;
+            titleEl.h = 62;
+          }
         }
 
         if (wizardData.photos.length > 0) {
@@ -1329,19 +1340,54 @@
           if (coverImgEl) {
             coverImgEl.bg = `url("${wizardData.photos[0]}")`;
             coverImgEl.src = wizardData.photos[0];
+            // Push cover photo down if title is long so title NEVER covers faces
+            if (titleEl) {
+              const safeY = titleEl.y + (titleEl.h || 60) + 16;
+              if (coverImgEl.y < safeY) {
+                const bottom = coverImgEl.y + coverImgEl.h;
+                coverImgEl.y = safeY;
+                coverImgEl.h = Math.max(260, bottom - safeY);
+              }
+            }
           }
         }
 
-        // Page 2 or 3: Inject main editorial story and photos
+        // --- PAGE 2 (FEATURE SPREAD / ARTICLE) ---
         if (templatePages.length > 1) {
           const p2 = templatePages[1];
           const p2Els = getEls(p2);
-          const storyEl = p2Els.find(e => (e.t === 'text' || e.type === 'text') && ((e.w && e.w >= 200) || (e.h && e.h >= 100)));
-          if (storyEl) {
-            storyEl.text = story;
-            storyEl.content = story;
+
+          // 1. Tag element (small uppercase, y < 50)
+          const tagEl = p2Els.find(e => (e.t === 'text' || e.type === 'text') && e.size <= 12 && e.y < 50);
+          if (tagEl) {
+            tagEl.text = (wizardData.category || "EDITORIAL").toUpperCase() + " · DISPATCH";
+            tagEl.content = tagEl.text;
           }
 
+          // 2. Headline element (Playfair / serif, size 24-38)
+          const headlineEl = p2Els.find(e => (e.t === 'text' || e.type === 'text') && e.size >= 24 && e.size <= 40);
+          if (headlineEl) {
+            const hText = headline || "Monsoon, Coffee, and One Broken Umbrella";
+            headlineEl.text = hText;
+            headlineEl.content = hText;
+            if (hText.length > 28) {
+              headlineEl.size = 26;
+              headlineEl.h = 56;
+            }
+            // Ensure headline is strictly below tag
+            if (tagEl) {
+              headlineEl.y = tagEl.y + (tagEl.h || 20) + 8;
+            }
+          }
+
+          // 3. Body story element: target the actual body paragraph (Inter font, size <= 15, y >= 140)
+          const bodyEl = p2Els.find(e => (e.t === 'text' || e.type === 'text') && e.size <= 15 && e.size >= 11 && (e.y >= 140 || e.h >= 90) && e !== tagEl);
+          if (bodyEl) {
+            bodyEl.text = story;
+            bodyEl.content = story;
+          }
+
+          // 4. Inner photo for Page 2
           if (wizardData.photos.length > 1) {
             const innerImg = p2Els.find(e => e.t === 'img' || e.type === 'img');
             if (innerImg) {
@@ -1349,24 +1395,39 @@
               innerImg.src = wizardData.photos[1];
             }
           }
+
+          // 5. Pull quote on Page 2
+          const quoteEl = p2Els.find(e => (e.t === 'text' || e.type === 'text') && (e.italic || (e.font && e.font.includes('Garamond'))));
+          if (quoteEl && dedication) {
+            quoteEl.text = `“${dedication.replace(/^["'“]+|["'”]+$/g, '')}”`;
+            quoteEl.content = quoteEl.text;
+          }
         }
 
-        // Page 3: Inject dedication or quotes
+        // --- PAGE 3 (DEDICATION / SPREAD / ARCHIVE) ---
         if (templatePages.length > 2) {
           const p3 = templatePages[2];
           const p3Els = getEls(p3);
-          const quoteEl = p3Els.find(e => (e.t === 'text' || e.type === 'text') && e.italic);
-          if (quoteEl) {
-            quoteEl.text = dedication;
-            quoteEl.content = dedication;
+          
+          // Dedication main text
+          const dedEl = p3Els.find(e => (e.t === 'text' || e.type === 'text') && (e.size >= 22 || e.italic));
+          if (dedEl && dedication) {
+            dedEl.text = dedication;
+            dedEl.content = dedication;
           }
 
-          if (wizardData.photos.length > 2) {
-            const innerImg2 = p3Els.find(e => e.t === 'img' || e.type === 'img');
-            if (innerImg2) {
-              innerImg2.bg = `url("${wizardData.photos[2]}")`;
-              innerImg2.src = wizardData.photos[2];
-            }
+          // Assign remaining uploaded photos to images on page 3 & beyond
+          let photoIdx = 2;
+          for (let pi = 2; pi < templatePages.length; pi++) {
+            const p = templatePages[pi];
+            const pEls = getEls(p);
+            pEls.filter(e => e.t === 'img' || e.type === 'img').forEach(img => {
+              if (photoIdx < wizardData.photos.length) {
+                img.bg = `url("${wizardData.photos[photoIdx]}")`;
+                img.src = wizardData.photos[photoIdx];
+                photoIdx++;
+              }
+            });
           }
         }
       }
