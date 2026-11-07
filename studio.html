@@ -1,0 +1,1691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>PAPERLY. Magazine Studio</title>
+  <meta name="description" content="Personalised Digital Magazine Creation Studio powered by Google Gemini AI.">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Inter:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="css/paperly.css">
+
+  <style>
+    :root {
+      --ink: #0c0b0a;
+      --panel: #141210;
+      --panel2: #1c1916;
+      --line: #2a2622;
+      --tx: #f1eadc;
+      --mut: #9b9082;
+      --beige: #d9c9ad;
+      --burg: #6e1423;
+      --burg-light: #8a2434;
+      --bg: #0c0b0a;
+      --ivory: #f4ede0;
+      box-sizing: border-box;
+    }
+
+    [data-theme="light"] {
+      --ink: #faf6ee;
+      --panel: #f2ebe0;
+      --panel2: #e7ded0;
+      --line: #d5c8b2;
+      --tx: #1a1613;
+      --mut: #706556;
+      --bg: #e3d7c3;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow: hidden; }
+    body {
+      background: var(--ink);
+      color: var(--tx);
+      font: 13px/1.4 Inter, system-ui, -apple-system, sans-serif;
+      display: flex;
+      flex-direction: column;
+    }
+
+    button, input, select, textarea {
+      font: inherit;
+      color: inherit;
+    }
+    button {
+      background: var(--panel2);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 6px 12px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+    button:hover {
+      border-color: var(--beige);
+      background: rgba(217, 201, 173, 0.12);
+    }
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .pri {
+      background: var(--burg) !important;
+      border-color: var(--burg) !important;
+      color: #fff !important;
+      font-weight: 500;
+    }
+    .pri:hover {
+      background: #8a2434 !important;
+      border-color: #8a2434 !important;
+    }
+    .ghost {
+      background: transparent;
+      border-color: transparent;
+    }
+    .ghost:hover {
+      background: var(--panel2);
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--line);
+      background: var(--ink);
+      flex-wrap: nowrap;
+      z-index: 30;
+    }
+    .logo-link {
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .logo {
+      font: 700 20px 'Playfair Display', Georgia, serif;
+      letter-spacing: 0.1em;
+    }
+    .logo i {
+      color: var(--burg);
+      font-style: normal;
+    }
+    .home-badge {
+      font-size: 10px;
+      color: var(--mut);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 2px 7px;
+    }
+    .home-badge:hover {
+      color: var(--tx);
+      border-color: var(--beige);
+    }
+
+    .pn {
+      background: transparent;
+      border: 1px solid transparent;
+      font: italic 16px 'Cormorant Garamond', Georgia, serif;
+      width: 220px;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+    .pn:hover { border-color: var(--line); }
+    .pn:focus { border-color: var(--beige); outline: 0; background: var(--panel2); }
+
+    .sp { flex: 1; }
+    .st {
+      color: var(--mut);
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .st b {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #4caf50;
+      display: inline-block;
+    }
+
+    .key-btn {
+      font-size: 11px;
+      padding: 5px 10px;
+      border-radius: 20px;
+    }
+    .key-btn.has-key {
+      border-color: rgba(76, 175, 80, 0.4);
+      color: #81c784;
+    }
+
+    /* Main 3-Column Layout */
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 180px 1fr 310px;
+      min-height: 0;
+    }
+
+    aside {
+      background: var(--panel);
+      overflow-y: auto;
+      padding: 14px;
+    }
+    #L { border-right: 1px solid var(--line); }
+    #R { border-left: 1px solid var(--line); }
+
+    h4 {
+      margin: 0 0 10px;
+      font: 600 10px Inter;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--mut);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    .row > * { flex: 1; }
+
+    /* Thumbnails */
+    .th {
+      position: relative;
+      margin: 0 auto 12px;
+      width: 116px;
+      height: 154px;
+      border: 1px solid var(--line);
+      cursor: grab;
+      overflow: hidden;
+      border-radius: 2px;
+      background: #f4ede0;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      transition: all 0.15s ease;
+    }
+    .th.on {
+      outline: 2px solid var(--burg);
+      outline-offset: 2px;
+    }
+    .th > .pg {
+      transform: scale(0.214);
+      transform-origin: 0 0;
+      pointer-events: none;
+    }
+    .th span {
+      position: absolute;
+      left: 5px;
+      bottom: 4px;
+      background: rgba(0, 0, 0, 0.75);
+      color: #fff;
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 8px;
+      font-weight: 500;
+    }
+    .th.over {
+      outline: 2px dashed var(--beige);
+    }
+
+    .chips button {
+      font-size: 11px;
+      padding: 6px 8px;
+      text-align: left;
+      justify-content: flex-start;
+      border-radius: 3px;
+    }
+
+    /* Stage / Center Canvas */
+    #C {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      background: var(--bg);
+    }
+    .tb {
+      display: flex;
+      gap: 6px;
+      padding: 8px 14px;
+      align-items: center;
+      flex-wrap: wrap;
+      border-bottom: 1px solid var(--line);
+      background: var(--ink);
+    }
+    #ws {
+      flex: 1;
+      overflow: auto;
+      display: flex;
+      padding: 30px;
+    }
+    #stage {
+      margin: auto;
+      position: relative;
+      flex: none;
+    }
+
+    /* Magazine Page */
+    .pg {
+      position: relative;
+      width: 540px;
+      height: 720px;
+      overflow: hidden;
+      background: #f4ede0;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    }
+    #stage .pg {
+      transform-origin: 0 0;
+    }
+
+    /* Elements */
+    .el {
+      position: absolute;
+      user-select: none;
+      touch-action: none;
+      cursor: move;
+      white-space: pre-wrap;
+    }
+    .pg.live .el.sel {
+      outline: 1.5px solid var(--burg);
+      outline-offset: 1px;
+    }
+    .pg.live .el:hover {
+      outline: 1px dashed var(--burg);
+    }
+    .hd {
+      position: absolute;
+      right: -6px;
+      bottom: -6px;
+      width: 12px;
+      height: 12px;
+      background: #fff;
+      border: 2px solid var(--burg);
+      cursor: nwse-resize;
+      z-index: 5;
+    }
+    .gd {
+      position: absolute;
+      inset: 36px;
+      border: 1px dashed rgba(110, 20, 35, 0.35);
+      pointer-events: none;
+    }
+
+    .zc {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .zc span {
+      min-width: 44px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--mut);
+    }
+
+    /* Right Sidebar Tabs & Controls */
+    .tabs {
+      display: flex;
+      margin: -14px -14px 14px;
+      border-bottom: 1px solid var(--line);
+    }
+    .tabs button {
+      flex: 1;
+      border: 0;
+      border-radius: 0;
+      background: none;
+      padding: 12px;
+      color: var(--mut);
+      font-weight: 500;
+      font-size: 12px;
+    }
+    .tabs button.on {
+      color: var(--tx);
+      box-shadow: inset 0 -2px var(--burg);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    label {
+      display: block;
+      margin: 0 0 12px;
+      color: var(--mut);
+      font-size: 11px;
+    }
+    label > *:not(span) {
+      display: block;
+      width: 100%;
+      margin-top: 4px;
+      background: var(--panel2);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 7px;
+      color: var(--tx);
+    }
+    label > select {
+      cursor: pointer;
+    }
+
+    .g2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .sw {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    .sw i {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+    .sw i:hover {
+      transform: scale(1.15);
+      border-color: var(--beige);
+    }
+
+    .pill {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .pill button {
+      border-radius: 16px;
+      font-size: 11px;
+      padding: 4px 10px;
+    }
+    .pill .on {
+      background: var(--burg);
+      border-color: var(--burg);
+      color: #fff;
+    }
+
+    .out {
+      background: var(--panel2);
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--burg);
+      padding: 12px;
+      margin: 12px 0;
+      font: italic 15px/1.4 'Cormorant Garamond', Georgia, serif;
+      color: var(--tx);
+      border-radius: 2px;
+    }
+    .hint {
+      color: var(--mut);
+      font-size: 11px;
+      line-height: 1.4;
+      margin-top: 4px;
+    }
+
+    /* Fullscreen Preview Modal */
+    #pv {
+      position: fixed;
+      inset: 0;
+      background: rgba(12, 11, 10, 0.95);
+      backdrop-filter: blur(8px);
+      z-index: 150;
+      overflow-y: auto;
+      padding: 40px 0;
+      display: none;
+    }
+    #pv .pg {
+      margin: 0 auto 30px;
+    }
+    #pv .x {
+      position: fixed;
+      top: 16px;
+      right: 20px;
+      z-index: 160;
+    }
+
+    /* Print Output */
+    #pa { display: none; }
+    @media print {
+      body > *:not(#pa) { display: none !important; }
+      #pa { display: block; }
+      #pa .pg {
+        box-shadow: none;
+        page-break-after: always;
+        margin: 0;
+      }
+      @page {
+        size: 540px 720px;
+        margin: 0;
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 980px) {
+      main {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr auto;
+      }
+      #L {
+        display: flex;
+        gap: 12px;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+        overflow-x: auto;
+        max-height: none;
+      }
+      #L > div { flex: none; }
+      .th { margin: 0 8px 0 0; }
+      .pn { width: 140px; }
+      #R {
+        border-left: 0;
+        border-top: 1px solid var(--line);
+        max-height: 38vh;
+      }
+      #ws { padding: 14px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Studio Header -->
+  <header>
+    <a href="index.html" class="logo-link" title="Return to PAPERLY Homepage">
+      <span class="logo">PAPERLY<i>.</i></span>
+      <span class="home-badge">← Home</span>
+    </a>
+
+    <input class="pn" id="pname" value="The Summer Issue" aria-label="Project Title" title="Click to rename publication">
+
+    <button id="undo" title="Undo (Ctrl+Z)">↶ Undo</button>
+    <button id="redo" title="Redo (Ctrl+Shift+Z)">↷ Redo</button>
+
+    <span class="sp"></span>
+
+    <!-- Status & API Pill -->
+    <button id="geminiKeyBtn" class="key-btn" title="Configure Google Gemini API Key">
+      <span id="geminiStatusDot" style="width: 6px; height: 6px; border-radius: 50%; background: #e3d5bd; display: inline-block;"></span>
+      <span id="geminiKeyLabel">✦ Gemini AI</span>
+    </button>
+
+    <span class="st" title="Auto-save enabled">
+      <b></b><span id="sv">Saved</span>
+    </span>
+
+    <button id="btnSaveJson" title="Download project JSON file to your device">Save File</button>
+    <button id="btnLoadJson" title="Open project JSON file">Load</button>
+    <input type="file" id="jsonFileInput" accept=".json,.paperly" style="display: none;">
+
+    <button id="prev" title="View magazine in fullscreen presentation">Preview</button>
+    <button class="pri" id="exp" title="Export as print-ready PDF">Export PDF</button>
+  </header>
+
+  <main>
+    <!-- Left Sidebar: Pages & Templates -->
+    <aside id="L">
+      <div>
+        <h4>Pages · <span id="cnt">1</span></h4>
+        <div class="row">
+          <button id="add" title="Add blank page">+ Add</button>
+          <button id="dup" title="Duplicate current page">Copy</button>
+          <button id="del" title="Delete current page">Del</button>
+        </div>
+        <div id="thumbs"></div>
+      </div>
+
+      <div style="margin-top: 1.5rem;">
+        <h4>Starter Editions</h4>
+        <div class="row chips" style="flex-direction: column;">
+          <button data-ed="best-friend">✦ Forever Sisters (Best Friend)</button>
+          <button data-ed="birthday">✦ The Birthday Issue</button>
+          <button data-ed="couple">✦ Two of Us (Couple)</button>
+          <button data-ed="anniversary">✦ Ten Years, Retold</button>
+          <button data-ed="travel">✦ Lisbon After Dark (Travel)</button>
+          <button data-ed="fashion">✦ The Unhurried Season (Style)</button>
+        </div>
+      </div>
+
+      <div style="margin-top: 1.5rem;">
+        <h4>Add Page Template</h4>
+        <div class="row chips" style="flex-direction: column;">
+          <button data-t="cover">+ Cover Story</button>
+          <button data-t="feature">+ Photo Feature</button>
+          <button data-t="spread">+ Editorial Spread</button>
+          <button data-t="gallery">+ Photo Archive</button>
+          <button data-t="dedication">+ Dedication</button>
+        </div>
+        <p class="hint" style="margin-top: 8px;">Drag thumbnails to reorder pages.</p>
+      </div>
+    </aside>
+
+    <!-- Center Section: Toolbar & Stage -->
+    <section id="C">
+      <div class="tb">
+        <button data-a="h" title="Add headline text">+ Headline</button>
+        <button data-a="t" title="Add story paragraph">+ Text</button>
+        <button data-a="p" title="Add photo frame">+ Photo</button>
+        <button data-a="l" title="Add decorative rule">+ Rule</button>
+        <button data-a="g" class="ghost" id="guideBtn" title="Toggle alignment guides">Guides</button>
+
+        <span class="sp"></span>
+
+        <!-- Zoom Controls -->
+        <div class="zc">
+          <button id="zo" title="Zoom Out">−</button>
+          <span id="zv">80%</span>
+          <button id="zi" title="Zoom In">+</button>
+          <button id="zf" title="Fit to Screen">Fit</button>
+        </div>
+
+        <!-- Page Navigation -->
+        <div class="zc" style="margin-left: 8px;">
+          <button id="pp" title="Previous page">‹</button>
+          <span id="pc">1 / 1</span>
+          <button id="pn" title="Next page">›</button>
+        </div>
+      </div>
+
+      <div id="ws">
+        <div id="stage"></div>
+      </div>
+    </section>
+
+    <!-- Right Sidebar: Design Inspector & AI Writer -->
+    <aside id="R">
+      <div class="tabs">
+        <button class="on" data-tab="d">Design</button>
+        <button data-tab="a">✦ AI Writer</button>
+      </div>
+
+      <!-- Tab 1: Design Inspector -->
+      <div id="pd"></div>
+
+      <!-- Tab 2: Gemini AI Writer -->
+      <div id="pa2" hidden></div>
+    </aside>
+  </main>
+
+  <!-- Fullscreen Preview Overlay -->
+  <div id="pv">
+    <button class="x pri" id="px">Close Preview (Esc)</button>
+    <div id="pvb"></div>
+  </div>
+
+  <!-- Print Container -->
+  <div id="pa"></div>
+
+  <!-- Gemini API Key Settings Modal -->
+  <div id="keyModal" class="paperly-modal-backdrop">
+    <div class="paperly-modal-card">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+        <div>
+          <span style="font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: #6e1423; font-weight: 600;">Intelligence Settings</span>
+          <h3 class="font-serif" style="font-size: 1.5rem; font-weight: 700; margin-top: 2px;">Google Gemini API</h3>
+        </div>
+        <button id="closeKeyModal" style="padding: 4px 8px; font-size: 14px;">✕</button>
+      </div>
+
+      <p style="font-size: 13px; color: #555; line-height: 1.5; margin-bottom: 1.25rem;">
+        Connect your free Google Gemini API key to generate bespoke editorial copy, headlines, and photo captions in real time.
+      </p>
+
+      <label style="color: #333; margin-bottom: 1rem;">
+        <span style="font-weight: 600;">Gemini API Key</span>
+        <div style="display: flex; gap: 6px; margin-top: 4px;">
+          <input type="password" id="geminiKeyInput" placeholder="AIzaSy..." style="flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px; background: #fff; color: #111;">
+          <button id="toggleKeyVisibility" style="background: #e8dfcf; border: 1px solid #ccc;">Show</button>
+        </div>
+      </label>
+
+      <div style="background: rgba(110, 20, 35, 0.06); padding: 10px 14px; border-radius: 4px; font-size: 12px; color: #444; margin-bottom: 1.5rem;">
+        <strong>How to get a key:</strong> You can create a free key in seconds at <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" style="color: #6e1423; text-decoration: underline; font-weight: 600;">Google AI Studio</a>. Keys are stored safely in your own browser's local storage.
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+        <button id="testApiKeyBtn" style="border: 1px solid #6e1423; color: #6e1423; background: transparent;">
+          Test Connection
+        </button>
+        <div style="display: flex; gap: 8px;">
+          <button id="clearApiKeyBtn" style="color: #888; border-color: #ddd;">Clear</button>
+          <button id="saveApiKeyBtn" class="pri">Save Key</button>
+        </div>
+      </div>
+
+      <div id="apiTestResult" style="margin-top: 12px; font-size: 12px; display: none;"></div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="paperlyToast" class="paperly-toast">
+    <span id="toastMsg">Changes saved</span>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/gemini.js"></script>
+  <script src="js/templates-data.js"></script>
+
+  <script>
+    // ---- Global State & Helpers
+    const $ = s => document.querySelector(s);
+    let uid = 2000;
+
+    // Toast helper
+    function showToast(msg) {
+      const toast = $("#paperlyToast");
+      $("#toastMsg").textContent = msg;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 2800);
+    }
+
+    // Default element factory
+    const E = (t, x, y, w, h, o = {}) => ({
+      id: uid++,
+      t,
+      x,
+      y,
+      w,
+      h,
+      font: "Playfair Display",
+      size: 20,
+      color: "#1b1714",
+      align: "left",
+      weight: 400,
+      italic: false,
+      sp: 0,
+      text: "",
+      ...o
+    });
+
+    // Central Studio State
+    let S = {
+      pages: [],
+      cur: 0,
+      sel: null,
+      zoom: 0.8,
+      guides: true
+    };
+
+    let H = []; // Undo stack
+    let F = []; // Redo stack
+    let tmr;
+
+    // History Snapshots
+    const snap = () => {
+      H.push(JSON.stringify(S.pages));
+      if (H.length > 60) H.shift();
+      F = [];
+    };
+
+    // Auto-Save
+    function save() {
+      $("#sv").textContent = "Saving…";
+      clearTimeout(tmr);
+      tmr = setTimeout(() => {
+        try {
+          localStorage.setItem("paperly_project", JSON.stringify({
+            title: $("#pname").value,
+            pages: S.pages
+          }));
+        } catch (e) {}
+        $("#sv").textContent = "All changes saved";
+      }, 400);
+    }
+
+    const P = () => S.pages[S.cur] || S.pages[0];
+    const SE = () => P() ? P().els.find(e => e.id === S.sel) : null;
+
+    // Node Renderer
+    function node(e, live) {
+      const d = document.createElement("div");
+      const s = d.style;
+      d.className = "el" + (live && e.id === S.sel ? " sel" : "");
+      d.dataset.id = e.id;
+      s.left = e.x + "px";
+      s.top = e.y + "px";
+      s.width = e.w + "px";
+
+      if (e.t === "img") {
+        s.height = e.h + "px";
+        s.backgroundImage = e.bg;
+        s.backgroundSize = "cover";
+        s.backgroundPosition = "center";
+      } else if (e.t === "line") {
+        s.height = e.h + "px";
+        s.background = e.color || "#6e1423";
+      } else {
+        s.minHeight = e.h + "px";
+        d.textContent = e.text;
+        Object.assign(s, {
+          fontFamily: `'${e.font}', serif`,
+          fontSize: e.size + "px",
+          color: e.color,
+          textAlign: e.align,
+          fontWeight: e.weight,
+          fontStyle: e.italic ? "italic" : "normal",
+          letterSpacing: e.sp + "px",
+          lineHeight: 1.18
+        });
+      }
+
+      if (live && e.id === S.sel) {
+        const h = document.createElement("div");
+        h.className = "hd";
+        h.dataset.rs = 1;
+        d.appendChild(h);
+      }
+      return d;
+    }
+
+    // Page Renderer
+    function page(p, live) {
+      const d = document.createElement("div");
+      d.className = "pg" + (live ? " live" : "");
+      d.style.background = p.bg;
+      p.els.forEach(e => d.appendChild(node(e, live)));
+      if (live && S.guides) {
+        const g = document.createElement("div");
+        g.className = "gd";
+        d.appendChild(g);
+      }
+      return d;
+    }
+
+    // Render Canvas & Thumbnails
+    function render(keepProps) {
+      if (!S.pages.length) return;
+      const st = $("#stage");
+      st.innerHTML = "";
+      const pg = page(P(), true);
+      pg.style.transform = `scale(${S.zoom})`;
+      st.appendChild(pg);
+      st.style.width = (540 * S.zoom) + "px";
+      st.style.height = (720 * S.zoom) + "px";
+
+      const th = $("#thumbs");
+      th.innerHTML = "";
+      S.pages.forEach((p, i) => {
+        const t = document.createElement("div");
+        t.className = "th" + (i === S.cur ? " on" : "");
+        t.draggable = true;
+        t.dataset.i = i;
+        t.appendChild(page(p, false));
+        const n = document.createElement("span");
+        n.textContent = i + 1;
+        t.appendChild(n);
+        th.appendChild(t);
+      });
+
+      $("#cnt").textContent = S.pages.length;
+      $("#pc").textContent = `${S.cur + 1} / ${S.pages.length}`;
+      $("#zv").textContent = Math.round(S.zoom * 100) + "%";
+
+      if (!keepProps) props();
+    }
+
+    // Inspector Properties Panel
+    function props() {
+      const e = SE();
+      const p = P();
+      if (!p) return;
+
+      let h = `<h4>Page Background</h4>
+      <div class="sw">
+        ${["#f4ede0", "#f6f0e4", "#e9dcc3", "#0c0b0a", "#6e1423", "#e3d5bd"].map(c => `<i data-bg="${c}" style="background:${c}"></i>`).join("")}
+        <input type="color" data-bgc value="${p.bg.startsWith('#') ? p.bg : '#f4ede0'}" style="width:28px;height:28px;padding:0;border:0;background:none;cursor:pointer;" title="Custom Color">
+      </div>`;
+
+      if (!e) {
+        h += `<p class="hint">Select an element on the canvas to edit text, typography, photography, or layer order. Double-click any text to type directly on the page.</p>`;
+      } else {
+        h += `<h4>${e.t === "text" ? "Text Layer" : e.t === "img" ? "Photograph Frame" : "Editorial Rule"}</h4>`;
+
+        if (e.t === "text") {
+          h += `
+          <label><span>Content</span>
+            <textarea data-k="text" style="min-height:75px;">${e.text.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</textarea>
+          </label>
+          <label><span>Font Family</span>
+            <select data-k="font">
+              ${["Playfair Display", "Cormorant Garamond", "Inter", "Georgia"].map(f => `<option${f === e.font ? " selected" : ""}>${f}</option>`).join("")}
+            </select>
+          </label>
+          <div class="g2">
+            <label><span>Size (px)</span><input type="number" data-k="size" value="${e.size}"></label>
+            <label><span>Tracking (px)</span><input type="number" data-k="sp" value="${e.sp}"></label>
+          </div>
+          <div class="g2">
+            <label><span>Colour</span><input type="color" data-k="color" value="${e.color}"></label>
+            <label><span>Weight</span>
+              <select data-k="weight">
+                <option value="400"${e.weight == 400 ? " selected" : ""}>Regular</option>
+                <option value="600"${e.weight == 600 ? " selected" : ""}>Medium</option>
+                <option value="700"${e.weight == 700 ? " selected" : ""}>Bold</option>
+              </select>
+            </label>
+          </div>
+          <div class="row">
+            ${["left", "center", "right"].map(a => `<button data-al="${a}" style="${e.align === a ? 'border-color:var(--burg);' : ''}">${a[0].toUpperCase() + a.slice(1)}</button>`).join("")}
+            <button data-it style="${e.italic ? 'border-color:var(--burg);' : ''}">Italic</button>
+          </div>`;
+        }
+
+        if (e.t === "img") {
+          h += `
+          <label><span>Upload Local Photograph</span>
+            <input type="file" accept="image/*" id="fi">
+          </label>
+          <div style="margin-bottom: 12px;">
+            <span style="font-size:11px;color:var(--mut);display:block;margin-bottom:6px;">Or Choose Editorial Photography</span>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
+              <button class="stock-photo-btn" data-url="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80" style="padding:4px;font-size:10px;">Coast</button>
+              <button class="stock-photo-btn" data-url="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=800&q=80" style="padding:4px;font-size:10px;">Sisters</button>
+              <button class="stock-photo-btn" data-url="https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80" style="padding:4px;font-size:10px;">Lisbon</button>
+              <button class="stock-photo-btn" data-url="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=800&q=80" style="padding:4px;font-size:10px;">Coffee</button>
+              <button class="stock-photo-btn" data-url="https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=800&q=80" style="padding:4px;font-size:10px;">Celebrate</button>
+              <button class="stock-photo-btn" data-url="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=800&q=80" style="padding:4px;font-size:10px;">Minimal</button>
+            </div>
+          </div>
+          <div class="row">
+            <button id="btnVisionCaption" style="border-color: var(--burg); color: var(--tx);">✦ Write Caption with Gemini Vision</button>
+          </div>
+          <p class="hint">Resize with the bottom-right corner handle; photographs automatically fill and crop to the frame.</p>`;
+        }
+
+        if (e.t === "line") {
+          h += `<label><span>Colour</span><input type="color" data-k="color" value="${e.color || '#6e1423'}"></label>`;
+        }
+
+        h += `<h4>Layout Coordinates</h4>
+        <div class="g2">
+          ${["x", "y", "w", "h"].map(k => `<label><span>${{ x: "X", y: "Y", w: "Width", h: "Height" }[k]}</span><input type="number" data-k="${k}" value="${Math.round(e[k])}"></label>`).join("")}
+        </div>
+        <div class="row">
+          <button data-z="up">Bring Forward</button>
+          <button data-z="dn">Send Back</button>
+        </div>
+        <div class="row">
+          <button data-x style="color:#ff6b6b; border-color: rgba(255,107,107,0.3);">Delete Element</button>
+        </div>`;
+      }
+
+      $("#pd").innerHTML = h;
+    }
+
+    // State Mutation & History
+    function chg(fn) {
+      snap();
+      fn();
+      render(1);
+      save();
+    }
+
+    function setPage(i) {
+      S.cur = Math.max(0, Math.min(S.pages.length - 1, i));
+      S.sel = null;
+      render();
+    }
+
+    // Navigation and Page Ops
+    $("#undo").onclick = () => {
+      if (!H.length) return;
+      F.push(JSON.stringify(S.pages));
+      S.pages = JSON.parse(H.pop());
+      S.cur = Math.min(S.cur, S.pages.length - 1);
+      S.sel = null;
+      render();
+      save();
+      showToast("Undone");
+    };
+
+    $("#redo").onclick = () => {
+      if (!F.length) return;
+      H.push(JSON.stringify(S.pages));
+      S.pages = JSON.parse(F.pop());
+      S.sel = null;
+      render();
+      save();
+      showToast("Redone");
+    };
+
+    $("#add").onclick = () => {
+      snap();
+      S.pages.splice(S.cur + 1, 0, {
+        bg: "#f4ede0",
+        els: [E("text", 36, 40, 468, 60, { text: "New Page Title", size: 36, weight: 700 })]
+      });
+      setPage(S.cur + 1);
+      save();
+    };
+
+    $("#dup").onclick = () => {
+      snap();
+      const c = JSON.parse(JSON.stringify(P()));
+      c.els.forEach(e => e.id = uid++);
+      S.pages.splice(S.cur + 1, 0, c);
+      setPage(S.cur + 1);
+      save();
+      showToast("Page duplicated");
+    };
+
+    $("#del").onclick = () => {
+      if (S.pages.length < 2) {
+        showToast("Cannot delete the only page");
+        return;
+      }
+      snap();
+      S.pages.splice(S.cur, 1);
+      setPage(Math.min(S.cur, S.pages.length - 1));
+      save();
+      showToast("Page deleted");
+    };
+
+    $("#pp").onclick = () => setPage(S.cur - 1);
+    $("#pn").onclick = () => setPage(S.cur + 1);
+
+    // Zoom
+    const zm = z => {
+      S.zoom = Math.max(0.3, Math.min(1.6, z));
+      render(1);
+    };
+    $("#zo").onclick = () => zm(S.zoom - 0.1);
+    $("#zi").onclick = () => zm(S.zoom + 0.1);
+    const fit = () => {
+      const ws = $("#ws");
+      const fitZoom = Math.min(1, (ws.clientHeight - 60) / 720, (ws.clientWidth - 60) / 540);
+      zm(Math.max(0.4, fitZoom));
+    };
+    $("#zf").onclick = fit;
+
+    // Toolbar Add Elements
+    document.querySelectorAll("[data-a]").forEach(b => b.onclick = () => {
+      const a = b.dataset.a;
+      if (a === "g") {
+        S.guides = !S.guides;
+        render(1);
+        return;
+      }
+      chg(() => {
+        let e;
+        if (a === "h") {
+          e = E("text", 36, 70, 468, 60, { text: "Editorial Headline", size: 40, weight: 700 });
+        } else if (a === "t") {
+          e = E("text", 36, 280, 320, 90, { text: "Write your memory or story here…", size: 14, font: "Inter" });
+        } else if (a === "p") {
+          e = E("img", 100, 180, 340, 340, { bg: PAPERLY_TEMPLATES.art(Math.floor(Math.random() * 6)) });
+        } else {
+          e = E("line", 36, 280, 80, 2, { color: "#6e1423" });
+        }
+        P().els.push(e);
+        S.sel = e.id;
+      });
+      props();
+    });
+
+    // Page Template Insertion
+    document.querySelectorAll("[data-t]").forEach(b => b.onclick = () => {
+      const key = b.dataset.t;
+      if (PAPERLY_TEMPLATES.PAGE_BLOCKS[key]) {
+        snap();
+        S.pages.splice(S.cur + 1, 0, PAPERLY_TEMPLATES.PAGE_BLOCKS[key]());
+        setPage(S.cur + 1);
+        save();
+        showToast(`Added ${key} template`);
+      }
+    });
+
+    // Starter Edition Loader
+    document.querySelectorAll("[data-ed]").forEach(b => b.onclick = () => {
+      const key = b.dataset.ed;
+      const edition = PAPERLY_TEMPLATES.EDITIONS[key];
+      if (edition) {
+        if (confirm(`Load the "${edition.name}" starter magazine? This will replace current pages.`)) {
+          snap();
+          S.pages = JSON.parse(JSON.stringify(edition.pages));
+          $("#pname").value = edition.name;
+          S.cur = 0;
+          S.sel = null;
+          render();
+          save();
+          showToast(`Loaded ${edition.name}`);
+        }
+      }
+    });
+
+    // Stage Pointer Drag & Resize
+    const stage = $("#stage");
+    stage.addEventListener("pointerdown", ev => {
+      const el = ev.target.closest(".el");
+      if (!el || el.isContentEditable) {
+        if (!el) {
+          S.sel = null;
+          render();
+        }
+        return;
+      }
+
+      const e = P().els.find(x => x.id == el.dataset.id);
+      if (!e) return;
+
+      S.sel = e.id;
+      snap();
+      const rs = ev.target.dataset.rs;
+      const sx = ev.clientX;
+      const sy = ev.clientY;
+      const o = { ...e };
+      let moved = 0;
+
+      const mv = m => {
+        moved = 1;
+        const dx = (m.clientX - sx) / S.zoom;
+        const dy = (m.clientY - sy) / S.zoom;
+        if (rs) {
+          e.w = Math.max(20, o.w + dx);
+          e.h = Math.max(2, o.h + dy);
+        } else {
+          e.x = o.x + dx;
+          e.y = o.y + dy;
+        }
+        const n = node(e, true);
+        el.replaceWith(n);
+      };
+
+      const up = () => {
+        removeEventListener("pointermove", mv);
+        removeEventListener("pointerup", up);
+        if (!moved) H.pop();
+        else save();
+        render();
+      };
+
+      addEventListener("pointermove", mv);
+      addEventListener("pointerup", up);
+      props();
+      stage.querySelectorAll(".el").forEach(n => n.classList.toggle("sel", n.dataset.id == e.id));
+    });
+
+    // Double Click to Edit Text In-Place
+    stage.addEventListener("dblclick", ev => {
+      const el = ev.target.closest(".el");
+      if (!el) return;
+      const e = P().els.find(x => x.id == el.dataset.id);
+      if (!e || e.t !== "text") return;
+
+      el.contentEditable = true;
+      el.style.cursor = "text";
+      el.focus();
+      el.onblur = () => {
+        if (el.textContent !== e.text) {
+          snap();
+          e.text = el.textContent;
+          save();
+        }
+        render();
+      };
+    });
+
+    // Thumbnail Drag to Reorder
+    let dragI = null;
+    const th = $("#thumbs");
+    th.onclick = e => {
+      const t = e.target.closest(".th");
+      if (t) setPage(+t.dataset.i);
+    };
+    th.ondragstart = e => {
+      dragI = +e.target.closest(".th").dataset.i;
+    };
+    th.ondragover = e => {
+      e.preventDefault();
+      const t = e.target.closest(".th");
+      th.querySelectorAll(".over").forEach(x => x.classList.remove("over"));
+      if (t) t.classList.add("over");
+    };
+    th.ondrop = e => {
+      e.preventDefault();
+      const t = e.target.closest(".th");
+      if (!t || dragI == null) return;
+      const j = +t.dataset.i;
+      snap();
+      const [m] = S.pages.splice(dragI, 1);
+      S.pages.splice(j, 0, m);
+      S.cur = j;
+      dragI = null;
+      render();
+      save();
+    };
+
+    // Design Inspector Event Handlers
+    const R = $("#pd");
+    R.addEventListener("focusin", () => snap());
+    R.addEventListener("input", ev => {
+      const t = ev.target;
+      const e = SE();
+      if (t.dataset.bgc !== undefined) {
+        P().bg = t.value;
+        render(1);
+        save();
+        return;
+      }
+      if (!e || !t.dataset.k) return;
+      let v = t.value;
+      if (["x", "y", "w", "h", "size", "sp", "weight"].includes(t.dataset.k)) v = +v;
+      e[t.dataset.k] = v;
+      render(1);
+      save();
+    });
+
+    R.addEventListener("click", ev => {
+      const t = ev.target;
+      const e = SE();
+      if (t.dataset.bg) {
+        chg(() => P().bg = t.dataset.bg);
+        props();
+        return;
+      }
+      if (!e) return;
+      if (t.dataset.al) chg(() => e.align = t.dataset.al);
+      if (t.dataset.it !== undefined) chg(() => e.italic = !e.italic);
+      if (t.dataset.z) {
+        chg(() => {
+          const a = P().els;
+          const i = a.indexOf(e);
+          const j = t.dataset.z === "up" ? Math.min(a.length - 1, i + 1) : Math.max(0, i - 1);
+          a.splice(i, 1);
+          a.splice(j, 0, e);
+        });
+      }
+      if (t.dataset.x !== undefined) {
+        chg(() => {
+          P().els = P().els.filter(x => x !== e);
+          S.sel = null;
+          props();
+        });
+      }
+      if (t.classList.contains("stock-photo-btn")) {
+        const url = t.dataset.url;
+        if (url && e && e.t === "img") {
+          chg(() => e.bg = `url("${url}")`);
+          showToast("Editorial photo applied");
+        }
+        return;
+      }
+      if (t.id === "btnVisionCaption") {
+        handleVisionCaption();
+      }
+    });
+
+    R.addEventListener("change", ev => {
+      if (ev.target.id !== "fi") return;
+      const f = ev.target.files[0];
+      if (!f) return;
+      const r = new FileReader();
+      r.onload = () => chg(() => {
+        SE().bg = `url("${r.result}")`;
+        showToast("Photo updated");
+      });
+      r.readAsDataURL(f);
+    });
+
+    // Tab Switching
+    document.querySelectorAll("[data-tab]").forEach(b => b.onclick = () => {
+      document.querySelectorAll("[data-tab]").forEach(x => x.classList.toggle("on", x === b));
+      $("#pd").hidden = b.dataset.tab !== "d";
+      $("#pa2").hidden = b.dataset.tab !== "a";
+    });
+
+    // ---- GEMINI AI WRITER PANEL
+    let AI = {
+      tone: "Emotional",
+      kind: "Headline",
+      out: "",
+      memo: "",
+      loading: false
+    };
+
+    function updateAiKeyStatus() {
+      const hasKey = PAPERLY_GEMINI.hasApiKey();
+      const dot = $("#geminiStatusDot");
+      const label = $("#geminiKeyLabel");
+      const btn = $("#geminiKeyBtn");
+
+      if (hasKey) {
+        dot.style.background = "#4caf50";
+        label.textContent = "✦ Gemini Active";
+        btn.classList.add("has-key");
+      } else {
+        dot.style.background = "#e3d5bd";
+        label.textContent = "✦ Gemini Key";
+        btn.classList.remove("has-key");
+      }
+    }
+
+    function aiUI() {
+      const hasKey = PAPERLY_GEMINI.hasApiKey();
+      const kinds = ["Headline", "Caption", "Story", "Wish", "Dedication"];
+      const tones = PAPERLY_GEMINI.tones;
+
+      let h = `
+      <div style="background: var(--panel2); border: 1px solid var(--line); border-radius: 4px; padding: 10px 12px; margin-bottom: 14px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 11px; font-weight: 600; color: ${hasKey ? '#81c784' : 'var(--beige)'}">
+            ${hasKey ? '● Connected to Gemini 2.5 Flash' : '○ Offline Mode (Sample copy)'}
+          </span>
+          <button id="btnAiConfigureKey" style="font-size: 10px; padding: 2px 7px;">${hasKey ? 'Config' : 'Add Key'}</button>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 10px;">
+        <span style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--mut); display: block; margin-bottom: 5px;">✦ Prompt Inspirations</span>
+        <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+          <button class="ai-prompt-chip" data-memo="Sunset in Lisbon with tiled walls and warm evening breeze" data-tone="Luxury Editorial" data-kind="Story" style="font-size: 10px; padding: 3px 8px; border-radius: 12px;">Lisbon Sunset</button>
+          <button class="ai-prompt-chip" data-memo="Goa monsoon road trip with my best friend, laughing in the rain" data-tone="Cute" data-kind="Headline" style="font-size: 10px; padding: 3px 8px; border-radius: 12px;">Goa Monsoon</button>
+          <button class="ai-prompt-chip" data-memo="Maa's 60th birthday celebration surrounded by all the grandchildren" data-tone="Meaningful" data-kind="Wish" style="font-size: 10px; padding: 3px 8px; border-radius: 12px;">Maa's 60th</button>
+          <button class="ai-prompt-chip" data-memo="Twenty years of inside jokes, ordinary Sundays and true friendship" data-tone="Emotional" data-kind="Dedication" style="font-size: 10px; padding: 3px 8px; border-radius: 12px;">20 Years</button>
+        </div>
+      </div>
+
+      <label><span>Your memory, details or brief</span>
+        <textarea id="memo" placeholder="e.g. Sunset at Marine Drive with my sister, our last evening before she moved abroad">${AI.memo}</textarea>
+      </label>
+
+      <h4>Writing Style</h4>
+      <div class="pill" id="tn">
+        ${tones.map(t => `<button class="${t === AI.tone ? 'on' : ''}">${t}</button>`).join("")}
+      </div>
+
+      <h4>Content Format</h4>
+      <div class="pill" id="kd">
+        ${kinds.map(t => `<button class="${t === AI.kind ? 'on' : ''}">${t}</button>`).join("")}
+      </div>
+
+      <div class="row">
+        <button class="pri" data-ac="gen" ${AI.loading ? 'disabled' : ''} style="width: 100%;">
+          ${AI.loading ? '<span class="paperly-loading">✦ Consulting Gemini…</span>' : '✦ Generate with Gemini'}
+        </button>
+      </div>`;
+
+      if (AI.out) {
+        h += `
+        <div class="out" id="aiOutText">${AI.out}</div>
+        <div class="row">
+          <button data-ac="ins">Insert on Page</button>
+          <button data-ac="app">Apply to Selected</button>
+        </div>
+        <h4>Refine With Gemini</h4>
+        <div class="row" style="flex-wrap: wrap;">
+          <button data-ac="rw">Rewrite</button>
+          <button data-ac="em">More Emotional</button>
+          <button data-ac="sh">Shorten</button>
+          <button data-ac="ex">Expand Story</button>
+          <button data-ac="an">Another Variation</button>
+        </div>`;
+      }
+
+      h += `<p class="hint">Generated text places cleanly onto the canvas and stays 100% editable.</p>`;
+      $("#pa2").innerHTML = h;
+
+      const cfgBtn = $("#btnAiConfigureKey");
+      if (cfgBtn) cfgBtn.onclick = openKeyModal;
+    }
+
+    async function executeAiGeneration(action = 'gen') {
+      AI.loading = true;
+      aiUI();
+
+      const sel = SE();
+      const existingText = (sel && sel.t === 'text') ? sel.text : (AI.out || '');
+
+      const result = await PAPERLY_GEMINI.generate({
+        tone: AI.tone,
+        kind: AI.kind,
+        memo: AI.memo,
+        action,
+        existingText
+      });
+
+      AI.out = result.text;
+      AI.loading = false;
+      aiUI();
+
+      if (result.source === 'gemini') {
+        showToast("Gemini copy generated!");
+      } else if (result.source === 'fallback') {
+        showToast("Offline editorial draft generated");
+      }
+    }
+
+    async function handleVisionCaption() {
+      const e = SE();
+      if (!e || e.t !== 'img' || !e.bg) {
+        showToast("Select a photo frame first");
+        return;
+      }
+
+      // Check if dataUrl
+      const match = e.bg.match(/url\(["']?(data:image\/[^"']+)["']?\)/);
+      if (!match) {
+        showToast("Uploaded photos are required for AI vision");
+        return;
+      }
+
+      showToast("✦ Gemini Vision analyzing photo…");
+      const res = await PAPERLY_GEMINI.generateFromImage({
+        dataUrl: match[1],
+        tone: AI.tone,
+        kind: "Caption",
+        memo: AI.memo
+      });
+
+      AI.out = res.text;
+      document.querySelector('[data-tab="a"]').click();
+      aiUI();
+      showToast("Caption ready from photo!");
+    }
+
+    $("#pa2").addEventListener("input", e => {
+      if (e.target.id === "memo") AI.memo = e.target.value;
+    });
+
+    $("#pa2").addEventListener("click", async e => {
+      const t = e.target;
+      const a = t.dataset.ac;
+
+      if (t.classList.contains("ai-prompt-chip")) {
+        if (t.dataset.memo) AI.memo = t.dataset.memo;
+        if (t.dataset.tone) AI.tone = t.dataset.tone;
+        if (t.dataset.kind) AI.kind = t.dataset.kind;
+        aiUI();
+        showToast("Prompt filled");
+        return;
+      }
+      if (t.closest("#tn") && t.tagName === "BUTTON") {
+        AI.tone = t.textContent;
+        aiUI();
+        return;
+      }
+      if (t.closest("#kd") && t.tagName === "BUTTON") {
+        AI.kind = t.textContent;
+        aiUI();
+        return;
+      }
+
+      if (!a) return;
+      const sel = SE();
+
+      if (["gen", "rw", "an", "em", "sh", "ex"].includes(a)) {
+        await executeAiGeneration(a);
+        return;
+      }
+
+      if (a === "ins" && AI.out) {
+        chg(() => {
+          const big = AI.kind === "Headline";
+          const n = E("text", 36, big ? 90 : 340, 468, 60, {
+            text: AI.out,
+            size: big ? 38 : 15,
+            weight: big ? 700 : 400,
+            font: big ? "Playfair Display" : (AI.kind === "Story" ? "Inter" : "Cormorant Garamond"),
+            italic: AI.kind === "Dedication" || AI.kind === "Caption"
+          });
+          P().els.push(n);
+          S.sel = n.id;
+        });
+        props();
+        showToast("Inserted onto canvas");
+      }
+
+      if (a === "app") {
+        if (sel && sel.t === "text" && AI.out) {
+          chg(() => sel.text = AI.out);
+          showToast("Applied to selected element");
+        } else {
+          showToast("Please select a text element first");
+        }
+      }
+    });
+
+    // ---- API KEY MODAL LOGIC
+    const keyModal = $("#keyModal");
+    const keyInput = $("#geminiKeyInput");
+
+    function openKeyModal() {
+      keyInput.value = PAPERLY_GEMINI.getApiKey();
+      $("#apiTestResult").style.display = "none";
+      keyModal.classList.add("active");
+    }
+
+    function closeKeyModal() {
+      keyModal.classList.remove("active");
+      updateAiKeyStatus();
+      aiUI();
+    }
+
+    $("#geminiKeyBtn").onclick = openKeyModal;
+    $("#closeKeyModal").onclick = closeKeyModal;
+    keyModal.onclick = e => { if (e.target === keyModal) closeKeyModal(); };
+
+    $("#toggleKeyVisibility").onclick = () => {
+      if (keyInput.type === "password") {
+        keyInput.type = "text";
+        $("#toggleKeyVisibility").textContent = "Hide";
+      } else {
+        keyInput.type = "password";
+        $("#toggleKeyVisibility").textContent = "Show";
+      }
+    };
+
+    $("#saveApiKeyBtn").onclick = () => {
+      const val = keyInput.value.trim();
+      PAPERLY_GEMINI.setApiKey(val);
+      showToast(val ? "Gemini API Key saved" : "API Key removed");
+      closeKeyModal();
+    };
+
+    $("#clearApiKeyBtn").onclick = () => {
+      keyInput.value = "";
+      PAPERLY_GEMINI.setApiKey("");
+      showToast("API Key cleared");
+      closeKeyModal();
+    };
+
+    $("#testApiKeyBtn").onclick = async () => {
+      const testRes = $("#apiTestResult");
+      const key = keyInput.value.trim();
+      if (!key) {
+        testRes.style.display = "block";
+        testRes.style.color = "#ff6b6b";
+        testRes.textContent = "Please enter an API key to test.";
+        return;
+      }
+
+      testRes.style.display = "block";
+      testRes.style.color = "var(--beige)";
+      testRes.textContent = "Testing connection with Gemini 2.5 Flash…";
+
+      try {
+        const ep = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(key)}`;
+        const r = await fetch(ep, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ contents: [{ parts: [{ text: "Respond with the word 'OK'." }] }] })
+        });
+
+        if (r.ok) {
+          testRes.style.color = "#4caf50";
+          testRes.textContent = "✓ Connected successfully! Gemini is ready.";
+        } else {
+          const err = await r.json().catch(() => ({}));
+          testRes.style.color = "#ff6b6b";
+          testRes.textContent = `Error: ${err.error?.message || "Invalid key or permission denied."}`;
+        }
+      } catch (e) {
+        testRes.style.color = "#ff6b6b";
+        testRes.textContent = `Connection failed: ${e.message}`;
+      }
+    };
+
+    // ---- PROJECT JSON SAVE / LOAD
+    $("#btnSaveJson").onclick = () => {
+      const data = {
+        app: "PAPERLY",
+        version: "1.0",
+        title: $("#pname").value,
+        timestamp: new Date().toISOString(),
+        pages: S.pages
+      };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `${$("#pname").value.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.paperly.json`;
+      a.click();
+      showToast("Project file downloaded");
+    };
+
+    $("#btnLoadJson").onclick = () => $("#jsonFileInput").click();
+    $("#jsonFileInput").onchange = e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        try {
+          const data = JSON.parse(ev.target.result);
+          if (data && data.pages) {
+            snap();
+            S.pages = data.pages;
+            if (data.title) $("#pname").value = data.title;
+            S.cur = 0;
+            S.sel = null;
+            render();
+            save();
+            showToast("Project file loaded!");
+          }
+        } catch (err) {
+          alert("Invalid project file.");
+        }
+      };
+      reader.readAsText(file);
+    };
+
+    // ---- FULLSCREEN PREVIEW & EXPORT
+    $("#prev").onclick = () => {
+      const b = $("#pvb");
+      b.innerHTML = "";
+      S.pages.forEach(p => b.appendChild(page(p, false)));
+      $("#pv").style.display = "block";
+    };
+    $("#px").onclick = () => $("#pv").style.display = "none";
+    addEventListener("keydown", e => {
+      if (e.key === "Escape" && $("#pv").style.display === "block") {
+        $("#pv").style.display = "none";
+      }
+    });
+
+    $("#exp").onclick = () => {
+      const a = $("#pa");
+      a.innerHTML = "";
+      S.pages.forEach(p => a.appendChild(page(p, false)));
+      window.print();
+    };
+
+    // Keyboard Shortcuts
+    addEventListener("keydown", e => {
+      // Undo / Redo
+      if ((e.ctrlKey || e.metaKey) && e.key === "z" && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) {
+        e.preventDefault();
+        (e.shiftKey ? $("#redo") : $("#undo")).click();
+        return;
+      }
+
+      // If active in text field or editing, don't trigger canvas shortcuts
+      if (/INPUT|TEXTAREA/.test(document.activeElement.tagName) || document.activeElement.isContentEditable) {
+        return;
+      }
+
+      // Delete selected element
+      if (e.key === "Delete" || e.key === "Backspace") {
+        if (S.sel) {
+          e.preventDefault();
+          const sel = SE();
+          if (sel) {
+            chg(() => {
+              P().els = P().els.filter(x => x.id !== S.sel);
+              S.sel = null;
+            });
+            props();
+            showToast("Element deleted");
+          }
+        }
+      } else if (e.key === "ArrowLeft") {
+        if (S.cur > 0) {
+          e.preventDefault();
+          setPage(S.cur - 1);
+        }
+      } else if (e.key === "ArrowRight") {
+        if (S.cur < S.pages.length - 1) {
+          e.preventDefault();
+          setPage(S.cur + 1);
+        }
+      } else if (e.key === "Escape") {
+        if (S.sel) {
+          S.sel = null;
+          render();
+        }
+      }
+    });
+
+    // Handle URL Query Params (e.g. ?template=birthday)
+    function handleInitialTemplate() {
+      const params = new URLSearchParams(window.location.search);
+      const tplParam = params.get("template");
+
+      if (tplParam && PAPERLY_TEMPLATES.EDITIONS[tplParam]) {
+        const ed = PAPERLY_TEMPLATES.EDITIONS[tplParam];
+        S.pages = JSON.parse(JSON.stringify(ed.pages));
+        $("#pname").value = ed.name;
+        return true;
+      }
+      return false;
+    }
+
+    // Initialize Studio
+    function init() {
+      const loadedFromUrl = handleInitialTemplate();
+
+      if (!loadedFromUrl) {
+        try {
+          const saved = JSON.parse(localStorage.getItem("paperly_project"));
+          if (saved && saved.pages && saved.pages.length) {
+            S.pages = saved.pages;
+            if (saved.title) $("#pname").value = saved.title;
+          }
+        } catch (e) {}
+      }
+
+      // Default fallback if empty
+      if (!S.pages || !S.pages.length) {
+        const defaultEd = PAPERLY_TEMPLATES.EDITIONS["best-friend"];
+        S.pages = JSON.parse(JSON.stringify(defaultEd.pages));
+        $("#pname").value = defaultEd.name;
+      }
+
+      updateAiKeyStatus();
+      aiUI();
+      render();
+      fit();
+    }
+
+    window.addEventListener("resize", fit);
+    init();
+  </script>
+</body>
+</html>
+

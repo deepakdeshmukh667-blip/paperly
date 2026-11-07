@@ -1,0 +1,19 @@
+{
+  "name": "paperly",
+  "version": "1.0.0",
+  "description": "PAPERLY — Stories, reimagined for the digital age. AI-powered personalised digital magazine creation platform.",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "digital-magazine",
+    "editorial",
+    "gemini-ai",
+    "publishing",
+    "paperly"
+  ],
+  "author": "PAPERLY",
+  "license": "MIT"
+}
+
