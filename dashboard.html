@@ -1,0 +1,1635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Customer Dashboard — PAPERLY.</title>
+  <meta name="description" content="Manage, edit, and curate your personalized digital magazine collection with PAPERLY.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230c0b0a'/><text x='35' y='68' font-family='Georgia,serif' font-size='56' font-weight='bold' fill='%23f6f0e4'>P</text><circle cx='68' cy='63' r='6' fill='%236e1423'/></svg>">
+  <link rel="manifest" href="manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600;700&display=swap">
+  <link rel="stylesheet" href="css/paperly.css">
+
+  <style>
+    :root {
+      --bg: #0c0b0a;
+      --card-bg: #151311;
+      --card-border: #24201c;
+      
+      --ivory: #f6f0e4;
+      --beige: #e3d5bd;
+      --burgundy: #6e1423;
+      --burgundy-light: #8a2434;
+      --muted: #8e8476;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--ivory);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* Top Navigation */
+    .dash-nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(12, 11, 10, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--card-border);
+      padding: 0 1.5rem;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .brand-logo {
+      font-family: var(--font-serif);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--ivory);
+      text-decoration: none;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-logo span {
+      color: var(--burgundy);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      list-style: none;
+    }
+
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+    }
+
+    .nav-link {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--beige);
+      text-decoration: none;
+      padding: 0.4rem 0.6rem;
+      border-radius: 4px;
+      transition: color 0.15s;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      color: #fff;
+    }
+
+    .nav-link.active {
+      font-weight: 600;
+      border-bottom: 2px solid var(--burgundy);
+      border-radius: 0;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .btn-create-mag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--ivory);
+      color: var(--bg);
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 0.5rem 1.15rem;
+      border-radius: 3px;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .btn-create-mag:hover {
+      background: var(--beige);
+      transform: translateY(-1px);
+    }
+
+    /* User Avatar Menu */
+    .user-pill {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      padding: 4px 10px 4px 4px;
+      border-radius: 24px;
+      cursor: pointer;
+      user-select: none;
+      transition: border-color 0.2s;
+    }
+
+    .user-pill:hover {
+      border-color: var(--muted);
+    }
+
+    .user-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--burgundy), #3a0b13);
+      color: var(--ivory);
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-transform: uppercase;
+    }
+
+    .user-name {
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--ivory);
+      max-width: 120px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-dropdown {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      background: #181512;
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      box-shadow: 0 16px 36px rgba(0,0,0,0.6);
+      width: 220px;
+      padding: 6px 0;
+      display: none;
+      z-index: 60;
+    }
+
+    .user-dropdown.active {
+      display: block;
+    }
+
+    .dropdown-header {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .dropdown-header p {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .dropdown-header h5 {
+      font-size: 0.85rem;
+      color: #fff;
+      font-weight: 600;
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 14px;
+      font-size: 0.82rem;
+      color: var(--beige);
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      background: none;
+      border: none;
+      width: 100%;
+      text-align: left;
+    }
+
+    .dropdown-item:hover {
+      background: #24201c;
+      color: #fff;
+    }
+
+    .dropdown-item.danger {
+      color: #e06c75;
+      border-top: 1px solid var(--card-border);
+      margin-top: 4px;
+    }
+
+    .dropdown-item.danger:hover {
+      background: rgba(224, 108, 117, 0.1);
+      color: #ff858d;
+    }
+
+    /* Main Container */
+    .dash-container {
+      max-width: 1320px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 5rem;
+      flex: 1;
+    }
+
+    /* Hero / Header Section */
+    .dash-hero {
+      margin-bottom: 2.5rem;
+    }
+
+    .dash-tagline {
+      font-family: var(--font-quote);
+      font-style: italic;
+      color: var(--beige);
+      font-size: 1.15rem;
+      margin-bottom: 0.35rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dash-tagline::before {
+      content: "";
+      width: 24px;
+      height: 1px;
+      background: var(--burgundy);
+    }
+
+    .dash-title {
+      font-family: var(--font-serif);
+      font-size: 2.3rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #fff;
+    }
+
+    .dash-sub {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-top: 0.35rem;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      padding: 1.25rem 1.4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 3px;
+      height: 100%;
+      background: var(--burgundy);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .stat-card:hover::after {
+      opacity: 1;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .stat-val {
+      font-family: var(--font-serif);
+      font-size: 1.9rem;
+      font-weight: 700;
+      color: var(--ivory);
+      margin-top: 0.35rem;
+    }
+
+    .stat-desc {
+      font-size: 0.78rem;
+      color: var(--beige);
+      opacity: 0.75;
+      margin-top: 0.2rem;
+    }
+
+    /* Action & Filter Bar */
+    .action-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      background: #141210;
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      padding: 0.85rem 1.25rem;
+      margin-bottom: 2rem;
+    }
+
+    .search-box {
+      position: relative;
+      flex: 1;
+      min-width: 240px;
+      max-width: 360px;
+    }
+
+    .search-box input {
+      width: 100%;
+      background: #1a1714;
+      border: 1px solid #2d2822;
+      border-radius: 4px;
+      padding: 0.5rem 0.85rem 0.5rem 2.25rem;
+      color: #fff;
+      font-size: 0.85rem;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .search-box input:focus {
+      border-color: var(--beige);
+    }
+
+    .search-box svg {
+      position: absolute;
+      left: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 14px;
+      height: 14px;
+      color: var(--muted);
+      pointer-events: none;
+    }
+
+    .filter-pills {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+
+    .filter-pill {
+      background: none;
+      border: 1px solid transparent;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 500;
+      padding: 0.35rem 0.75rem;
+      border-radius: 20px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+
+    .filter-pill:hover {
+      color: var(--ivory);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .filter-pill.active {
+      color: var(--ivory);
+      background: var(--burgundy);
+      border-color: var(--burgundy-light);
+    }
+
+    .view-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .sort-select {
+      background: #1a1714;
+      border: 1px solid #2d2822;
+      border-radius: 4px;
+      color: var(--beige);
+      font-size: 0.78rem;
+      padding: 0.45rem 0.75rem;
+      outline: none;
+      cursor: pointer;
+    }
+
+    /* Magazine Grid */
+    .mag-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+      gap: 2rem;
+    }
+
+    /* Magazine Card (Editorial Presentation) */
+    .mag-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s, border-color 0.25s;
+    }
+
+    .mag-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px -15px rgba(0,0,0,0.7);
+      border-color: #3d362e;
+    }
+
+    /* 3:4 Cover Wrapper */
+    .cover-wrap {
+      position: relative;
+      aspect-ratio: 3 / 4;
+      width: 100%;
+      background: #1e1b17;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    /* Realistic Editorial Spine Fold Effect */
+    .cover-wrap::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 24px;
+      background: linear-gradient(to right, rgba(0,0,0,0.5), rgba(0,0,0,0.15) 40%, rgba(255,255,255,0.06) 60%, transparent);
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    .cover-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.4s ease;
+    }
+
+    .mag-card:hover .cover-img {
+      transform: scale(1.03);
+    }
+
+    /* Dynamic SVG Cover Fallback */
+    .cover-svg-fallback {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 1.5rem;
+      background: linear-gradient(145deg, #181512, #29241f);
+      position: relative;
+    }
+
+    .cover-badge-row {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 6;
+      display: flex;
+      gap: 6px;
+    }
+
+    .badge-status {
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 3px 8px;
+      border-radius: 3px;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    .badge-status.draft {
+      background: rgba(22, 20, 18, 0.85);
+      color: var(--beige);
+      border: 1px solid rgba(227, 213, 189, 0.2);
+    }
+
+    .badge-status.published {
+      background: rgba(110, 20, 35, 0.9);
+      color: #fff;
+      border: 1px solid var(--burgundy-light);
+    }
+
+    /* Hover Overlay */
+    .cover-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(12, 11, 10, 0.88);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      z-index: 8;
+      padding: 1.5rem;
+    }
+
+    .mag-card:hover .cover-overlay {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .btn-card-primary {
+      width: 100%;
+      background: var(--ivory);
+      color: #0c0b0a;
+      border: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 0.65rem 1rem;
+      border-radius: 3px;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: background 0.15s;
+    }
+
+    .btn-card-primary:hover {
+      background: var(--beige);
+    }
+
+    .btn-card-secondary {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--ivory);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      font-size: 0.8rem;
+      font-weight: 500;
+      padding: 0.55rem 1rem;
+      border-radius: 3px;
+      cursor: pointer;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .btn-card-secondary:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: var(--beige);
+    }
+
+    /* Card Details */
+    .mag-info {
+      padding: 1.15rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .mag-cat-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.4rem;
+    }
+
+    .mag-category {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--burgundy-light);
+      font-weight: 600;
+    }
+
+    .mag-pages {
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+
+    .mag-name {
+      font-family: var(--font-serif);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.3;
+      margin-bottom: 0.4rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .mag-meta {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid #1f1c19;
+      padding-top: 0.75rem;
+    }
+
+    .mag-actions-trigger {
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.15s;
+    }
+
+    .mag-actions-trigger:hover {
+      color: #fff;
+    }
+
+    /* Empty State */
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 5rem 2rem;
+      background: var(--card-bg);
+      border: 1px dashed var(--card-border);
+      border-radius: 8px;
+    }
+
+    .empty-icon {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 1.25rem;
+      color: var(--muted);
+    }
+
+    .empty-title {
+      font-family: var(--font-serif);
+      font-size: 1.5rem;
+      color: #fff;
+      margin-bottom: 0.5rem;
+    }
+
+    .empty-text {
+      color: var(--muted);
+      font-size: 0.9rem;
+      max-width: 420px;
+      margin: 0 auto 1.5rem;
+    }
+
+    /* Create New Card (First item in grid) */
+    .create-card {
+      background: rgba(21, 19, 17, 0.4);
+      border: 2px dashed #2a2520;
+      border-radius: 6px;
+      aspect-ratio: 3 / 4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+      cursor: pointer;
+      text-decoration: none;
+      color: var(--muted);
+      transition: all 0.2s ease;
+    }
+
+    .create-card:hover {
+      border-color: var(--beige);
+      color: #fff;
+      background: rgba(30, 27, 24, 0.6);
+      transform: translateY(-4px);
+    }
+
+    .create-card-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #1f1b17;
+      border: 1px solid #332d26;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+      color: var(--beige);
+      transition: all 0.2s;
+    }
+
+    .create-card:hover .create-card-icon {
+      background: var(--burgundy);
+      border-color: var(--burgundy-light);
+      color: #fff;
+      transform: scale(1.08);
+    }
+
+    .create-card-title {
+      font-family: var(--font-serif);
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--ivory);
+      margin-bottom: 0.35rem;
+    }
+
+    .create-card-desc {
+      font-size: 0.78rem;
+      color: var(--muted);
+      max-width: 180px;
+    }
+
+    /* Modal Styling */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(12, 11, 10, 0.85);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-box {
+      background: #161412;
+      border: 1px solid #2e2823;
+      border-radius: 6px;
+      width: 100%;
+      max-width: 520px;
+      padding: 2rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+      position: relative;
+    }
+
+    .modal-title {
+      font-family: var(--font-serif);
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.5rem;
+    }
+
+    .modal-desc {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--beige);
+      margin-bottom: 0.4rem;
+    }
+
+    .form-group input, .form-group select {
+      width: 100%;
+      background: #1e1b17;
+      border: 1px solid #332d26;
+      border-radius: 4px;
+      padding: 0.65rem 0.85rem;
+      color: #fff;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .form-group input:focus, .form-group select:focus {
+      border-color: var(--beige);
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+
+    .btn-modal-cancel {
+      background: none;
+      border: 1px solid #332d26;
+      color: var(--muted);
+      font-size: 0.85rem;
+      padding: 0.55rem 1.15rem;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    .btn-modal-cancel:hover {
+      color: #fff;
+      border-color: #555;
+    }
+
+    .btn-modal-confirm {
+      background: var(--ivory);
+      color: #0c0b0a;
+      border: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 0.55rem 1.25rem;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    .btn-modal-confirm:hover {
+      background: var(--beige);
+    }
+
+    .btn-modal-danger {
+      background: #821c27;
+      color: #fff;
+      border: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 0.55rem 1.25rem;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    .btn-modal-danger:hover {
+      background: #a32230;
+    }
+
+    /* Magazine Spread Preview Modal */
+    .preview-modal-box {
+      max-width: 860px;
+      width: 95%;
+      background: #141210;
+    }
+
+    .spread-preview-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      padding: 1.5rem 0;
+      min-height: 420px;
+    }
+
+    .spread-sheet {
+      width: 320px;
+      height: 426px;
+      background: #f6f0e4;
+      color: #0c0b0a;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+      position: relative;
+      overflow: hidden;
+      border-radius: 2px;
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #181512;
+      border: 1px solid #332d26;
+      border-left: 3px solid var(--burgundy);
+      color: var(--ivory);
+      padding: 12px 20px;
+      border-radius: 4px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      font-size: 0.85rem;
+      z-index: 200;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s;
+    }
+
+    .toast.active {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <nav class="dash-nav">
+    <div class="brand-wrap">
+      <a href="index.html" class="brand-logo">PAPERLY<span>.</span></a>
+      <ul class="nav-links">
+        <li><a href="dashboard.html" class="nav-link active">Overview</a></li>
+        <li><a href="templates.html" class="nav-link">Explore Templates</a></li>
+        <li><a href="create.html" class="nav-link">New Creation</a></li>
+        <li><a href="studio.html" class="nav-link">Studio Editor</a></li>
+      </ul>
+    </div>
+
+    <div class="nav-actions">
+      <a href="create.html" class="btn-create-mag">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        <span>Create Magazine</span>
+      </a>
+
+      <!-- User Dropdown Pill -->
+      <div class="user-pill" id="userPill">
+        <div class="user-avatar" id="navAvatar">U</div>
+        <span class="user-name" id="navUserName">User</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--muted);"><polyline points="6 9 12 15 18 9"></polyline></svg>
+
+        <div class="user-dropdown" id="userDropdown">
+          <div class="dropdown-header">
+            <p>Signed in as</p>
+            <h5 id="dropdownUserEmail">user@example.com</h5>
+          </div>
+          <button class="dropdown-item" id="btnOpenAccountSettings">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            <span>Account Settings</span>
+          </button>
+          <button class="dropdown-item" id="btnExportAllData">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            <span>Export Archive JSON</span>
+          </button>
+          <button class="dropdown-item danger" id="btnLogout">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+            <span>Sign Out</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Container -->
+  <main class="dash-container">
+    <!-- Welcome Header -->
+    <header class="dash-hero">
+      <p class="dash-tagline">Stories, reimagined for the digital age.</p>
+      <h1 class="dash-title">Welcome back, <span id="heroUserName">Creator</span></h1>
+      <p class="dash-sub">Curate, refine, and publish your personal editorial universe.</p>
+    </header>
+
+    <!-- Stats Overview Cards -->
+    <section class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Total Magazines</div>
+        <div class="stat-val" id="statTotalMagazines">0</div>
+        <div class="stat-desc">Editions in your library</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Published Issues</div>
+        <div class="stat-val" id="statPublishedMagazines">0</div>
+        <div class="stat-desc">Ready for print & export</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total Spreads</div>
+        <div class="stat-val" id="statTotalPages">0</div>
+        <div class="stat-desc">Designed pages in studio</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">AI Story Engine</div>
+        <div class="stat-val" style="color:var(--burgundy-light);">Active</div>
+        <div class="stat-desc">Gemini 2.5 Flash ready</div>
+      </div>
+    </section>
+
+    <!-- Action & Filter Bar -->
+    <section class="action-bar">
+      <!-- Search Input -->
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" id="searchInput" placeholder="Search by edition title or occasion…">
+      </div>
+
+      <!-- Category Filter Pills -->
+      <div class="filter-pills" id="categoryPills">
+        <button class="filter-pill active" data-cat="all">All Editions</button>
+        <button class="filter-pill" data-cat="Best Friend">Best Friend</button>
+        <button class="filter-pill" data-cat="Birthday">Birthday</button>
+        <button class="filter-pill" data-cat="Couple">Couple</button>
+        <button class="filter-pill" data-cat="Anniversary">Anniversary</button>
+        <button class="filter-pill" data-cat="Travel">Travel</button>
+        <button class="filter-pill" data-cat="Fashion">Fashion</button>
+      </div>
+
+      <!-- Sort Selection -->
+      <div class="view-controls">
+        <select class="sort-select" id="sortSelect">
+          <option value="recent">Recently Edited</option>
+          <option value="az">Title (A → Z)</option>
+          <option value="pages">Most Pages</option>
+        </select>
+      </div>
+    </section>
+
+    <!-- Magazines Gallery -->
+    <section class="mag-grid" id="magazinesGrid">
+      <!-- Injected via JavaScript -->
+    </section>
+  </main>
+
+  <!-- Rename Modal -->
+  <div class="modal-overlay" id="renameModal">
+    <div class="modal-box">
+      <h3 class="modal-title">Rename Magazine</h3>
+      <p class="modal-desc">Give this edition a distinctive title for your library and covers.</p>
+      <form id="renameForm">
+        <div class="form-group">
+          <label for="renameInput">Magazine Title</label>
+          <input type="text" id="renameInput" required maxlength="60">
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-modal-cancel" id="btnCancelRename">Cancel</button>
+          <button type="submit" class="btn-modal-confirm">Save Title</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Modal -->
+  <div class="modal-overlay" id="deleteModal">
+    <div class="modal-box">
+      <h3 class="modal-title" style="color:#ff858d;">Delete Magazine</h3>
+      <p class="modal-desc">Are you sure you want to delete <strong id="deleteTargetTitle" style="color:#fff;"></strong>? This action will remove all pages, layouts, and curated AI stories permanently.</p>
+      <div class="modal-actions">
+        <button type="button" class="btn-modal-cancel" id="btnCancelDelete">Keep Magazine</button>
+        <button type="button" class="btn-modal-danger" id="btnConfirmDelete">Delete Forever</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Account Settings Modal -->
+  <div class="modal-overlay" id="accountModal">
+    <div class="modal-box">
+      <h3 class="modal-title">Account Settings</h3>
+      <p class="modal-desc">Manage your PAPERLY creator profile and preferences.</p>
+      <form id="accountForm">
+        <div class="form-group">
+          <label for="accName">Full Name</label>
+          <input type="text" id="accName" required>
+        </div>
+        <div class="form-group">
+          <label for="accEmail">Email Address</label>
+          <input type="email" id="accEmail" required>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-modal-cancel" id="btnCancelAccount">Close</button>
+          <button type="submit" class="btn-modal-confirm">Update Profile</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Spread Preview Modal -->
+  <div class="modal-overlay" id="previewModal">
+    <div class="modal-box preview-modal-box">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+        <div>
+          <h3 class="modal-title" id="previewTitle" style="margin-bottom:2px;">The Birthday Issue</h3>
+          <p class="modal-desc" id="previewSub" style="margin:0;">Page 1 of 6</p>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <a href="#" id="previewOpenStudioBtn" class="btn-card-primary" style="padding:6px 14px; font-size:0.8rem;">Open in Studio</a>
+          <button class="btn-modal-cancel" id="btnClosePreview">Close</button>
+        </div>
+      </div>
+      <div class="spread-preview-container" id="previewSpreadCanvas">
+        <!-- Live page render -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast">
+    <span id="toastMessage">Changes saved</span>
+  </div>
+
+  <!-- Core JavaScript Architecture -->
+  <script src="js/templates-data.js"></script>
+  <script>
+    // --- State & User Management ---
+    const STORAGE_KEY_USER = 'paperly_active_user';
+    const STORAGE_KEY_PROJECTS = 'paperly_projects';
+
+    let activeUser = null;
+    let projects = [];
+    let currentFilter = 'all';
+    let currentSearch = '';
+    let currentSort = 'recent';
+    let targetProjectId = null;
+
+    // Toast helper
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastMessage').textContent = msg;
+      toast.classList.add('active');
+      setTimeout(() => toast.classList.remove('active'), 3200);
+    }
+
+    // Load active session
+    function loadUserSession() {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY_USER);
+        if (stored) {
+          activeUser = JSON.parse(stored);
+        } else {
+          // Create default demo user session
+          activeUser = {
+            id: 'usr_demo',
+            name: 'Editorial Creator',
+            email: 'creator@paperly.design'
+          };
+          localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(activeUser));
+        }
+      } catch (e) {
+        activeUser = { id: 'usr_demo', name: 'Editorial Creator', email: 'creator@paperly.design' };
+      }
+
+      // Populate UI
+      const firstName = (activeUser.name || 'Creator').split(' ')[0];
+      document.getElementById('heroUserName').textContent = firstName;
+      document.getElementById('navUserName').textContent = firstName;
+      document.getElementById('navAvatar').textContent = (activeUser.name || 'C').charAt(0);
+      document.getElementById('dropdownUserEmail').textContent = activeUser.email || '';
+      document.getElementById('accName').value = activeUser.name || '';
+      document.getElementById('accEmail').value = activeUser.email || '';
+    }
+
+    // Default Starter Seed Projects if empty
+    function getDefaultSeedProjects(userId) {
+      const seeds = [
+        {
+          id: 'proj_bday_101',
+          userId: userId,
+          title: 'The Birthday Issue — Golden Twenty',
+          category: 'Birthday',
+          status: 'Published',
+          coverImage: 'https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=720&q=80',
+          pages: (window.PAPERLY_TEMPLATES && window.PAPERLY_TEMPLATES.EDITIONS['birthday']?.pages) || [],
+          pageCount: 6,
+          createdAt: new Date(Date.now() - 86400000 * 3).toISOString(),
+          updatedAt: new Date(Date.now() - 3600000 * 2).toISOString()
+        },
+        {
+          id: 'proj_bff_102',
+          userId: userId,
+          title: 'Forever Sisters — Studio Edition',
+          category: 'Best Friend',
+          status: 'Draft',
+          coverImage: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=720&q=80',
+          pages: (window.PAPERLY_TEMPLATES && window.PAPERLY_TEMPLATES.EDITIONS['best-friend']?.pages) || [],
+          pageCount: 8,
+          createdAt: new Date(Date.now() - 86400000 * 7).toISOString(),
+          updatedAt: new Date(Date.now() - 3600000 * 18).toISOString()
+        },
+        {
+          id: 'proj_travel_103',
+          userId: userId,
+          title: 'Lisbon After Dark',
+          category: 'Travel',
+          status: 'Draft',
+          coverImage: 'https://images.unsplash.com/photo-1508672019048-805c876b67e2?auto=format&fit=crop&w=720&q=80',
+          pages: (window.PAPERLY_TEMPLATES && window.PAPERLY_TEMPLATES.EDITIONS['travel']?.pages) || [],
+          pageCount: 6,
+          createdAt: new Date(Date.now() - 86400000 * 12).toISOString(),
+          updatedAt: new Date(Date.now() - 86400000 * 2).toISOString()
+        }
+      ];
+      return seeds;
+    }
+
+    // Load Projects
+    function loadProjects() {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY_PROJECTS);
+        if (stored) {
+          projects = JSON.parse(stored);
+        } else {
+          projects = getDefaultSeedProjects(activeUser.id);
+          saveProjects();
+        }
+      } catch (e) {
+        projects = getDefaultSeedProjects(activeUser.id);
+      }
+    }
+
+    // Save Projects
+    function saveProjects() {
+      try {
+        localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(projects));
+      } catch (e) {
+        console.error('Storage quota exceeded or error saving projects', e);
+      }
+    }
+
+    // Update Statistics
+    function updateStats() {
+      const userProjects = projects.filter(p => !p.userId || p.userId === activeUser.id);
+      const total = userProjects.length;
+      const published = userProjects.filter(p => p.status === 'Published').length;
+      const totalPages = userProjects.reduce((acc, p) => acc + (p.pages ? p.pages.length : (p.pageCount || 4)), 0);
+
+      document.getElementById('statTotalMagazines').textContent = total;
+      document.getElementById('statPublishedMagazines').textContent = published;
+      document.getElementById('statTotalPages').textContent = totalPages;
+    }
+
+    // Time Ago formatter
+    function timeAgo(dateString) {
+      if (!dateString) return 'recently';
+      const d = new Date(dateString);
+      const now = new Date();
+      const diffSec = Math.floor((now - d) / 1000);
+      if (diffSec < 60) return 'just now';
+      if (diffSec < 3600) return `${Math.floor(diffSec / 60)}m ago`;
+      if (diffSec < 86400) return `${Math.floor(diffSec / 3600)}h ago`;
+      return `${Math.floor(diffSec / 86400)}d ago`;
+    }
+
+    // Render Magazines Grid
+    function renderGrid() {
+      const grid = document.getElementById('magazinesGrid');
+      grid.innerHTML = '';
+
+      // Always include "+ Start New Edition" Card as first item
+      const createCard = document.createElement('a');
+      createCard.href = 'create.html';
+      createCard.className = 'create-card';
+      createCard.innerHTML = `
+        <div class="create-card-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        </div>
+        <h4 class="create-card-title">New Magazine</h4>
+        <p class="create-card-desc">Step-by-step creation wizard with AI writing assistance</p>
+      `;
+      grid.appendChild(createCard);
+
+      // Filter
+      let filtered = projects.filter(p => {
+        // user ownership check
+        if (p.userId && p.userId !== activeUser.id && activeUser.id !== 'usr_demo') return false;
+        // category check
+        if (currentFilter !== 'all' && (p.category || '').toLowerCase() !== currentFilter.toLowerCase()) return false;
+        // search query check
+        if (currentSearch) {
+          const q = currentSearch.toLowerCase();
+          const matchTitle = (p.title || '').toLowerCase().includes(q);
+          const matchCat = (p.category || '').toLowerCase().includes(q);
+          return matchTitle || matchCat;
+        }
+        return true;
+      });
+
+      // Sort
+      if (currentSort === 'recent') {
+        filtered.sort((a, b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0));
+      } else if (currentSort === 'az') {
+        filtered.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+      } else if (currentSort === 'pages') {
+        filtered.sort((a, b) => (b.pages?.length || b.pageCount || 0) - (a.pages?.length || a.pageCount || 0));
+      }
+
+      if (filtered.length === 0 && (currentFilter !== 'all' || currentSearch)) {
+        const empty = document.createElement('div');
+        empty.className = 'empty-state';
+        empty.innerHTML = `
+          <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <h3 class="empty-title">No Magazines Found</h3>
+          <p class="empty-text">No editions match your current filter or search criteria. Try selecting another category or clearing your query.</p>
+          <button class="btn-card-primary" style="display:inline-block; max-width:200px; margin:0 auto;" onclick="resetFilters()">Show All Editions</button>
+        `;
+        grid.appendChild(empty);
+        return;
+      }
+
+      // Render Project Cards
+      filtered.forEach(p => {
+        const card = document.createElement('article');
+        card.className = 'mag-card';
+
+        const pageCount = p.pages ? p.pages.length : (p.pageCount || 6);
+        const coverImg = p.coverImage || (p.pages && p.pages[0]?.elements?.find(e => e.type === 'img')?.src) || 'https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=720&q=80';
+        const isDraft = (p.status || 'Draft') === 'Draft';
+
+        card.innerHTML = `
+          <div class="cover-wrap">
+            <img class="cover-img" src="${coverImg}" alt="${p.title}" loading="lazy">
+            <div class="cover-badge-row">
+              <span class="badge-status ${isDraft ? 'draft' : 'published'}">${p.status || 'Draft'}</span>
+            </div>
+            <div class="cover-overlay">
+              <a href="studio.html?id=${p.id}" class="btn-card-primary">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                <span>Edit in Studio</span>
+              </a>
+              <button class="btn-card-secondary" onclick="openPreview('${p.id}')">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                <span>Quick Preview</span>
+              </button>
+              <button class="btn-card-secondary" onclick="duplicateProject('${p.id}')">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                <span>Duplicate</span>
+              </button>
+            </div>
+          </div>
+          <div class="mag-info">
+            <div class="mag-cat-row">
+              <span class="mag-category">${p.category || 'General'}</span>
+              <span class="mag-pages">${pageCount} Pages</span>
+            </div>
+            <h3 class="mag-name" title="${p.title}">${p.title}</h3>
+            <div class="mag-meta">
+              <span>Edited ${timeAgo(p.updatedAt)}</span>
+              <div style="display:flex; gap:6px;">
+                <button class="mag-actions-trigger" title="Rename" onclick="openRenameModal('${p.id}')">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
+                </button>
+                <button class="mag-actions-trigger" title="Delete" onclick="openDeleteModal('${p.id}')">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function resetFilters() {
+      currentFilter = 'all';
+      currentSearch = '';
+      document.getElementById('searchInput').value = '';
+      document.querySelectorAll('.filter-pill').forEach(b => b.classList.toggle('active', b.dataset.cat === 'all'));
+      renderGrid();
+    }
+
+    // --- Action Handlers ---
+
+    // Rename
+    function openRenameModal(id) {
+      targetProjectId = id;
+      const p = projects.find(item => item.id === id);
+      if (!p) return;
+      document.getElementById('renameInput').value = p.title || '';
+      document.getElementById('renameModal').classList.add('active');
+    }
+
+    document.getElementById('btnCancelRename').onclick = () => {
+      document.getElementById('renameModal').classList.remove('active');
+    };
+
+    document.getElementById('renameForm').onsubmit = (e) => {
+      e.preventDefault();
+      const newTitle = document.getElementById('renameInput').value.trim();
+      if (!newTitle) return;
+      const p = projects.find(item => item.id === targetProjectId);
+      if (p) {
+        p.title = newTitle;
+        p.updatedAt = new Date().toISOString();
+        saveProjects();
+        renderGrid();
+        showToast('Magazine title updated');
+      }
+      document.getElementById('renameModal').classList.remove('active');
+    };
+
+    // Delete
+    function openDeleteModal(id) {
+      targetProjectId = id;
+      const p = projects.find(item => item.id === id);
+      if (!p) return;
+      document.getElementById('deleteTargetTitle').textContent = `"${p.title}"`;
+      document.getElementById('deleteModal').classList.add('active');
+    }
+
+    document.getElementById('btnCancelDelete').onclick = () => {
+      document.getElementById('deleteModal').classList.remove('active');
+    };
+
+    document.getElementById('btnConfirmDelete').onclick = () => {
+      projects = projects.filter(p => p.id !== targetProjectId);
+      saveProjects();
+      updateStats();
+      renderGrid();
+      showToast('Magazine permanently deleted');
+      document.getElementById('deleteModal').classList.remove('active');
+    };
+
+    // Duplicate
+    function duplicateProject(id) {
+      const orig = projects.find(p => p.id === id);
+      if (!orig) return;
+      const clone = JSON.parse(JSON.stringify(orig));
+      clone.id = 'proj_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+      clone.title = `${orig.title} (Copy)`;
+      clone.status = 'Draft';
+      clone.createdAt = new Date().toISOString();
+      clone.updatedAt = new Date().toISOString();
+      projects.unshift(clone);
+      saveProjects();
+      updateStats();
+      renderGrid();
+      showToast('Magazine duplicated');
+    }
+
+    // Quick Preview
+    function openPreview(id) {
+      const p = projects.find(item => item.id === id);
+      if (!p) return;
+      document.getElementById('previewTitle').textContent = p.title;
+      document.getElementById('previewSub').textContent = `${p.category || 'Magazine'} Edition • ${(p.pages || []).length} Spreads`;
+      document.getElementById('previewOpenStudioBtn').href = `studio.html?id=${p.id}`;
+
+      const canvas = document.getElementById('previewSpreadCanvas');
+      canvas.innerHTML = '';
+
+      if (p.pages && p.pages.length) {
+        const coverPage = p.pages[0];
+        const sheet = document.createElement('div');
+        sheet.className = 'spread-sheet';
+        sheet.style.background = coverPage.bg || '#f6f0e4';
+
+        const els = coverPage.els || coverPage.elements || [];
+        els.forEach(el => {
+          const d = document.createElement('div');
+          d.style.position = 'absolute';
+          d.style.left = ((el.x / 540) * 100) + '%';
+          d.style.top = ((el.y / 720) * 100) + '%';
+          d.style.width = ((el.w / 540) * 100) + '%';
+          d.style.height = ((el.h / 720) * 100) + '%';
+
+          const isImg = el.t === 'img' || el.type === 'img';
+          const isText = el.t === 'text' || el.type === 'text';
+
+          if (isImg) {
+            if (el.bg) {
+              d.style.background = el.bg;
+              d.style.backgroundSize = 'cover';
+              d.style.backgroundPosition = 'center';
+            } else if (el.src) {
+              d.innerHTML = `<img src="${el.src}" style="width:100%; height:100%; object-fit:cover;">`;
+            }
+          } else if (isText) {
+            d.style.fontFamily = el.font || 'Georgia, serif';
+            d.style.fontSize = Math.max(9, (el.size || 16) * 0.58) + 'px';
+            d.style.fontWeight = el.weight || (el.bold ? 'bold' : 'normal');
+            d.style.fontStyle = el.italic ? 'italic' : 'normal';
+            d.style.color = el.color || '#0c0b0a';
+            d.style.textAlign = el.align || 'left';
+            d.style.letterSpacing = (el.sp ? el.sp * 0.5 : 0) + 'px';
+            d.innerHTML = el.text || el.content || '';
+          }
+          sheet.appendChild(d);
+        });
+        canvas.appendChild(sheet);
+      } else {
+        canvas.innerHTML = `<p style="color:var(--muted); font-size:0.9rem;">No spread preview available for this edition.</p>`;
+      }
+
+      document.getElementById('previewModal').classList.add('active');
+    }
+
+    document.getElementById('btnClosePreview').onclick = () => {
+      document.getElementById('previewModal').classList.remove('active');
+    };
+
+    // User Dropdown toggle
+    const userPill = document.getElementById('userPill');
+    const userDropdown = document.getElementById('userDropdown');
+    userPill.addEventListener('click', (e) => {
+      if (e.target.closest('.user-dropdown')) return;
+      userDropdown.classList.toggle('active');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!userPill.contains(e.target)) {
+        userDropdown.classList.remove('active');
+      }
+    });
+
+    // Account settings modal
+    document.getElementById('btnOpenAccountSettings').onclick = () => {
+      userDropdown.classList.remove('active');
+      document.getElementById('accountModal').classList.add('active');
+    };
+
+    document.getElementById('btnCancelAccount').onclick = () => {
+      document.getElementById('accountModal').classList.remove('active');
+    };
+
+    document.getElementById('accountForm').onsubmit = (e) => {
+      e.preventDefault();
+      activeUser.name = document.getElementById('accName').value.trim();
+      activeUser.email = document.getElementById('accEmail').value.trim();
+      localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(activeUser));
+      loadUserSession();
+      document.getElementById('accountModal').classList.remove('active');
+      showToast('Profile information saved');
+    };
+
+    // Export Archive JSON
+    document.getElementById('btnExportAllData').onclick = () => {
+      const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify({
+        user: activeUser,
+        projects: projects,
+        exportedAt: new Date().toISOString()
+      }, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute('href', dataStr);
+      downloadAnchor.setAttribute('download', `paperly-archive-${Date.now()}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      userDropdown.classList.remove('active');
+      showToast('Archive downloaded to your device');
+    };
+
+    // Logout
+    document.getElementById('btnLogout').onclick = () => {
+      localStorage.removeItem(STORAGE_KEY_USER);
+      window.location.href = 'login.html';
+    };
+
+    // Search & Filter event listeners
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      currentSearch = e.target.value.trim();
+      renderGrid();
+    });
+
+    document.querySelectorAll('.filter-pill').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentFilter = btn.dataset.cat;
+        renderGrid();
+      });
+    });
+
+    document.getElementById('sortSelect').addEventListener('change', (e) => {
+      currentSort = e.target.value;
+      renderGrid();
+    });
+
+    // Close modals on overlay backdrop click
+    document.querySelectorAll('.modal-overlay').forEach(modal => {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.classList.remove('active');
+      });
+    });
+
+    // Initialize
+    loadUserSession();
+    loadProjects();
+    updateStats();
+    renderGrid();
+  </script>
+</body>
+</html>

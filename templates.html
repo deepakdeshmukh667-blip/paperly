@@ -297,7 +297,7 @@
         <li><a href="index.html#how-it-works">How It Works</a></li>
         <li><a href="login.html">Login</a></li>
         <li>
-          <a href="studio.html" style="display:inline-flex; align-items:center; gap:6px; padding:0.5rem 1.25rem; font-size:0.85rem; font-weight:500; background:#0c0b0a; color:#f6f0e4; border-radius:2px;">
+          <a href="create.html" style="display:inline-flex; align-items:center; gap:6px; padding:0.5rem 1.25rem; font-size:0.85rem; font-weight:500; background:#0c0b0a; color:#f6f0e4; border-radius:2px;">
             Create Your Magazine
           </a>
         </li>
@@ -315,7 +315,7 @@
       <a href="index.html#how-it-works">How It Works</a>
       <a href="login.html">Login</a>
       <a href="signup.html">Create Account</a>
-      <a href="studio.html" style="background:#0c0b0a; color:#fff; text-align:center; padding:10px; border-radius:2px;">Launch Studio</a>
+      <a href="create.html" style="background:#0c0b0a; color:#fff; text-align:center; padding:10px; border-radius:2px;">Create Magazine</a>
     </div>
   </header>
 
@@ -335,7 +335,7 @@
           <input type="text" id="searchInput" class="search-input" placeholder="Search templates, styles, occasions…">
         </div>
 
-        <a href="studio.html" style="font-size: 0.85rem; color: var(--color-burgundy); font-weight: 600; text-decoration: underline;">
+        <a href="create.html" style="font-size: 0.85rem; color: var(--color-burgundy); font-weight: 600; text-decoration: underline;">
           Or start with a blank magazine →
         </a>
       </div>
@@ -456,7 +456,7 @@
             <p class="card-desc">${ed.description}</p>
             <div class="card-actions">
               <button class="btn-preview" data-preview="${k}">Preview Edition</button>
-              <a href="studio.html?template=${k}" class="btn-use">Use Template</a>
+              <a href="create.html?template=${k}" class="btn-use">Use Template</a>
             </div>
           </div>
         `;
@@ -493,7 +493,7 @@
       modalTitle.textContent = ed.name;
       modalCat.textContent = `${ed.category} Edition`;
       modalDesc.textContent = ed.description;
-      modalUseBtn.href = `studio.html?template=${key}`;
+      modalUseBtn.href = `create.html?template=${key}`;
       document.getElementById('modalPagesCount').textContent = `${ed.pages.length} Pages Included · Fully Editable`;
 
       modalSpreads.innerHTML = '';
@@ -566,3 +566,4 @@
   </script>
 </body>
 </html>
+

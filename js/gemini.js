@@ -431,5 +431,65 @@ CRITICAL RULES:
 
 if (typeof window !== 'undefined') {
   window.PAPERLY_GEMINI = PAPERLY_GEMINI;
+
+  // PAPERLY_AI — high-level adapter used by the Creation Wizard (create.html)
+  // Wraps PAPERLY_GEMINI with named methods and tone/format mapping.
+  window.PAPERLY_AI = {
+    /**
+     * @param {{ recipient, occasion, details, tone }} opts
+     */
+    generateHeadline: ({ recipient, occasion, details, tone = 'Emotional' }) =>
+      PAPERLY_GEMINI.generate({
+        tone: normalizeTone(tone),
+        kind: 'Headline',
+        memo: `Recipient: ${recipient}. Occasion: ${occasion}. Notes: ${details}`,
+        action: 'gen'
+      }).then(r => r.text),
+
+    generateStory: ({ recipient, occasion, details, tone = 'Emotional' }) =>
+      PAPERLY_GEMINI.generate({
+        tone: normalizeTone(tone),
+        kind: 'Story',
+        memo: `Recipient: ${recipient}. Occasion: ${occasion}. Notes: ${details}`,
+        action: 'gen'
+      }).then(r => r.text),
+
+    generateDedication: ({ recipient, occasion, details, tone = 'Emotional' }) =>
+      PAPERLY_GEMINI.generate({
+        tone: normalizeTone(tone),
+        kind: 'Dedication',
+        memo: `Recipient: ${recipient}. Occasion: ${occasion}. Notes: ${details}`,
+        action: 'gen'
+      }).then(r => r.text),
+
+    generateCaption: ({ details, tone = 'Emotional' }) =>
+      PAPERLY_GEMINI.generate({
+        tone: normalizeTone(tone),
+        kind: 'Caption',
+        memo: details,
+        action: 'gen'
+      }).then(r => r.text),
+
+    generateWish: ({ recipient, occasion, details, tone = 'Emotional' }) =>
+      PAPERLY_GEMINI.generate({
+        tone: normalizeTone(tone),
+        kind: 'Wish',
+        memo: `For ${recipient}. ${occasion}. Notes: ${details}`,
+        action: 'gen'
+      }).then(r => r.text),
+  };
+
+  // Maps wizard tone keys to PAPERLY_GEMINI tone strings
+  function normalizeTone(t) {
+    const MAP = {
+      emotional: 'Emotional',
+      cute: 'Cute',
+      funny: 'Funny',
+      deep: 'Deep',
+      meaningful: 'Meaningful',
+      luxury: 'Luxury Editorial'
+    };
+    return MAP[t] || MAP[t.toLowerCase()] || 'Emotional';
+  }
 }
 

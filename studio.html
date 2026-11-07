@@ -507,6 +507,7 @@
       <span class="logo">PAPERLY<i>.</i></span>
       <span class="home-badge">← Home</span>
     </a>
+    <a href="dashboard.html" class="home-badge" style="text-decoration: none;" title="Go to Creator Dashboard">Dashboard</a>
 
     <input class="pn" id="pname" value="The Summer Issue" aria-label="Project Title" title="Click to rename publication">
 
@@ -715,7 +716,8 @@
       cur: 0,
       sel: null,
       zoom: 0.8,
-      guides: true
+      guides: true,
+      projectId: null
     };
 
     let H = []; // Undo stack
@@ -736,9 +738,26 @@
       tmr = setTimeout(() => {
         try {
           localStorage.setItem("paperly_project", JSON.stringify({
+            id: S.projectId,
             title: $("#pname").value,
             pages: S.pages
           }));
+
+          // Sync to paperly_projects list
+          if (S.projectId) {
+            let projects = [];
+            try {
+              projects = JSON.parse(localStorage.getItem("paperly_projects") || "[]");
+            } catch (err) {}
+            const p = projects.find(item => item.id === S.projectId);
+            if (p) {
+              p.title = $("#pname").value;
+              p.pages = S.pages;
+              p.pageCount = S.pages.length;
+              p.updatedAt = new Date().toISOString();
+              localStorage.setItem("paperly_projects", JSON.stringify(projects));
+            }
+          }
         } catch (e) {}
         $("#sv").textContent = "All changes saved";
       }, 400);
@@ -1645,11 +1664,27 @@
       }
     });
 
-    // Handle URL Query Params (e.g. ?template=birthday)
+    // Handle URL Query Params (e.g. ?template=birthday, ?id=proj_xxx)
     function handleInitialTemplate() {
       const params = new URLSearchParams(window.location.search);
       const tplParam = params.get("template");
+      const idParam = params.get("id");
 
+      // ?id=proj_xxx — load project from paperly_projects
+      if (idParam) {
+        try {
+          const projects = JSON.parse(localStorage.getItem("paperly_projects") || "[]");
+          const proj = projects.find(p => p.id === idParam);
+          if (proj && proj.pages && proj.pages.length) {
+            S.pages = JSON.parse(JSON.stringify(proj.pages));
+            S.projectId = proj.id;
+            $("#pname").value = proj.title || "Untitled Magazine";
+            return true;
+          }
+        } catch (e) {}
+      }
+
+      // ?template=birthday — load from templates library
       if (tplParam && PAPERLY_TEMPLATES.EDITIONS[tplParam]) {
         const ed = PAPERLY_TEMPLATES.EDITIONS[tplParam];
         S.pages = JSON.parse(JSON.stringify(ed.pages));

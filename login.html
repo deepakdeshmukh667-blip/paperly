@@ -311,7 +311,7 @@
             }));
             showAlert('Login successful! Redirecting…', false);
             setTimeout(() => {
-              window.location.href = 'studio.html';
+              window.location.href = 'dashboard.html';
             }, 800);
           } else if (!users.length || !user) {
             // Demo account fallback for instant testing
@@ -321,9 +321,9 @@
               email: email
             };
             localStorage.setItem('paperly_active_user', JSON.stringify(defaultUser));
-            showAlert('Welcome! Redirecting to studio…', false);
+            showAlert('Welcome! Redirecting to your dashboard…', false);
             setTimeout(() => {
-              window.location.href = 'studio.html';
+              window.location.href = 'dashboard.html';
             }, 800);
           } else {
             showAlert('Incorrect password. Please verify and try again.');
