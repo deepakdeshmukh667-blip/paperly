@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -530,6 +530,7 @@
     <button id="btnLoadJson" title="Open project JSON file">Load</button>
     <input type="file" id="jsonFileInput" accept=".json,.paperly" style="display: none;">
 
+    <button id="btnPublish" title="Toggle published/draft status" style="border: 1px solid #3a2e28; background: transparent; color: #e3d5bd; font-size: 0.72rem; letter-spacing: 0.06em; padding: 0.3rem 0.8rem; cursor: pointer; font-family: inherit; transition: background 0.2s, color 0.2s;">DRAFT</button>
     <button id="prev" title="View magazine in fullscreen presentation">Preview</button>
     <button class="pri" id="exp" title="Export as print-ready PDF">Export PDF</button>
   </header>
@@ -1555,6 +1556,38 @@
       }
     };
 
+    // ---- PUBLISH TOGGLE
+    (function initPublishBtn() {
+      const btn = $("#btnPublish");
+      if (!btn) return;
+      function refreshPublishBtn() {
+        if (!S.projectId) return;
+        try {
+          const projects = JSON.parse(localStorage.getItem("paperly_projects") || "[]");
+          const p = projects.find(item => item.id === S.projectId);
+          const isPublished = p && p.status === "Published";
+          btn.textContent = isPublished ? "PUBLISHED" : "DRAFT";
+          btn.style.background = isPublished ? "#6e1423" : "transparent";
+          btn.style.color = isPublished ? "#f6f0e4" : "#e3d5bd";
+          btn.title = isPublished ? "Click to revert to Draft" : "Click to mark as Published";
+        } catch (e) {}
+      }
+      btn.onclick = () => {
+        if (!S.projectId) { showToast("Save your project first"); return; }
+        try {
+          const projects = JSON.parse(localStorage.getItem("paperly_projects") || "[]");
+          const p = projects.find(item => item.id === S.projectId);
+          if (p) {
+            p.status = (p.status === "Published") ? "Draft" : "Published";
+            localStorage.setItem("paperly_projects", JSON.stringify(projects));
+            refreshPublishBtn();
+            showToast(p.status === "Published" ? "Magazine published!" : "Reverted to draft");
+          }
+        } catch (e) {}
+      };
+      setTimeout(refreshPublishBtn, 600);
+    })();
+
     // ---- PROJECT JSON SAVE / LOAD
     $("#btnSaveJson").onclick = () => {
       const data = {
@@ -1726,4 +1759,6 @@
   </script>
 </body>
 </html>
+
+
 

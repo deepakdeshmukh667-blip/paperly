@@ -1,4 +1,4 @@
-/**
+﻿/**
  * PAPERLY — Magazine Starter Editions & Page Presets
  * Pre-designed luxury editorial layouts for all 6 signature categories.
  */
@@ -169,6 +169,18 @@ const PAPERLY_TEMPLATES = (() => {
         PAGE_BLOCKS.gallery("LOOKBOOK", "Light, Texture & Form", 3, 4, 1),
         PAGE_BLOCKS.dedication("COLOPHON", "Created with PAPERLY Magazine Studio.\nDesigned for collectors of rare and thoughtful moments.", "PAPERLY Publishing House", "#0c0b0a")
       ]
+    },
+
+    "personal-journal": {
+      name: "Dear Diary",
+      category: "Personal Journal",
+      description: "Your private world in print. Reflections, moods and the quiet moments that shaped a year.",
+      pages: [
+        PAGE_BLOCKS.cover("DEAR DIARY", "PERSONAL VOLUME \u00b7 2026", "Reflections, moods and the quiet moments that shaped a year.", 0, "#2a1f1a", "#f4ede0"),
+        PAGE_BLOCKS.spread("The Year I Chose Myself", "Some years arrive quietly and leave you transformed. I stopped measuring progress by milestones and started measuring it by mornings.", "REFLECTIONS", 1),
+        PAGE_BLOCKS.feature("INNER LIFE", "What I Learned in the Silence", "I kept a journal because I had nowhere else to put the thoughts that were too tender for conversation and too important to forget.", "\u201cWriting is the painting of the voice.\u201d", 3),
+        PAGE_BLOCKS.dedication("NOTE TO SELF", "You have survived every hard day so far.\n\nKeep choosing the version of yourself that you are proudest of.", "With love, Future You \u00b7 Written with PAPERLY", "#f4ede0")
+      ]
     }
   };
 
@@ -183,4 +195,5 @@ const PAPERLY_TEMPLATES = (() => {
 if (typeof window !== 'undefined') {
   window.PAPERLY_TEMPLATES = PAPERLY_TEMPLATES;
 }
+
 

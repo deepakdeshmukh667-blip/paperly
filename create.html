@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -803,6 +803,16 @@
             <p class="category-sub">High-fashion visual lookbook, wardrobe curations, moodboards, and minimal Scandinavian typography.</p>
           </div>
         </div>
+
+        <div class="category-card" data-cat="Personal Journal" data-tpl="personal-journal">
+          <div class="category-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+          </div>
+          <div>
+            <h3 class="category-title">Personal Journal</h3>
+            <p class="category-sub">Your private world in print. Reflections, moods, and the quiet moments that shaped a year.</p>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -1081,6 +1091,9 @@
         } else if (cat === 'Fashion') {
           document.getElementById('magTitleInput').value = 'The Minimalist Wardrobe';
           document.getElementById('occasionInput').value = 'Curated Autumn Editorial';
+        } else if (cat === 'Personal Journal') {
+          document.getElementById('magTitleInput').value = 'Dear Diary — 2026 Reflections';
+          document.getElementById('occasionInput').value = 'A Year of Quiet Growth & Solitude';
         } else {
           document.getElementById('magTitleInput').value = 'Forever Sisters — The Studio Issue';
           document.getElementById('occasionInput').value = 'Ten Years of Unfiltered Laughter';
@@ -1095,13 +1108,33 @@
 
       if (!window.PAPERLY_TEMPLATES) return;
       const eds = window.PAPERLY_TEMPLATES.EDITIONS;
+      const selCat = (wizardData.category || '').toLowerCase();
 
-      Object.keys(eds).forEach(key => {
+      // Sort: matching category first, then others
+      const keys = Object.keys(eds).sort((a, b) => {
+        const aMatch = (eds[a].category || '').toLowerCase() === selCat;
+        const bMatch = (eds[b].category || '').toLowerCase() === selCat;
+        return (bMatch ? 1 : 0) - (aMatch ? 1 : 0);
+      });
+
+      let firstMatch = null;
+
+      keys.forEach(key => {
         const ed = eds[key];
-        const isMatch = (ed.category || '').toLowerCase() === wizardData.category.toLowerCase() || key === wizardData.templateKey;
+        const isMatch = (ed.category || '').toLowerCase() === selCat || key === wizardData.templateKey;
         const card = document.createElement('div');
-        card.className = `tpl-card ${isMatch ? 'selected' : ''}`;
+        card.className = 'tpl-card' + (isMatch && !firstMatch ? ' selected' : '');
+        // Auto-select first matching template if none explicitly chosen
+        if (isMatch && !firstMatch) {
+          firstMatch = key;
+          if (!wizardData.templateKey || (eds[wizardData.templateKey] && (eds[wizardData.templateKey].category || '').toLowerCase() !== selCat)) {
+            wizardData.templateKey = key;
+          }
+        }
         card.dataset.key = key;
+
+        // Dim non-matching templates rather than hiding them
+        if (!isMatch) card.style.opacity = '0.45';
 
         card.innerHTML = `
           <div class="tpl-preview">
@@ -1117,13 +1150,26 @@
         `;
 
         card.addEventListener('click', () => {
-          document.querySelectorAll('.tpl-card').forEach(c => c.classList.remove('selected'));
+          document.querySelectorAll('.tpl-card').forEach(c => {
+            c.classList.remove('selected');
+          });
           card.classList.add('selected');
+          card.style.opacity = '';
           wizardData.templateKey = key;
         });
 
         grid.appendChild(card);
       });
+
+      // Re-select the explicitly chosen key if present
+      if (wizardData.templateKey) {
+        const existing = grid.querySelector(`[data-key="${wizardData.templateKey}"]`);
+        if (existing) {
+          grid.querySelectorAll('.tpl-card').forEach(c => c.classList.remove('selected'));
+          existing.classList.add('selected');
+          existing.style.opacity = '';
+        }
+      }
     }
 
     // --- Photo Upload Handling ---
@@ -1379,3 +1425,4 @@
   </script>
 </body>
 </html>
+
