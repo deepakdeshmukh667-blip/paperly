@@ -967,14 +967,20 @@
     <div class="brand-wrap">
       <a href="index.html" class="brand-logo">PAPERLY<span>.</span></a>
       <ul class="nav-links">
+        <li><a href="index.html" class="nav-link">Home</a></li>
         <li><a href="dashboard.html" class="nav-link active">Overview</a></li>
         <li><a href="templates.html" class="nav-link">Explore Templates</a></li>
         <li><a href="create.html" class="nav-link">New Creation</a></li>
         <li><a href="studio.html" class="nav-link">Studio Editor</a></li>
+        <li><a href="login.html" class="nav-link">Sign In</a></li>
       </ul>
     </div>
 
     <div class="nav-actions">
+      <button type="button" class="btn-create-mag" id="btnDashGemini" style="background: transparent; border: 1px solid var(--card-border); color: var(--ivory);" title="Configure Google Gemini API Key">
+        <span style="color: #6e1423; font-weight: bold;">✦</span>
+        <span>Gemini Key</span>
+      </button>
       <a href="create.html" class="btn-create-mag">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
         <span>Create Magazine</span>
@@ -1121,9 +1127,19 @@
           <label for="accEmail">Email Address</label>
           <input type="email" id="accEmail" required>
         </div>
+        <div class="form-group">
+          <label for="accGeminiKey">Google Gemini API Key</label>
+          <div style="display: flex; gap: 8px;">
+            <input type="password" id="accGeminiKey" placeholder="AIzaSy..." autocomplete="off" style="flex: 1;">
+            <button type="button" id="btnToggleDashKey" style="background: var(--card-bg); border: 1px solid var(--card-border); color: var(--ivory); padding: 0 12px; border-radius: 4px; font-size: 0.8rem; cursor: pointer;">Show</button>
+          </div>
+          <small style="color: var(--muted); font-size: 0.75rem; margin-top: 5px; display: block;">
+            Powers on-device AI editorial story writing, auto-headlines, and vision captions with Gemini 2.5 Flash. Stored securely in your browser.
+          </small>
+        </div>
         <div class="modal-actions">
           <button type="button" class="btn-modal-cancel" id="btnCancelAccount">Close</button>
-          <button type="submit" class="btn-modal-confirm">Update Profile</button>
+          <button type="submit" class="btn-modal-confirm">Save Settings</button>
         </div>
       </form>
     </div>
@@ -1562,11 +1578,45 @@
       }
     });
 
-    // Account settings modal
+    // Account settings modal & Gemini key
+    function openAccountSettingsModal() {
+      const modal = document.getElementById('accountModal');
+      const keyInput = document.getElementById('accGeminiKey');
+      if (keyInput) {
+        keyInput.value = localStorage.getItem('paperly_gemini_api_key') || '';
+      }
+      modal.classList.add('active');
+    }
+
     document.getElementById('btnOpenAccountSettings').onclick = () => {
       userDropdown.classList.remove('active');
-      document.getElementById('accountModal').classList.add('active');
+      openAccountSettingsModal();
     };
+
+    const btnDashGemini = document.getElementById('btnDashGemini');
+    if (btnDashGemini) {
+      btnDashGemini.onclick = () => {
+        openAccountSettingsModal();
+        setTimeout(() => {
+          const keyInput = document.getElementById('accGeminiKey');
+          if (keyInput) keyInput.focus();
+        }, 100);
+      };
+    }
+
+    const toggleKeyBtn = document.getElementById('btnToggleDashKey');
+    if (toggleKeyBtn) {
+      toggleKeyBtn.onclick = () => {
+        const keyInput = document.getElementById('accGeminiKey');
+        if (keyInput.type === 'password') {
+          keyInput.type = 'text';
+          toggleKeyBtn.textContent = 'Hide';
+        } else {
+          keyInput.type = 'password';
+          toggleKeyBtn.textContent = 'Show';
+        }
+      };
+    }
 
     document.getElementById('btnCancelAccount').onclick = () => {
       document.getElementById('accountModal').classList.remove('active');
@@ -1577,9 +1627,17 @@
       activeUser.name = document.getElementById('accName').value.trim();
       activeUser.email = document.getElementById('accEmail').value.trim();
       localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(activeUser));
+
+      const keyVal = document.getElementById('accGeminiKey').value.trim();
+      if (keyVal) {
+        localStorage.setItem('paperly_gemini_api_key', keyVal);
+      } else {
+        localStorage.removeItem('paperly_gemini_api_key');
+      }
+
       loadUserSession();
       document.getElementById('accountModal').classList.remove('active');
-      showToast('Profile information saved');
+      showToast('Profile & Gemini API key saved');
     };
 
     // Export Archive JSON

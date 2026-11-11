@@ -24,4 +24,8 @@ desktop.ini
 .idea/
 *.swp
 *.swo
+.agent/
+.agents/
+.gemini/
+.gsd/
 
