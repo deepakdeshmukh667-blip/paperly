@@ -445,33 +445,45 @@
     // 1-Click Editorial Guest Sign In
     document.getElementById('btnGuestSignIn').addEventListener('click', () => {
       showAlert('Signing in as Editorial Collector…', false);
-      const guestUser = {
-        id: 'usr_editorial_lead',
-        name: 'Editorial',
-        email: 'editorial@paperly.studio'
-      };
-      PAPERLY_AUTH.setSession(guestUser, 'token_demo_' + Date.now());
+      try {
+        const guestUser = {
+          id: 'usr_editorial_lead',
+          name: 'Editorial',
+          email: 'editorial@paperly.studio'
+        };
+        // Store directly in localStorage as a reliable fallback
+        localStorage.setItem('paperly_active_user', JSON.stringify(guestUser));
+        localStorage.setItem('paperly_jwt_token', 'token_demo_' + Date.now());
+        if (typeof PAPERLY_AUTH !== 'undefined' && PAPERLY_AUTH.setSession) {
+          PAPERLY_AUTH.setSession(guestUser, 'token_demo_' + Date.now());
+        }
+      } catch(e) {}
+      setTimeout(() => {
+        const nextUrl = new URLSearchParams(window.location.search).get('next') || 'dashboard.html';
+        window.location.href = nextUrl;
+      }, 400);
+    });
+
+    // Google Sign-In Option (OAuth simulation)
+    document.getElementById('btnGoogleSignIn').addEventListener('click', () => {
+      showAlert('Connecting with Google…', false);
+      try {
+        const googleUser = {
+          id: 'usr_google_' + Date.now().toString(36),
+          name: 'Editorial Creator',
+          email: 'creator@gmail.com'
+        };
+        // Store directly in localStorage as a reliable fallback
+        localStorage.setItem('paperly_active_user', JSON.stringify(googleUser));
+        localStorage.setItem('paperly_jwt_token', 'token_google_' + Date.now());
+        if (typeof PAPERLY_AUTH !== 'undefined' && PAPERLY_AUTH.setSession) {
+          PAPERLY_AUTH.setSession(googleUser, 'token_google_' + Date.now());
+        }
+      } catch(e) {}
       setTimeout(() => {
         const nextUrl = new URLSearchParams(window.location.search).get('next') || 'dashboard.html';
         window.location.href = nextUrl;
       }, 500);
-    });
-
-    // Google Sign-In Option
-    document.getElementById('btnGoogleSignIn').addEventListener('click', () => {
-      showAlert('Connecting with Google…', false);
-      // Simulate Google OAuth flow with persistent session
-      const googleUser = {
-        id: 'usr_google_' + Date.now().toString(36),
-        name: 'Editorial Creator',
-        email: 'creator@gmail.com',
-        avatar_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80'
-      };
-      PAPERLY_AUTH.setSession(googleUser, 'token_google_' + Date.now());
-      setTimeout(() => {
-        const nextUrl = new URLSearchParams(window.location.search).get('next') || 'dashboard.html';
-        window.location.href = nextUrl;
-      }, 600);
     });
 
     document.getElementById('forgotPwLink').addEventListener('click', e => {

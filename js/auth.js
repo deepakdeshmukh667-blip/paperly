@@ -244,6 +244,7 @@ const PAPERLY_AUTH = (() => {
   return {
     getCurrentUser,
     getToken,
+    setSession,
     login,
     signup,
     logout,
