@@ -185,3 +185,4 @@ const PAPERLY_TOKENS = (() => {
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = PAPERLY_TOKENS;
 }
+

@@ -1105,18 +1105,34 @@
     });
 
     // --- Template Grid Rendering ---
+    function normalizeCat(c) {
+      if (!c) return '';
+      const s = c.toLowerCase();
+      if (s.includes('friend') || s.includes('birthday') || s.includes('couple') || s.includes('anniversary') || s.includes('memory') || s.includes('journal')) return 'personal/memory';
+      if (s.includes('fashion') || s.includes('aesthetic')) return 'fashion';
+      if (s.includes('travel') || s.includes('city')) return 'travel';
+      if (s.includes('wedding')) return 'wedding';
+      if (s.includes('life')) return 'lifestyle';
+      if (s.includes('business')) return 'business';
+      if (s.includes('port')) return 'portfolio';
+      if (s.includes('food')) return 'food';
+      if (s.includes('photo')) return 'photography';
+      if (s.includes('edu')) return 'education';
+      return s;
+    }
+
     function renderTemplatesForCategory() {
       const grid = document.getElementById('templateGrid');
       grid.innerHTML = '';
 
       if (!window.PAPERLY_TEMPLATES) return;
       const eds = window.PAPERLY_TEMPLATES.EDITIONS;
-      const selCat = (wizardData.category || '').toLowerCase();
+      const selCat = normalizeCat(wizardData.category);
 
       // Sort: matching category first, then others
       const keys = Object.keys(eds).sort((a, b) => {
-        const aMatch = (eds[a].category || '').toLowerCase() === selCat;
-        const bMatch = (eds[b].category || '').toLowerCase() === selCat;
+        const aMatch = normalizeCat(eds[a].category) === selCat;
+        const bMatch = normalizeCat(eds[b].category) === selCat;
         return (bMatch ? 1 : 0) - (aMatch ? 1 : 0);
       });
 
@@ -1124,13 +1140,13 @@
 
       keys.forEach(key => {
         const ed = eds[key];
-        const isMatch = (ed.category || '').toLowerCase() === selCat || key === wizardData.templateKey;
+        const isMatch = normalizeCat(ed.category) === selCat || key === wizardData.templateKey;
         const card = document.createElement('div');
         card.className = 'tpl-card' + (isMatch && !firstMatch ? ' selected' : '');
         // Auto-select first matching template if none explicitly chosen
         if (isMatch && !firstMatch) {
           firstMatch = key;
-          if (!wizardData.templateKey || (eds[wizardData.templateKey] && (eds[wizardData.templateKey].category || '').toLowerCase() !== selCat)) {
+          if (!wizardData.templateKey || (eds[wizardData.templateKey] && normalizeCat(eds[wizardData.templateKey].category) !== selCat)) {
             wizardData.templateKey = key;
           }
         }
@@ -1139,12 +1155,14 @@
         // Dim non-matching templates rather than hiding them
         if (!isMatch) card.style.opacity = '0.45';
 
-        const coverBg = ed.coverBg || (ed.pages && ed.pages[0]?.bg) || '#1c1712';
-        const coverImg = ed.cover || '';
+        // Use best available preview: sample cover photo → thumbnail → page bg
+        const coverBg = ed.coverBg || (ed.pages && ed.pages[0] && ed.pages[0].bg) || '#1c1712';
+        const p1Imgs = (ed.pages && ed.pages[0] && ed.pages[0].els || []).filter(e => e.t === 'img' && e.src && !e.src.includes('thumbnails'));
+        const coverImg = (p1Imgs.length > 0 ? p1Imgs[0].src : null) || ed.cover || ed.thumbnail || ('assets/thumbnails/' + key + '.png');
 
         card.innerHTML = `
           <div class="tpl-preview" style="background: ${coverBg}; position: relative; overflow: hidden;">
-            ${coverImg ? `<img src="${coverImg}" alt="${ed.name}" loading="lazy" onerror="this.style.opacity='0';" style="width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; z-index: 1; transition: opacity 0.3s;">` : ''}
+            <img src="${coverImg}" alt="${ed.name}" loading="lazy" onerror="this.onerror=null;this.src='assets/thumbnails/${key}.png';" style="width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; z-index: 1;">
             <div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.2) 40%, rgba(0,0,0,0.88) 100%); z-index: 2; display: flex; flex-direction: column; justify-content: space-between; padding: 1.25rem 1rem;">
               <div>
                 <span style="font-size: 0.62rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--beige); font-weight: 600; opacity: 0.95;">${ed.category}</span>
@@ -1341,47 +1359,54 @@
         const p1 = templatePages[0];
         const p1Els = getEls(p1);
         const titleText = headline || wizardData.title || "The Summer Issue";
-        
-        // Find main cover title
-        const titleEl = p1Els.find(e => (e.t === 'text' || e.type === 'text') && e.size >= 32);
+
+        // Find main cover title: largest text on page 1
+        const p1Texts = p1Els.filter(e => e.t === 'text' || e.type === 'text');
+        const titleEl = p1Texts.reduce((best, e) => (!best || (e.size || 0) > (best.size || 0)) ? e : best, null);
         if (titleEl) {
           titleEl.text = titleText;
           titleEl.content = titleText;
-          titleEl.y = 40;
-          // Smart Auto-Scale: If title is long, scale font size so it never covers faces
+          titleEl.y = 36;
+          titleEl.align = titleEl.align || 'center';
+          // Auto-scale font: short → 36px, medium → 28px, long → 22px
           if (titleText.length > 32) {
-            titleEl.size = 26;
-            titleEl.h = 60;
+            titleEl.size = 22;
           } else if (titleText.length > 20) {
-            titleEl.size = 32;
-            titleEl.h = 62;
+            titleEl.size = 28;
           } else {
-            titleEl.size = 40;
-            titleEl.h = 64;
+            titleEl.size = 36;
           }
+          // Height = estimated line count × line-height
+          const charsPerLine = Math.max(10, Math.floor((titleEl.w || 468) / (titleEl.size * 0.58)));
+          const lines = Math.max(1, Math.ceil(titleText.length / charsPerLine));
+          titleEl.h = Math.max(48, Math.round(lines * titleEl.size * 1.3));
         }
 
-        // Subtitle / issue line
-        const issueEl = p1Els.find(e => (e.t === 'text' || e.type === 'text') && e.size <= 11 && e.y < 120);
+        // Subtitle / issue line — push below title
+        const issueEl = p1Texts.find(e => (e.size || 14) <= 11 && e.y < 130 && e !== titleEl);
         if (issueEl && titleEl) {
-          issueEl.y = titleEl.y + titleEl.h + 6;
+          issueEl.y = titleEl.y + (titleEl.h || 50) + 8;
+          issueEl.h = 18;
         }
 
+        // Cover photo — always starts below title + issue line (face never covered)
         if (wizardData.photos.length > 0) {
           const coverImgEl = p1Els.find(e => e.t === 'img' || e.type === 'img');
           if (coverImgEl) {
             const pModel = wizardData.photoModels && wizardData.photoModels[0];
-            coverImgEl.bg = `url("${wizardData.photos[0]}")`;
             coverImgEl.src = wizardData.photos[0];
+            coverImgEl.bg = `url("${wizardData.photos[0]}")`;
             coverImgEl.type = 'upload';
             coverImgEl.fit = 'cover';
             coverImgEl.position = 'center';
             if (pModel) coverImgEl.imageId = pModel.id;
 
-            // Push cover photo down below title + issue line so faces are NEVER blocked
-            const safeTop = (issueEl ? issueEl.y + issueEl.h : (titleEl ? titleEl.y + titleEl.h : 110)) + 14;
-            coverImgEl.y = Math.max(coverImgEl.y, safeTop);
-            coverImgEl.h = Math.min(coverImgEl.h, 570 - coverImgEl.y);
+            const textBottom = issueEl
+              ? issueEl.y + (issueEl.h || 18) + 14
+              : (titleEl ? titleEl.y + titleEl.h + 14 : 110);
+            coverImgEl.x = coverImgEl.x || 36;
+            coverImgEl.y = Math.max(coverImgEl.y || 130, textBottom);
+            coverImgEl.h = Math.min(coverImgEl.h || 450, 695 - coverImgEl.y);
           }
         }
 
@@ -1389,91 +1414,96 @@
         if (templatePages.length > 1) {
           const p2 = templatePages[1];
           const p2Els = getEls(p2);
+          const p2Texts = p2Els.filter(e => e.t === 'text' || e.type === 'text');
+          const p2Imgs  = p2Els.filter(e => e.t === 'img'  || e.type === 'img');
 
-          // 1. Tag element (small uppercase, y < 50)
-          const tagEl = p2Els.find(e => (e.t === 'text' || e.type === 'text') && e.size <= 12 && e.y < 50);
-          if (tagEl) {
-            tagEl.text = (wizardData.category || "EDITORIAL").toUpperCase() + " · DISPATCH";
-            tagEl.content = tagEl.text;
-            tagEl.y = 36;
-            tagEl.h = 18;
+          // Identify key roles by font size + position
+          // Tag: smallest text at the top (size <= 12 AND y < 80)
+          const p2TagEl = p2Texts.find(e => (e.size || 14) <= 12 && e.y < 80);
+          // Headline: largest text element, excluding chapter numbers ("01","02" etc)
+          const p2HeadEl = p2Texts
+            .filter(e => e !== p2TagEl && (e.size || 14) >= 20 && (e.text || '').length > 4)
+            .sort((a, b) => (b.size || 0) - (a.size || 0))[0] || null;
+          // Pull-quote: italic or Cormorant Garamond
+          const p2QuoteEl = p2Texts.find(e =>
+            e !== p2TagEl && e !== p2HeadEl &&
+            (e.italic || (e.font && e.font.includes('Garamond')))
+          );
+          // Body: small Inter text in right column or below photos
+          const p2BodyEl = p2Texts.find(e =>
+            e !== p2TagEl && e !== p2HeadEl && e !== p2QuoteEl &&
+            (e.size || 14) >= 11 && (e.size || 14) <= 15 &&
+            (e.x >= 260 || e.y >= 160)
+          );
+
+          // 1. Write category tag
+          if (p2TagEl) {
+            p2TagEl.text    = (wizardData.category || 'EDITORIAL').toUpperCase() + ' · DISPATCH';
+            p2TagEl.content = p2TagEl.text;
+            p2TagEl.y       = 36;
+            p2TagEl.h       = 18;
           }
 
-          // 2. Headline element (Playfair / serif, size 24-38)
-          const headlineEl = p2Els.find(e => (e.t === 'text' || e.type === 'text') && e.size >= 22 && e.size <= 40);
-          if (headlineEl) {
-            const hText = headline || "Monsoon, Coffee, and One Broken Umbrella";
-            headlineEl.text = hText;
-            headlineEl.content = hText;
-            headlineEl.y = 56;
-            if (hText.length > 28) {
-              headlineEl.size = 24;
-              headlineEl.h = 58;
-            } else {
-              headlineEl.size = 28;
-              headlineEl.h = 50;
+          // 2. Write headline — below tag, auto-scaled height
+          if (p2HeadEl && headline) {
+            const hText = headline;
+            p2HeadEl.text    = hText;
+            p2HeadEl.content = hText;
+            if (hText.length > 32)      p2HeadEl.size = 20;
+            else if (hText.length > 20) p2HeadEl.size = 24;
+            else                         p2HeadEl.size = 28;
+            const tagBottom = p2TagEl ? p2TagEl.y + (p2TagEl.h || 18) : 36;
+            p2HeadEl.y = tagBottom + 10;
+            const cpl   = Math.max(10, Math.floor((p2HeadEl.w || 468) / (p2HeadEl.size * 0.58)));
+            const hLines = Math.max(1, Math.ceil(hText.length / cpl));
+            p2HeadEl.h = Math.max(40, Math.round(hLines * p2HeadEl.size * 1.3));
+          }
+
+          // 3. Push every OTHER text element below headline bottom
+          const p2HeadlineBottom = p2HeadEl ? p2HeadEl.y + (p2HeadEl.h || 50) : 120;
+          p2Texts.forEach(e => {
+            if (e !== p2TagEl && e !== p2HeadEl && e.y < p2HeadlineBottom + 10) {
+              e.y = p2HeadlineBottom + 16;
             }
+          });
+
+          // Line accent just below headline
+          const p2LineEl = p2Els.find(e => e.t === 'line' || e.type === 'line');
+          if (p2LineEl && p2HeadEl) {
+            p2LineEl.y = p2HeadEl.y + (p2HeadEl.h || 50) + 8;
           }
 
-          // Line accent below headline
-          const lineEl = p2Els.find(e => (e.t === 'line' || e.type === 'line') && e.y < 160);
-          if (lineEl && headlineEl) {
-            lineEl.y = headlineEl.y + headlineEl.h + 8;
-          }
-
-          // 3. Body story element: target the actual body paragraph (Inter font, size <= 15, x >= 300)
-          const bodyEl = p2Els.find(e => (e.t === 'text' || e.type === 'text') && e.size <= 15 && e.size >= 11 && (e.x >= 280 || e.y >= 140) && e !== tagEl);
-          if (bodyEl) {
-            bodyEl.text = story;
-            bodyEl.content = story;
-            bodyEl.x = 315;
-            bodyEl.y = 185;
-            bodyEl.w = 190;
-            bodyEl.h = 240;
-          }
-
-          // 4. Inner photos for Page 2: assign both photo slots safely
-          const p2Imgs = p2Els.filter(e => e.t === 'img' || e.type === 'img');
-          if (p2Imgs.length > 0) {
-            // First photo slot on spread
-            if (wizardData.photos.length > 1) {
-              const m1 = wizardData.photoModels && wizardData.photoModels[1];
-              p2Imgs[0].src = wizardData.photos[1];
-              p2Imgs[0].bg = `url("${wizardData.photos[1]}")`;
-              p2Imgs[0].type = 'upload';
-              if (m1) p2Imgs[0].imageId = m1.id;
+          // 4. Write body story
+          if (p2BodyEl && story) {
+            p2BodyEl.text    = story;
+            p2BodyEl.content = story;
+            if (p2BodyEl.x < 260) {
+              p2BodyEl.x = 315;
+              p2BodyEl.w = 190;
             }
-            p2Imgs[0].x = 36;
-            p2Imgs[0].y = 145;
-            p2Imgs[0].w = 260;
-            p2Imgs[0].h = 270;
-          }
-          if (p2Imgs.length > 1) {
-            // Second photo slot on spread
-            if (wizardData.photos.length > 2) {
-              const m2 = wizardData.photoModels && wizardData.photoModels[2];
-              p2Imgs[1].src = wizardData.photos[2];
-              p2Imgs[1].bg = `url("${wizardData.photos[2]}")`;
-              p2Imgs[1].type = 'upload';
-              if (m2) p2Imgs[1].imageId = m2.id;
-            }
-            p2Imgs[1].x = 36;
-            p2Imgs[1].y = 435;
-            p2Imgs[1].w = 160;
-            p2Imgs[1].h = 245;
+            if (p2BodyEl.y < p2HeadlineBottom + 20) p2BodyEl.y = p2HeadlineBottom + 20;
           }
 
-          // 5. Pull quote on Page 2
-          const quoteEl = p2Els.find(e => (e.t === 'text' || e.type === 'text') && (e.italic || (e.font && e.font.includes('Garamond'))));
-          if (quoteEl) {
-            if (dedication) {
-              quoteEl.text = `“${dedication.replace(/^["'“]+|["'”]+$/g, '')}”`;
-              quoteEl.content = quoteEl.text;
+          // 5. Assign uploaded photos to image slots (round-robin, [0] used by cover)
+          p2Imgs.forEach((img, idx) => {
+            const photoSrc = wizardData.photos[idx + 1];
+            if (photoSrc) {
+              img.src  = photoSrc;
+              img.bg   = 'url("' + photoSrc + '")';
+              img.type = 'upload';
+              const pm = wizardData.photoModels && wizardData.photoModels[idx + 1];
+              if (pm) img.imageId = pm.id;
             }
-            quoteEl.x = 216;
-            quoteEl.y = 455;
-            quoteEl.w = 290;
-            quoteEl.h = 210;
+            img.fit      = img.fit || 'cover';
+            img.position = img.position || 'center';
+          });
+
+          // 6. Write pull-quote
+          if (p2QuoteEl && dedication) {
+            const qText = dedication.replace(/^["‘“]+|["’”]+$/g, '');
+            p2QuoteEl.text    = '“' + qText + '”';
+            p2QuoteEl.content = p2QuoteEl.text;
+            if (p2QuoteEl.y < p2HeadlineBottom + 20) p2QuoteEl.y = p2HeadlineBottom + 20;
           }
         }
 

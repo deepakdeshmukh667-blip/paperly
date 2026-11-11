@@ -1,4 +1,4 @@
-name = "paperly-backend"
+name = "paperly"
 main = "worker/index.js"
 compatibility_date = "2024-04-01"
 compatibility_flags = ["nodejs_compat"]
@@ -23,7 +23,7 @@ bucket_name = "paperly-uploads"
 # Cloudflare KV (Session cache & temporary state)
 [[kv_namespaces]]
 binding = "KV_CACHE"
-id = "local-kv-placeholder"
+id = "4576a211e64e4f18ba30493d8c2c9a46"
 
 # Cloudflare Workers AI Binding
 [ai]

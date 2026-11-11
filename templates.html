@@ -11,173 +11,556 @@
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600;700&display=swap">
   <link rel="stylesheet" href="css/paperly.css">
 
   <style>
-    *, ::after, ::before { box-sizing: border-box; margin: 0; padding: 0; }
-    html {
-      scroll-behavior: smooth;
-      font-family: var(--font-sans);
-      line-height: 1.5;
+    :root {
+      --bg: #0c0b0a;
+      --card-bg: #151311;
+      --card-border: #24201c;
+      
+      --ivory: #f6f0e4;
+      --beige: #e3d5bd;
+      --burgundy: #6e1423;
+      --burgundy-light: #8a2434;
+      --muted: #8e8476;
     }
+
+    *, ::after, ::before {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
-      background-color: var(--color-ivory);
-      color: var(--color-black);
+      background-color: var(--bg);
+      color: var(--ivory);
+      font-family: var(--font-sans);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
-    a { color: inherit; text-decoration: none; }
-    button { font-family: inherit; cursor: pointer; background: transparent; border: none; }
 
-    /* Header */
-    header {
+    a { color: inherit; text-decoration: none; }
+    button, input, select, textarea { font-family: inherit; }
+
+    /* Top Navigation (Matches Dashboard Exactly) */
+    .dash-nav {
       position: sticky;
       top: 0;
-      z-index: 40;
-      border-bottom: 1px solid var(--color-border-light);
-      background-color: rgba(246, 240, 228, 0.96);
-      backdrop-filter: blur(10px);
-    }
-    .header-nav {
-      max-width: 80rem;
-      margin: 0 auto;
+      z-index: 50;
+      background: rgba(12, 11, 10, 0.94);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--card-border);
+      padding: 0 1.5rem;
+      height: 64px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 1rem 1.5rem;
     }
-    .logo {
-      font-family: var(--font-serif);
-      font-size: 1.6rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-    }
-    .nav-links {
+
+    .brand-wrap {
       display: flex;
       align-items: center;
       gap: 2rem;
-      font-size: 0.875rem;
+    }
+
+    .brand-logo {
+      font-family: var(--font-serif);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--ivory);
+      text-decoration: none;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-logo span {
+      color: var(--burgundy);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
       list-style: none;
     }
-    .nav-links a.active {
-      padding-bottom: 0.25rem;
-      border-bottom: 2px solid var(--color-burgundy);
+
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+    }
+
+    .nav-link {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--beige);
+      text-decoration: none;
+      padding: 0.4rem 0.6rem;
+      border-radius: 4px;
+      transition: color 0.15s;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      color: #fff;
+    }
+
+    .nav-link.active {
+      font-weight: 600;
+      border-bottom: 2px solid var(--burgundy);
+      border-radius: 0;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .btn-create-mag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--ivory);
+      color: var(--bg);
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 0.5rem 1.15rem;
+      border-radius: 3px;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .btn-create-mag:hover {
+      background: var(--beige);
+      transform: translateY(-1px);
+    }
+
+    /* User Avatar Menu */
+    .user-pill {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      padding: 4px 10px 4px 4px;
+      border-radius: 24px;
+      cursor: pointer;
+      user-select: none;
+      transition: border-color 0.2s;
+    }
+
+    .user-pill:hover {
+      border-color: var(--muted);
+    }
+
+    .user-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--burgundy), #3a0b13);
+      color: var(--ivory);
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-transform: uppercase;
+    }
+
+    .user-name {
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--ivory);
+      max-width: 120px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-dropdown {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      background: #181512;
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      box-shadow: 0 16px 36px rgba(0,0,0,0.6);
+      width: 220px;
+      padding: 6px 0;
+      display: none;
+      z-index: 60;
+    }
+
+    .user-dropdown.active {
+      display: block;
+    }
+
+    .dropdown-header {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .dropdown-header p {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .dropdown-header h5 {
+      font-size: 0.85rem;
+      color: #fff;
+      font-weight: 600;
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 14px;
+      font-size: 0.82rem;
+      color: var(--beige);
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      background: none;
+      border: none;
+      width: 100%;
+      text-align: left;
+    }
+
+    .dropdown-item:hover {
+      background: #24201c;
+      color: #fff;
+    }
+
+    .dropdown-item.danger {
+      color: #e06c75;
+      border-top: 1px solid var(--card-border);
+      margin-top: 4px;
+    }
+
+    .dropdown-item.danger:hover {
+      background: rgba(224, 108, 117, 0.1);
+      color: #ff858d;
+    }
+
+    /* Main Container */
+    .dash-container {
+      max-width: 1320px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 5rem;
+      flex: 1;
+    }
+
+    /* Hero / Header Section */
+    .dash-hero {
+      margin-bottom: 2.5rem;
+    }
+
+    .dash-tagline {
+      font-family: var(--font-quote);
+      font-style: italic;
+      color: var(--beige);
+      font-size: 1.15rem;
+      margin-bottom: 0.35rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dash-tagline::before {
+      content: "";
+      width: 24px;
+      height: 1px;
+      background: var(--burgundy);
+    }
+
+    .dash-title {
+      font-family: var(--font-serif);
+      font-size: 2.3rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #fff;
+    }
+
+    .dash-sub {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-top: 0.35rem;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      padding: 1.25rem 1.4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 3px;
+      height: 100%;
+      background: var(--burgundy);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .stat-card:hover::after {
+      opacity: 1;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
       font-weight: 600;
     }
 
-    /* Template Page Hero */
-    .hero-banner {
-      max-width: 80rem;
-      margin: 0 auto;
-      padding: 3.5rem 1.5rem 2rem;
-    }
-    .hero-title {
+    .stat-val {
       font-family: var(--font-serif);
-      font-size: clamp(2rem, 4vw, 3rem);
+      font-size: 1.9rem;
       font-weight: 700;
-      line-height: 1.15;
-    }
-    .hero-sub {
-      font-size: 1.05rem;
-      color: rgba(12, 11, 10, 0.7);
-      margin-top: 0.75rem;
-      max-width: 38rem;
+      color: var(--ivory);
+      margin-top: 0.35rem;
     }
 
-    /* Search & Filter Toolbar */
-    .controls-bar {
-      max-width: 80rem;
-      margin: 0 auto 2.5rem;
-      padding: 0 1.5rem;
+    .stat-desc {
+      font-size: 0.78rem;
+      color: var(--beige);
+      opacity: 0.75;
+      margin-top: 0.2rem;
+    }
+
+    /* Search & Filter Controls */
+    .controls-wrap {
+      margin-bottom: 2rem;
       display: flex;
       flex-direction: column;
       gap: 1.25rem;
     }
+
+    .search-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
     .search-box {
       position: relative;
-      max-width: 24rem;
+      flex: 1;
+      max-width: 440px;
     }
+
     .search-input {
       width: 100%;
-      padding: 0.65rem 1rem 0.65rem 2.25rem;
-      background: #fff;
-      border: 1px solid rgba(0, 0, 0, 0.15);
-      border-radius: 4px;
-      font-size: 0.875rem;
-      color: var(--color-black);
+      padding: 0.75rem 1rem 0.75rem 2.5rem;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      font-size: 0.88rem;
+      color: var(--ivory);
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
+
     .search-input:focus {
-      outline: 2px solid var(--color-burgundy);
-      border-color: transparent;
+      outline: none;
+      border-color: var(--burgundy);
+      box-shadow: 0 0 0 2px rgba(110, 20, 35, 0.35);
     }
+
+    .search-input::placeholder {
+      color: #6d6457;
+    }
+
     .search-icon {
       position: absolute;
-      left: 0.75rem;
+      left: 0.85rem;
       top: 50%;
       transform: translateY(-50%);
       width: 1rem;
       height: 1rem;
-      color: #888;
+      color: var(--muted);
       pointer-events: none;
     }
 
+    .action-btns {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-subtle-dark {
+      background: #181512;
+      border: 1px solid var(--card-border);
+      color: var(--beige);
+      padding: 8px 14px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+
+    .btn-subtle-dark:hover {
+      background: #221e1a;
+      border-color: var(--muted);
+      color: #fff;
+    }
+
+    .btn-burgundy {
+      background: var(--burgundy);
+      color: #fff;
+      border: 1px solid var(--burgundy-light);
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .btn-burgundy:hover {
+      background: var(--burgundy-light);
+      transform: translateY(-1px);
+    }
+
+    /* Filter Pills */
     .filter-pills {
       display: flex;
       flex-wrap: wrap;
       gap: 0.5rem;
     }
+
     .filter-btn {
       padding: 0.45rem 1rem;
       font-size: 0.8rem;
       font-weight: 500;
-      border: 1px solid rgba(0, 0, 0, 0.15);
+      border: 1px solid var(--card-border);
       border-radius: 20px;
-      background: rgba(255, 255, 255, 0.6);
+      background: #181512;
+      color: var(--beige);
+      cursor: pointer;
       transition: all 0.15s ease;
     }
+
     .filter-btn:hover {
-      border-color: var(--color-burgundy);
-      color: var(--color-burgundy);
-    }
-    .filter-btn.active {
-      background: var(--color-burgundy);
+      border-color: var(--muted);
       color: #fff;
-      border-color: var(--color-burgundy);
     }
 
-    /* Templates Grid */
+    .filter-btn.active {
+      background: var(--burgundy);
+      color: #fff;
+      border-color: var(--burgundy);
+      box-shadow: 0 2px 8px rgba(110, 20, 35, 0.4);
+    }
+
+    /* Secondary Refine Bar */
+    .refine-bar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      padding-top: 0.85rem;
+      border-top: 1px solid var(--card-border);
+      font-size: 12px;
+    }
+
+    .refine-select {
+      padding: 6px 12px;
+      border: 1px solid var(--card-border);
+      border-radius: 4px;
+      background: #181512;
+      color: var(--beige);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .refine-select:focus {
+      border-color: var(--burgundy);
+    }
+
+    .btn-reset-link {
+      background: none;
+      border: none;
+      color: var(--muted);
+      text-decoration: underline;
+      cursor: pointer;
+      margin-left: auto;
+      font-size: 12px;
+    }
+
+    .btn-reset-link:hover {
+      color: var(--beige);
+    }
+
+    /* Templates Grid (3 Columns) */
     .templates-grid {
-      max-width: 80rem;
-      margin: 0 auto;
-      padding: 0 1.5rem 5rem;
       display: grid;
       grid-template-columns: repeat(1, 1fr);
-      gap: 2rem;
+      gap: 1.75rem;
     }
+
     @media (min-width: 640px) {
       .templates-grid { grid-template-columns: repeat(2, 1fr); }
     }
+
     @media (min-width: 1024px) {
       .templates-grid { grid-template-columns: repeat(3, 1fr); }
     }
 
     /* Template Card */
     .template-card {
-      background: #fff;
-      border: 1px solid rgba(0, 0, 0, 0.08);
-      border-radius: 4px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
       overflow: hidden;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04);
       display: flex;
       flex-direction: column;
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+      position: relative;
     }
+
     .template-card:hover {
       transform: translateY(-4px);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      border-color: var(--muted);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
     }
+
     .card-cover {
       position: relative;
       aspect-ratio: 3/4;
@@ -185,74 +568,223 @@
       background: #111;
       cursor: pointer;
     }
+
+    .card-cover img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      transition: transform 0.4s ease;
+    }
+
+    .template-card:hover .card-cover img {
+      transform: scale(1.03);
+    }
+
+    .card-cover-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.2) 40%, rgba(0,0,0,0.88) 100%);
+      z-index: 2;
+    }
+
+    .card-cover-content {
+      position: absolute;
+      inset: 0;
+      padding: 8% 8% 0;
+      color: #f4ede0;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+
+    .card-cover-title {
+      font-family: var(--font-serif);
+      font-size: 1.35rem;
+      font-weight: 700;
+      line-height: 1.15;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.85);
+      color: #fff;
+    }
+
+    .card-cover-sub {
+      font-size: 0.65rem;
+      color: #e3d5bd;
+      opacity: 0.95;
+      margin-top: 4px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+    }
+
+    .card-cover-badge {
+      position: absolute;
+      bottom: 12px;
+      right: 12px;
+      background: rgba(12, 11, 10, 0.85);
+      color: #f4ede0;
+      font-size: 11px;
+      padding: 3px 9px;
+      border-radius: 12px;
+      z-index: 4;
+      border: 1px solid rgba(255,255,255,0.18);
+      backdrop-filter: blur(4px);
+    }
+
+    .card-source-badge {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      background: rgba(110, 20, 35, 0.85);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 12px;
+      z-index: 4;
+      border: 1px solid rgba(255,255,255,0.18);
+      letter-spacing: 0.04em;
+    }
+
+    .btn-fav-star {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 6;
+      background: rgba(12, 11, 10, 0.7);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      cursor: pointer;
+      transition: transform 0.2s, background 0.2s;
+    }
+
+    .btn-fav-star:hover {
+      transform: scale(1.1);
+      background: rgba(110, 20, 35, 0.8);
+    }
+
     .card-info {
-      padding: 1.25rem;
+      padding: 1.35rem 1.25rem;
       display: flex;
       flex-direction: column;
       flex: 1;
     }
+
     .card-category {
       font-size: 0.7rem;
       letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: var(--color-burgundy);
+      color: var(--burgundy-light);
       font-weight: 600;
     }
+
     .card-title {
       font-family: var(--font-serif);
       font-size: 1.25rem;
       font-weight: 700;
-      margin: 0.25rem 0 0.5rem;
+      margin: 0.3rem 0 0.5rem;
+      color: #fff;
     }
+
     .card-desc {
-      font-size: 0.85rem;
-      color: rgba(12, 11, 10, 0.7);
+      font-size: 0.84rem;
+      color: var(--muted);
       line-height: 1.5;
       margin-bottom: 1.25rem;
       flex: 1;
     }
+
     .card-actions {
       display: flex;
       gap: 0.75rem;
       align-items: center;
       padding-top: 1rem;
-      border-top: 1px solid rgba(0, 0, 0, 0.06);
+      border-top: 1px solid var(--card-border);
     }
 
     .btn-preview {
       flex: 1;
-      padding: 0.55rem;
-      font-size: 0.8rem;
+      padding: 0.6rem;
+      font-size: 0.82rem;
       font-weight: 500;
-      border: 1px solid #0c0b0a;
-      border-radius: 2px;
+      border: 1px solid var(--card-border);
+      border-radius: 4px;
       text-align: center;
+      color: var(--beige);
+      background: #181512;
+      cursor: pointer;
       transition: all 0.15s ease;
     }
+
     .btn-preview:hover {
-      background: #0c0b0a;
+      background: #24201c;
       color: #fff;
-    }
-    .btn-use {
-      flex: 1.2;
-      padding: 0.55rem;
-      font-size: 0.8rem;
-      font-weight: 500;
-      background: var(--color-burgundy);
-      color: #fff;
-      border-radius: 2px;
-      text-align: center;
-      transition: background 0.15s ease;
-    }
-    .btn-use:hover {
-      background: #8a2434;
+      border-color: var(--muted);
     }
 
-    /* Modal */
-    .preview-modal-dialog {
-      max-width: 760px;
-      padding: 24px;
+    .btn-use {
+      flex: 1.2;
+      padding: 0.6rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      background: var(--burgundy);
+      color: #fff;
+      border-radius: 4px;
+      border: 1px solid var(--burgundy-light);
+      text-align: center;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.15s ease, transform 0.1s;
     }
+
+    .btn-use:hover {
+      background: var(--burgundy-light);
+      transform: translateY(-1px);
+    }
+
+    /* Modal Styling */
+    .paperly-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(12, 11, 10, 0.88);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .paperly-modal-backdrop.active {
+      display: flex;
+    }
+
+    .paperly-modal-card {
+      background: #181512;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.8);
+      width: 100%;
+      max-width: 600px;
+      padding: 2rem;
+      position: relative;
+    }
+
+    .preview-modal-dialog {
+      max-width: 820px;
+      padding: 2rem;
+    }
+
     .preview-spread-viewer {
       display: flex;
       gap: 16px;
@@ -260,106 +792,193 @@
       padding: 16px 0;
       scroll-snap-type: x mandatory;
     }
+
     .preview-page-frame {
       flex: none;
       width: 270px;
       height: 360px;
       background: #f4ede0;
-      border: 1px solid rgba(0, 0, 0, 0.15);
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--card-border);
+      border-radius: 4px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
       scroll-snap-align: center;
       position: relative;
       overflow: hidden;
     }
 
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
-      .nav-links { display: none; }
-      .mobile-menu-btn { display: block; }
-    }
-    @media (min-width: 769px) {
-      .mobile-menu-btn { display: none; }
+    /* Footer */
+    footer {
+      margin-top: auto;
+      background-color: #0c0b0a;
+      color: var(--ivory);
+      border-top: 1px solid var(--card-border);
+      padding: 2.5rem 1.5rem 2rem;
     }
   </style>
 </head>
 <body>
 
-  <!-- Header -->
-  <header>
-    <div class="header-nav">
-      <a href="index.html" class="logo">
-        PAPERLY<span style="color: var(--color-burgundy);">.</span>
-      </a>
-
+  <!-- Top Navigation (Identical to Dashboard) -->
+  <header class="dash-nav">
+    <div class="brand-wrap">
+      <a href="dashboard.html" class="brand-logo">PAPERLY<span>.</span></a>
       <ul class="nav-links">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="templates.html" class="active">Explore Templates</a></li>
-        <li><a href="index.html#how-it-works">How It Works</a></li>
-        <li><a href="login.html">Login</a></li>
-        <li>
-          <a href="create.html" style="display:inline-flex; align-items:center; gap:6px; padding:0.5rem 1.25rem; font-size:0.85rem; font-weight:500; background:#0c0b0a; color:#f6f0e4; border-radius:2px;">
-            Create Your Magazine
-          </a>
-        </li>
+        <li><a href="dashboard.html" class="nav-link">Overview</a></li>
+        <li><a href="templates.html" class="nav-link active">Explore Templates</a></li>
+        <li><a href="create.html" class="nav-link">New Creation</a></li>
+        <li><a href="studio.html" class="nav-link">Studio Editor</a></li>
       </ul>
-
-      <button id="menuBtn" class="mobile-menu-btn" aria-label="Toggle navigation menu" style="padding: 6px;">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg>
-      </button>
     </div>
 
-    <!-- Mobile Drawer -->
-    <div id="mobDrawer" style="display: none; flex-direction: column; gap: 12px; padding: 16px 24px; border-top: 1px solid rgba(0,0,0,0.08); background: #f6f0e4;">
-      <a href="index.html">Home</a>
-      <a href="templates.html" style="color: var(--color-burgundy); font-weight: 600;">Explore Templates</a>
-      <a href="index.html#how-it-works">How It Works</a>
-      <a href="login.html">Login</a>
-      <a href="signup.html">Create Account</a>
-      <a href="create.html" style="background:#0c0b0a; color:#fff; text-align:center; padding:10px; border-radius:2px;">Create Magazine</a>
+    <div class="nav-actions">
+      <a href="create.html" class="btn-create-mag">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        <span>+ Create Magazine</span>
+      </a>
+
+      <!-- User Dropdown Pill -->
+      <div class="user-pill" id="userPill">
+        <div class="user-avatar" id="navAvatar">E</div>
+        <span class="user-name" id="navUserName">Editorial</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--muted);"><polyline points="6 9 12 15 18 9"></polyline></svg>
+
+        <div class="user-dropdown" id="userDropdown">
+          <div class="dropdown-header">
+            <p>Signed in as</p>
+            <h5 id="dropdownUserEmail">editorial@paperly.studio</h5>
+          </div>
+          <a href="dashboard.html" class="dropdown-item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+            <span>My Overview</span>
+          </a>
+          <a href="create.html" class="dropdown-item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+            <span>New Edition</span>
+          </a>
+          <button class="dropdown-item danger" id="btnSignOut">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+            <span>Sign Out</span>
+          </button>
+        </div>
+      </div>
     </div>
   </header>
 
-  <main>
-    <!-- Banner -->
-    <div class="hero-banner">
-      <span style="font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--color-burgundy); font-weight: 600;">The Library</span>
-      <h1 class="hero-title">Explore Editorial Templates</h1>
-      <p class="hero-sub">Choose from carefully designed publication layouts for milestones, friendships, travels, and quiet seasons. Each template is 100% customizable.</p>
-    </div>
+  <main class="dash-container">
+    <!-- Welcome Header (Matching Dashboard Look) -->
+    <header class="dash-hero">
+      <p class="dash-tagline">Stories, reimagined for the digital age.</p>
+      <h1 class="dash-title">Explore Template Catalog</h1>
+      <p class="dash-sub">Discover, preview, and build your digital magazine from 100 handcrafted editorial archetypes.</p>
+    </header>
+
+    <!-- Stats Overview Cards (Matching Dashboard Look) -->
+    <section class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Total Templates</div>
+        <div class="stat-val" id="statTotalTemplates">100</div>
+        <div class="stat-desc">Handcrafted editorial editions</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Categories</div>
+        <div class="stat-val">10</div>
+        <div class="stat-desc">Fashion, Travel, Life & more</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Curated Editions</div>
+        <div class="stat-val">50 / 50</div>
+        <div class="stat-desc">50 Imported · 50 Inspired</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">AI Story Engine</div>
+        <div class="stat-val" style="color: #ff858d;">Active</div>
+        <div class="stat-desc">Gemini 2.5 Flash ready</div>
+      </div>
+    </section>
 
     <!-- Filter & Search Controls -->
-    <div class="controls-bar">
-      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-        <div class="search-box" style="flex: 1; max-width: 480px;">
+    <div class="controls-wrap">
+      <div class="search-row">
+        <div class="search-box">
           <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-          <input type="text" id="searchInput" class="search-input" placeholder="Search templates, styles, occasions…">
+          <input type="text" id="searchInput" class="search-input" placeholder="Search by edition title, occasion, or style…">
         </div>
 
-        <div style="display: flex; align-items: center; gap: 12px;">
-          <button type="button" id="btnOpenInspiration" class="btn-use" style="background: var(--color-burgundy); color: #fff; border: none; padding: 8px 16px; border-radius: 20px; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path></svg>
-            ✦ AI Inspiration Engine
+        <div class="action-btns">
+          <button type="button" id="btnImportPack" class="btn-subtle-dark">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            <span>Import Pack (.json)</span>
           </button>
-          <a href="create.html" style="font-size: 0.85rem; color: var(--color-burgundy); font-weight: 600; text-decoration: underline;">
-            Or start blank magazine →
-          </a>
+          <button type="button" id="btnCreateTemplate" class="btn-subtle-dark">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>Create Template</span>
+          </button>
+          <button type="button" id="btnOpenInspiration" class="btn-burgundy">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path></svg>
+            <span>✦ Inspiration</span>
+          </button>
         </div>
       </div>
 
+      <!-- Category Filter Tabs -->
       <div class="filter-pills" id="categoryPills">
-        <button class="filter-btn active" data-cat="all">All Editions (<span id="countAll">12</span>)</button>
+        <button class="filter-btn active" data-cat="all">All Editions (<span id="countAll">100</span>)</button>
         <button class="filter-btn" data-cat="favorites">★ Favorites (<span id="countFavs">0</span>)</button>
-        <button class="filter-btn" data-cat="Best Friend">Best Friend</button>
-        <button class="filter-btn" data-cat="Birthday">Birthday</button>
-        <button class="filter-btn" data-cat="Couple">Couple</button>
-        <button class="filter-btn" data-cat="Anniversary">Anniversary</button>
+        <button class="filter-btn" data-cat="Fashion">Fashion</button>
         <button class="filter-btn" data-cat="Travel">Travel</button>
-        <button class="filter-btn" data-cat="Fashion">Fashion & Style</button>
-        <button class="filter-btn" data-cat="Minimalist Living">Architecture & Living</button>
-        <button class="filter-btn" data-cat="Culinary Arts">Culinary Arts</button>
-        <button class="filter-btn" data-cat="Indie Culture">Indie Culture</button>
-        <button class="filter-btn" data-cat="Commencement">Commencement</button>
-        <button class="filter-btn" data-cat="Monochrome">Monochrome</button>
+        <button class="filter-btn" data-cat="Lifestyle">Lifestyle</button>
+        <button class="filter-btn" data-cat="Wedding">Wedding</button>
+        <button class="filter-btn" data-cat="Business">Business</button>
+        <button class="filter-btn" data-cat="Portfolio">Portfolio</button>
+        <button class="filter-btn" data-cat="Food">Food</button>
+        <button class="filter-btn" data-cat="Photography">Photography</button>
+        <button class="filter-btn" data-cat="Personal/Memory">Personal/Memory</button>
+        <button class="filter-btn" data-cat="Education">Education</button>
+      </div>
+
+      <!-- Secondary Filters: Source, Mood, Page Count, Photo Count -->
+      <div class="refine-bar">
+        <span style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--burgundy-light);">Refine By:</span>
+        <select id="filterSource" class="refine-select">
+          <option value="all">All Sources (100)</option>
+          <option value="imported">Imported Packs (50)</option>
+          <option value="inspired">Original Inspired (50)</option>
+        </select>
+
+        <select id="filterMood" class="refine-select">
+          <option value="all">All Moods</option>
+          <option value="Sophisticated">Sophisticated</option>
+          <option value="Bold Avant-Garde">Bold Avant-Garde</option>
+          <option value="Minimalist">Minimalist</option>
+          <option value="Romantic & Timeless">Romantic & Timeless</option>
+          <option value="Nocturnal & Atmospheric">Nocturnal & Atmospheric</option>
+          <option value="Sun-drenched & Warm">Sun-drenched & Warm</option>
+          <option value="Serene & Organic">Serene & Organic</option>
+          <option value="Authoritative & Sharp">Authoritative & Sharp</option>
+          <option value="Curated Showcase">Curated Showcase</option>
+          <option value="Epicurean & Warm">Epicurean & Warm</option>
+          <option value="Fine Art Monochrome">Fine Art Monochrome</option>
+          <option value="Tender Friendship">Tender Friendship</option>
+          <option value="Triumphant & Dignified">Triumphant & Dignified</option>
+        </select>
+
+        <select id="filterPages" class="refine-select">
+          <option value="all">Any Page Count</option>
+          <option value="4">4 Pages</option>
+          <option value="5">5 Pages</option>
+          <option value="6">6 Pages</option>
+        </select>
+
+        <select id="filterPhotos" class="refine-select">
+          <option value="all">Any Photo Count</option>
+          <option value="3-4">3–4 Photo Slots</option>
+          <option value="5-6">5–6 Photo Slots</option>
+          <option value="7+">7+ Photo Slots</option>
+        </select>
+
+        <button type="button" id="btnResetFilters" class="btn-reset-link">
+          Reset Filters
+        </button>
       </div>
     </div>
 
@@ -367,30 +986,68 @@
     <div class="templates-grid" id="templatesContainer">
       <!-- Populated via JavaScript -->
     </div>
+
+    <!-- Pagination / Load More -->
+    <div id="loadMoreWrap" style="text-align: center; margin: 3rem 0; display: none;">
+      <button type="button" id="btnLoadMore" style="padding: 11px 28px; background: #1a1715; color: #f6f0e4; border: 1px solid var(--card-border); border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; transition: border-color 0.15s;">
+        Load More Templates
+      </button>
+    </div>
   </main>
+
+  <!-- Import Template Pack Modal -->
+  <div id="importPackModal" class="paperly-modal-backdrop">
+    <div class="paperly-modal-card" style="max-width: 560px;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+        <div>
+          <span style="font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--burgundy-light); font-weight: 600;">Template Expansion</span>
+          <h3 class="font-serif" style="font-size: 1.5rem; font-weight: 700; margin-top: 4px; color: #fff;">Import Template Pack (.json)</h3>
+        </div>
+        <button id="closeImportModalBtn" style="padding: 4px 8px; font-size: 18px; color: var(--muted); background: none; border: none; cursor: pointer;">✕</button>
+      </div>
+
+      <p style="font-size: 13px; color: var(--muted); line-height: 1.5; margin-bottom: 16px;">
+        Upload a JSON template pack file or paste raw template definitions. Schema validation will be performed before importing into your catalog.
+      </p>
+
+      <div style="margin-bottom: 14px;">
+        <input type="file" id="packFileInput" accept=".json,application/json" style="margin-bottom: 10px; color: var(--beige);">
+        <textarea id="packJsonInput" placeholder="Paste JSON template pack here..." style="width: 100%; height: 160px; font-family: monospace; font-size: 12px; padding: 10px; border: 1px solid var(--card-border); border-radius: 4px; background: #100e0c; color: #f6f0e4;"></textarea>
+      </div>
+
+      <div id="importValidationReport" style="display: none; padding: 10px; margin-bottom: 14px; font-size: 12px; border-radius: 4px;"></div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 10px;">
+        <button type="button" id="btnCancelImport" style="padding: 8px 16px; border: 1px solid var(--card-border); background: transparent; color: var(--beige); border-radius: 4px; font-size: 13px; cursor: pointer;">Cancel</button>
+        <button type="button" id="btnExecuteImport" class="btn-burgundy">
+          Validate & Import
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- Template Preview Modal -->
   <div id="previewModal" class="paperly-modal-backdrop">
     <div class="paperly-modal-card preview-modal-dialog">
       <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
         <div>
-          <span id="modalCat" style="font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-burgundy); font-weight: 600;">Edition</span>
-          <h3 id="modalTitle" class="font-serif" style="font-size: 1.6rem; font-weight: 700;">Template Title</h3>
+          <span id="modalCat" style="font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--burgundy-light); font-weight: 600;">Edition</span>
+          <h3 id="modalTitle" class="font-serif" style="font-size: 1.6rem; font-weight: 700; color: #fff;">Template Title</h3>
         </div>
-        <button id="closeModalBtn" style="padding: 4px 8px; font-size: 16px;">✕</button>
+        <button id="closeModalBtn" style="padding: 4px 8px; font-size: 18px; color: var(--muted); background: none; border: none; cursor: pointer;">✕</button>
       </div>
 
-      <p id="modalDesc" style="font-size: 13px; color: #555; line-height: 1.5; margin-bottom: 16px;">Description</p>
+      <p id="modalDesc" style="font-size: 13px; color: var(--muted); line-height: 1.5; margin-bottom: 16px;">Description</p>
 
       <div class="preview-spread-viewer" id="modalSpreads">
         <!-- Renders scaled down thumbnails of each page in the edition -->
       </div>
 
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 14px; border-top: 1px solid rgba(0,0,0,0.08);">
-        <span id="modalPagesCount" style="font-size: 12px; color: #777;">4 Pages Included</span>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--card-border);">
+        <span id="modalPagesCount" style="font-size: 12px; color: var(--muted);">4 Pages Included</span>
         <div style="display: flex; gap: 8px;">
-          <button id="modalCloseBtn" style="border: 1px solid #ccc; padding: 7px 14px; border-radius: 2px;">Close</button>
-          <a id="modalUseBtn" href="#" class="btn-use" style="padding: 7px 18px; border-radius: 2px; text-decoration: none;">Use This Template →</a>
+          <button id="modalCloseBtn" style="border: 1px solid var(--card-border); background: #1a1714; color: var(--beige); padding: 7px 14px; border-radius: 4px; cursor: pointer;">Close</button>
+          <a id="modalUseBtn" href="#" class="btn-use" style="padding: 7px 18px; text-decoration: none;">Use This Template →</a>
         </div>
       </div>
     </div>
@@ -401,22 +1058,22 @@
     <div class="paperly-modal-card" style="max-width: 520px;">
       <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
         <div>
-          <span style="font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--color-burgundy); font-weight: 600;">✦ AI Publication Architect</span>
-          <h3 class="font-serif" style="font-size: 1.6rem; font-weight: 700; margin-top: 4px;">Generate Inspiration Edition</h3>
+          <span style="font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--burgundy-light); font-weight: 600;">✦ AI Publication Architect</span>
+          <h3 class="font-serif" style="font-size: 1.6rem; font-weight: 700; margin-top: 4px; color: #fff;">Generate Inspiration Edition</h3>
         </div>
-        <button id="closeAiModalBtn" style="padding: 4px 8px; font-size: 16px; background: none; border: none; cursor: pointer;">✕</button>
+        <button id="closeAiModalBtn" style="padding: 4px 8px; font-size: 18px; color: var(--muted); background: none; border: none; cursor: pointer;">✕</button>
       </div>
 
-      <p style="font-size: 13px; color: #666; line-height: 1.5; margin-bottom: 20px;">Describe your concept, mood, or destination. PAPERLY's AI will compose an original layout and color palette.</p>
+      <p style="font-size: 13px; color: var(--muted); line-height: 1.5; margin-bottom: 20px;">Describe your concept, mood, or destination. PAPERLY's AI will compose an original layout and color palette.</p>
 
       <div style="margin-bottom: 16px;">
-        <label style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Concept / Occasion</label>
-        <input type="text" id="aiConceptInput" placeholder="e.g. 5 days in Kyoto with my sister, rainy tea houses & bamboo groves" style="width: 100%; padding: 10px 14px; border: 1px solid #dcd3c1; border-radius: 4px; font-size: 14px;">
+        <label style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; color: var(--beige);">Concept / Occasion</label>
+        <input type="text" id="aiConceptInput" placeholder="e.g. 5 days in Kyoto with my sister, rainy tea houses & bamboo groves" style="width: 100%; padding: 10px 14px; border: 1px solid var(--card-border); background: #100e0c; color: #fff; border-radius: 4px; font-size: 14px;">
       </div>
 
       <div style="margin-bottom: 20px;">
-        <label style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Editorial Aesthetic</label>
-        <select id="aiStyleSelect" style="width: 100%; padding: 10px 14px; border: 1px solid #dcd3c1; border-radius: 4px; font-size: 14px; background: #fff;">
+        <label style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; color: var(--beige);">Editorial Aesthetic</label>
+        <select id="aiStyleSelect" style="width: 100%; padding: 10px 14px; border: 1px solid var(--card-border); border-radius: 4px; font-size: 14px; background: #181512; color: #fff;">
           <option value="minimalist">Minimalist Architecture (Kinfolk style)</option>
           <option value="vogue">High Fashion Monograph (Vogue style)</option>
           <option value="romantic">Poetic Romance & Film Grain</option>
@@ -426,22 +1083,22 @@
       </div>
 
       <div style="display: flex; justify-content: flex-end; gap: 10px;">
-        <button type="button" id="btnCancelAiModal" style="padding: 8px 16px; border: 1px solid #ccc; background: transparent; border-radius: 4px; font-size: 13px; cursor: pointer;">Cancel</button>
-        <button type="button" id="btnGenerateAiTemplate" style="padding: 8px 20px; background: var(--color-burgundy); color: #fff; border: none; border-radius: 4px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+        <button type="button" id="btnCancelAiModal" style="padding: 8px 16px; border: 1px solid var(--card-border); background: transparent; color: var(--beige); border-radius: 4px; font-size: 13px; cursor: pointer;">Cancel</button>
+        <button type="button" id="btnGenerateAiTemplate" class="btn-burgundy">
           <span>✦ Generate & Open in Studio</span>
         </button>
       </div>
     </div>
   </div>
 
-  <!-- Footer -->
-  <footer style="margin-top: auto; background-color: #0c0b0a; color: #f6f0e4; border-top: 1px solid rgba(255,255,255,0.08); padding: 3rem 1.5rem 2rem;">
-    <div style="max-w: 80rem; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+  <!-- Footer (Dark Luxury Match) -->
+  <footer>
+    <div style="max-width: 1320px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
       <div>
-        <p class="font-serif" style="font-size: 1.5rem; font-weight: 700;">PAPERLY<span style="color: var(--color-burgundy);">.</span></p>
-        <p style="font-size: 0.8rem; color: #d9c9ad; margin-top: 4px;">Stories, reimagined for the digital age.</p>
+        <p class="brand-logo" style="font-size: 1.4rem;">PAPERLY<span style="color: var(--burgundy);">.</span></p>
+        <p style="font-size: 0.82rem; color: var(--beige); opacity: 0.8; margin-top: 4px;">Stories, reimagined for the digital age.</p>
       </div>
-      <div style="font-size: 0.8rem; color: #9b9082;">
+      <div style="font-size: 0.8rem; color: var(--muted);">
         © 2026 PAPERLY. All rights reserved.
       </div>
     </div>
@@ -451,149 +1108,437 @@
   <script src="js/templates-data.js"></script>
   <script src="js/auth.js"></script>
   <script>
-    const editions = PAPERLY_TEMPLATES.EDITIONS;
+    // Initialize User Pill (matching Dashboard)
+    (function initUser() {
+      let activeUser = null;
+      try {
+        activeUser = JSON.parse(localStorage.getItem('paperly_active_user') || 'null');
+      } catch (e) {}
+
+      if (!activeUser) {
+        activeUser = {
+          id: 'usr_editorial',
+          name: 'Editorial',
+          email: 'editorial@paperly.studio',
+          plan: 'Studio Pro'
+        };
+        try { localStorage.setItem('paperly_active_user', JSON.stringify(activeUser)); } catch (e) {}
+      }
+
+      const firstName = (activeUser.name || 'Editorial').split(' ')[0];
+      const navUser = document.getElementById('navUserName');
+      if (navUser) navUser.textContent = firstName;
+      const navAv = document.getElementById('navAvatar');
+      if (navAv) navAv.textContent = (activeUser.name || 'E').charAt(0).toUpperCase();
+      const dropEmail = document.getElementById('dropdownUserEmail');
+      if (dropEmail) dropEmail.textContent = activeUser.email || 'editorial@paperly.studio';
+
+      // Dropdown toggle
+      const userPill = document.getElementById('userPill');
+      const userDropdown = document.getElementById('userDropdown');
+      if (userPill && userDropdown) {
+        userPill.addEventListener('click', (e) => {
+          e.stopPropagation();
+          userDropdown.classList.toggle('active');
+        });
+        document.addEventListener('click', () => {
+          userDropdown.classList.remove('active');
+        });
+      }
+
+      const btnSignOut = document.getElementById('btnSignOut');
+      if (btnSignOut) {
+        btnSignOut.addEventListener('click', () => {
+          localStorage.removeItem('paperly_active_user');
+          window.location.href = 'index.html';
+        });
+      }
+    })();
+
+    let editions = Object.assign({}, PAPERLY_TEMPLATES.EDITIONS || {});
+    // Load any user-imported template packs from localStorage
+    try {
+      const userPacks = JSON.parse(localStorage.getItem('paperly_user_templates') || '{}');
+      Object.assign(editions, userPacks);
+    } catch(e) {}
+
     const container = document.getElementById('templatesContainer');
     const searchInput = document.getElementById('searchInput');
     const categoryPills = document.getElementById('categoryPills');
-    let activeCategory = 'all';
+    const filterSource = document.getElementById('filterSource');
+    const filterMood = document.getElementById('filterMood');
+    const filterPages = document.getElementById('filterPages');
+    const filterPhotos = document.getElementById('filterPhotos');
+    const btnResetFilters = document.getElementById('btnResetFilters');
+    const loadMoreWrap = document.getElementById('loadMoreWrap');
+    const btnLoadMore = document.getElementById('btnLoadMore');
 
-    // Favorites Storage
-    const FAVS_KEY = 'paperly_template_favorites';
+    let activeCategory = 'all';
+    let searchQuery = '';
+    let visibleCount = 24;
+    const PAGE_SIZE = 24;
+
     function getFavs() {
-      try { return JSON.parse(localStorage.getItem(FAVS_KEY) || '[]'); } catch(e) { return []; }
+      try {
+        return JSON.parse(localStorage.getItem('paperly_fav_templates') || '[]');
+      } catch(e) {
+        return [];
+      }
     }
+
     function toggleFav(key, e) {
-      if (e) { e.preventDefault(); e.stopPropagation(); }
+      if (e) e.stopPropagation();
       let favs = getFavs();
       if (favs.includes(key)) {
         favs = favs.filter(k => k !== key);
       } else {
         favs.push(key);
       }
-      localStorage.setItem(FAVS_KEY, JSON.stringify(favs));
+      localStorage.setItem('paperly_fav_templates', JSON.stringify(favs));
       updateCounts();
-      renderTemplates();
+      renderTemplates(false);
     }
 
     function updateCounts() {
-      const countEl = document.getElementById('countAll');
-      if (countEl) countEl.textContent = Object.keys(editions).length;
-      const favEl = document.getElementById('countFavs');
-      if (favEl) favEl.textContent = getFavs().length;
-    }
-    updateCounts();
-
-    // Render list
-    function renderTemplates() {
-      const query = searchInput.value.toLowerCase().trim();
+      const allKeys = Object.keys(editions);
       const favs = getFavs();
+      const countAll = document.getElementById('countAll');
+      const countFavs = document.getElementById('countFavs');
+      if (countAll) countAll.textContent = allKeys.length;
+      if (countFavs) countFavs.textContent = favs.length;
+      const statTotal = document.getElementById('statTotalTemplates');
+      if (statTotal) statTotal.textContent = allKeys.length;
+    }
+
+    function getFilteredKeys() {
+      const favs = getFavs();
+      const q = searchQuery.toLowerCase().trim();
+      const selSource = filterSource ? filterSource.value : 'all';
+      const selMood = filterMood ? filterMood.value : 'all';
+      const selPages = filterPages ? filterPages.value : 'all';
+      const selPhotos = filterPhotos ? filterPhotos.value : 'all';
+
+      return Object.keys(editions).filter(k => {
+        const ed = editions[k];
+        if (!ed) return false;
+
+        // Category filter
+        if (activeCategory === 'favorites') {
+          if (!favs.includes(k)) return false;
+        } else if (activeCategory !== 'all') {
+          if (ed.category.toLowerCase() !== activeCategory.toLowerCase()) return false;
+        }
+
+        // Source type filter
+        if (selSource !== 'all') {
+          if (ed.sourceType !== selSource) return false;
+        }
+
+        // Mood filter
+        if (selMood !== 'all') {
+          if (ed.mood !== selMood) return false;
+        }
+
+        // Page count filter
+        if (selPages !== 'all') {
+          const pCount = ed.pages ? ed.pages.length : (ed.pageCount || 4);
+          if (String(pCount) !== selPages) return false;
+        }
+
+        // Photo count filter
+        if (selPhotos !== 'all') {
+          const phCount = ed.photoSlots || 4;
+          if (selPhotos === '3-4' && (phCount < 3 || phCount > 4)) return false;
+          if (selPhotos === '5-6' && (phCount < 5 || phCount > 6)) return false;
+          if (selPhotos === '7+' && phCount < 7) return false;
+        }
+
+        // Search keyword
+        if (q) {
+          const textCorpus = [
+            ed.name,
+            ed.category,
+            ed.description,
+            ed.mood,
+            ...(ed.tags || [])
+          ].join(' ').toLowerCase();
+
+          if (!textCorpus.includes(q)) return false;
+        }
+
+        return true;
+      });
+    }
+
+    function renderTemplates(resetPagination = true) {
+      if (resetPagination) visibleCount = PAGE_SIZE;
+      const favs = getFavs();
+      const filteredKeys = getFilteredKeys();
+
       container.innerHTML = '';
 
-      const keys = Object.keys(editions).filter(k => {
-        const ed = editions[k];
-        let matchCat = false;
-        if (activeCategory === 'all') matchCat = true;
-        else if (activeCategory === 'favorites') matchCat = favs.includes(k);
-        else matchCat = (ed.category.toLowerCase() === activeCategory.toLowerCase());
-
-        const matchSearch = (!query || ed.name.toLowerCase().includes(query) || ed.category.toLowerCase().includes(query) || ed.description.toLowerCase().includes(query));
-        return matchCat && matchSearch;
-      });
-
-      if (!keys.length) {
+      if (!filteredKeys.length) {
         container.innerHTML = `
           <div style="grid-column: 1/-1; text-align: center; padding: 4rem 1rem;">
-            <p class="font-serif" style="font-size: 1.5rem; color: #333;">No templates found</p>
-            <p style="font-size: 0.9rem; color: #777; margin-top: 0.5rem;">Try adjusting your search query or selecting another category.</p>
+            <p class="font-serif" style="font-size: 1.5rem; color: #f4ede0;">No matching templates found</p>
+            <p style="font-size: 0.9rem; color: var(--muted); margin-top: 0.5rem;">Try clearing your filters or search keywords.</p>
+            <button type="button" onclick="resetAllFilters()" class="btn-burgundy" style="margin-top: 1rem;">Reset All Filters</button>
           </div>`;
+        if (loadMoreWrap) loadMoreWrap.style.display = 'none';
         return;
       }
 
-      keys.forEach(k => {
+      const visibleKeys = filteredKeys.slice(0, visibleCount);
+
+      visibleKeys.forEach(k => {
         const ed = editions[k];
         const card = document.createElement('div');
         card.className = 'template-card';
         const isFav = favs.includes(k);
 
-        const coverPage = ed.pages[0];
+        const coverPage = (ed.pages && ed.pages[0]) || {};
         const bg = ed.coverBg || coverPage.bg || '#0c0b0a';
-        const coverImg = ed.cover || '';
+        const p1Imgs = (coverPage.els || []).filter(e => e.t === 'img' && e.src && !e.src.includes('thumbnails'));
+        const thumbImg = (p1Imgs.length > 0 ? p1Imgs[0].src : null) || ed.thumbnail || ed.cover || '';
+        const isImported = ed.sourceType === 'imported';
 
         card.innerHTML = `
           <div class="card-cover" data-key="${k}" style="background: ${bg}; position: relative; overflow: hidden;" title="Click to preview ${ed.name}">
-            <button type="button" class="btn-fav-star" onclick="toggleFav('${k}', event)" title="${isFav ? 'Remove from favorites' : 'Add to favorites'}" style="position: absolute; top: 12px; right: 12px; z-index: 6; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.25); border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; color: ${isFav ? '#e07a8c' : '#ffffff'}; font-size: 14px; cursor: pointer; transition: transform 0.2s;">
+            <button type="button" class="btn-fav-star" onclick="toggleFav('${k}', event)" title="${isFav ? 'Remove from favorites' : 'Add to favorites'}" style="color: ${isFav ? '#e07a8c' : '#ffffff'};">
               ${isFav ? '★' : '☆'}
             </button>
-            ${coverImg ? `<img src="${coverImg}" alt="${ed.name}" loading="lazy" onerror="this.style.opacity='0';" style="width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; z-index: 1; transition: opacity 0.3s;">` : ''}
-            <div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.2) 40%, rgba(0,0,0,0.85) 100%); z-index: 2;"></div>
-            <div style="position: absolute; inset: 0; padding: 8% 8% 0; color: #f4ede0; z-index: 3;">
-              <p class="font-serif" style="font-size: 1.35rem; font-weight: 700; line-height: 1.1; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">${ed.name}</p>
-              <p style="font-size: 0.65rem; color: #e3d5bd; opacity: 0.95; margin-top: 3px; letter-spacing: 0.12em;">${ed.category.toUpperCase()} EDITION</p>
+            ${thumbImg ? `<img src="${thumbImg}" alt="${ed.name}" loading="lazy" onerror="this.onerror=null;this.src='assets/thumbnails/${k}.png';">` : ''}
+            <div class="card-cover-overlay"></div>
+            <div class="card-cover-content">
+              <p class="card-cover-title">${ed.name}</p>
+              <p class="card-cover-sub">${(ed.category || '').toUpperCase()} · ${ed.mood || 'EDITORIAL'}</p>
             </div>
-            <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 3;">
-              <div style="width: 80px; height: 80px; border-radius: 50%; border: 1px dashed rgba(227,213,189,0.5); display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.3); backdrop-filter: blur(2px);">
-                <span style="font-family: var(--font-quote); font-size: 1.1rem; font-style: italic; color: #e3d5bd;">PAPERLY.</span>
-              </div>
-            </div>
-            <div style="position: absolute; bottom: 10px; right: 12px; background: rgba(0,0,0,0.75); color: #fff; font-size: 10px; padding: 2px 8px; border-radius: 10px; z-index: 4; border: 1px solid rgba(255,255,255,0.15);">
-              ${ed.pages.length} Pages
+            <span class="card-source-badge">${isImported ? 'Imported Pack' : 'Original Edition'}</span>
+            <div class="card-cover-badge">
+              ${ed.pages ? ed.pages.length : ed.pageCount} Pages · ${ed.photoSlots || 4} Photos
             </div>
           </div>
           <div class="card-info">
             <span class="card-category">${ed.category}</span>
             <h3 class="card-title">${ed.name}</h3>
-            <p class="card-desc">${ed.description}</p>
+            <p class="card-desc">${ed.description || `${ed.category} magazine template handcrafted with balanced typography and photo spreads.`}</p>
             <div class="card-actions">
-              <button class="btn-preview" data-preview="${k}">Preview Edition</button>
-              <a href="create.html?template=${k}" class="btn-use">Use Template</a>
+              <button type="button" class="btn-preview" data-preview="${k}">Preview Edition</button>
+              <a href="studio.html?template=${k}" class="btn-use">Use Template</a>
             </div>
           </div>
         `;
         container.appendChild(card);
       });
+
+      // Pagination control
+      if (loadMoreWrap) {
+        if (visibleCount < filteredKeys.length) {
+          loadMoreWrap.style.display = 'block';
+          if (btnLoadMore) btnLoadMore.textContent = `Load More Templates (${filteredKeys.length - visibleCount} remaining)`;
+        } else {
+          loadMoreWrap.style.display = 'none';
+        }
+      }
     }
 
-    // Category Filtering
-    categoryPills.addEventListener('click', e => {
-      const btn = e.target.closest('.filter-btn');
-      if (!btn) return;
-      categoryPills.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      activeCategory = btn.dataset.cat;
-      renderTemplates();
+    if (btnLoadMore) {
+      btnLoadMore.onclick = () => {
+        visibleCount += PAGE_SIZE;
+        renderTemplates(false);
+      };
+    }
+
+    // Search event
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        searchQuery = e.target.value;
+        renderTemplates(true);
+      });
+    }
+
+    // Category pills events
+    if (categoryPills) {
+      categoryPills.addEventListener('click', (e) => {
+        const btn = e.target.closest('.filter-btn');
+        if (!btn) return;
+        categoryPills.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeCategory = btn.dataset.cat;
+        renderTemplates(true);
+      });
+    }
+
+    // Secondary filters
+    [filterSource, filterMood, filterPages, filterPhotos].forEach(el => {
+      if (el) el.addEventListener('change', () => renderTemplates(true));
     });
 
-    searchInput.addEventListener('input', renderTemplates);
+    function resetAllFilters() {
+      searchQuery = '';
+      if (searchInput) searchInput.value = '';
+      activeCategory = 'all';
+      if (categoryPills) {
+        categoryPills.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        const allBtn = categoryPills.querySelector('[data-cat="all"]');
+        if (allBtn) allBtn.classList.add('active');
+      }
+      if (filterSource) filterSource.value = 'all';
+      if (filterMood) filterMood.value = 'all';
+      if (filterPages) filterPages.value = 'all';
+      if (filterPhotos) filterPhotos.value = 'all';
+      renderTemplates(true);
+    }
 
-    // AI Inspiration Modal Logic
+    if (btnResetFilters) {
+      btnResetFilters.onclick = resetAllFilters;
+    }
+
+    // Modal & Action Listeners
+    const btnCreateTemplate = document.getElementById('btnCreateTemplate');
+    if (btnCreateTemplate) {
+      btnCreateTemplate.onclick = () => {
+        window.location.href = 'studio.html?mode=template-builder';
+      };
+    }
+
+    // Import Pack Modal
+    const importModal = document.getElementById('importPackModal');
+    const btnImportPack = document.getElementById('btnImportPack');
+    const closeImportModalBtn = document.getElementById('closeImportModalBtn');
+    const btnCancelImport = document.getElementById('btnCancelImport');
+    const btnExecuteImport = document.getElementById('btnExecuteImport');
+    const packFileInput = document.getElementById('packFileInput');
+    const packJsonInput = document.getElementById('packJsonInput');
+    const importReport = document.getElementById('importValidationReport');
+
+    function openImportModal() {
+      if (importModal) importModal.classList.add('active');
+      if (packJsonInput) packJsonInput.value = '';
+      if (importReport) importReport.style.display = 'none';
+    }
+
+    function closeImportModal() {
+      if (importModal) importModal.classList.remove('active');
+    }
+
+    if (btnImportPack) btnImportPack.onclick = openImportModal;
+    if (closeImportModalBtn) closeImportModalBtn.onclick = closeImportModal;
+    if (btnCancelImport) btnCancelImport.onclick = closeImportModal;
+
+    if (packFileInput) {
+      packFileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          if (packJsonInput) packJsonInput.value = ev.target.result;
+        };
+        reader.readAsText(file);
+      });
+    }
+
+    if (btnExecuteImport) {
+      btnExecuteImport.onclick = () => {
+        const raw = packJsonInput.value.trim();
+        if (!raw) {
+          showReport('Please paste or upload JSON template pack data.', false);
+          return;
+        }
+
+        let parsed;
+        try {
+          parsed = JSON.parse(raw);
+        } catch(e) {
+          showReport('JSON parse error: ' + e.message, false);
+          return;
+        }
+
+        const templatesToImport = Array.isArray(parsed) ? parsed : (parsed.templates ? parsed.templates : [parsed]);
+        let validCount = 0;
+        const validTemplates = {};
+
+        templatesToImport.forEach(tpl => {
+          if (tpl.id && tpl.name && tpl.pages && Array.isArray(tpl.pages)) {
+            validCount++;
+            validTemplates[tpl.id] = Object.assign({
+              category: tpl.category || 'Lifestyle',
+              tags: tpl.tags || ['Custom'],
+              mood: tpl.mood || 'Sophisticated',
+              pageCount: tpl.pages.length,
+              photoSlots: tpl.photoSlots || 4,
+              thumbnail: tpl.thumbnail || 'assets/thumbnails/fashion-1-the-unhurried-season.png',
+              description: tpl.description || 'Imported custom template pack',
+              pages: tpl.pages
+            }, tpl);
+          }
+        });
+
+        if (validCount === 0) {
+          showReport('Validation failed: No valid templates found with id, name, and pages array.', false);
+          return;
+        }
+
+        const userTemplates = JSON.parse(localStorage.getItem('paperly_user_templates') || '{}');
+        Object.assign(userTemplates, validTemplates);
+        localStorage.setItem('paperly_user_templates', JSON.stringify(userTemplates));
+        Object.assign(editions, validTemplates);
+
+        showReport(`✓ Successfully validated and imported ${validCount} template(s)!`, true);
+        setTimeout(() => {
+          closeImportModal();
+          updateCounts();
+          renderTemplates(true);
+        }, 900);
+      };
+    }
+
+    function showReport(msg, isSuccess) {
+      if (!importReport) return;
+      importReport.style.display = 'block';
+      importReport.style.background = isSuccess ? 'rgba(78, 140, 78, 0.15)' : 'rgba(180, 50, 50, 0.15)';
+      importReport.style.border = isSuccess ? '1px solid #4e8c4e' : '1px solid #b43232';
+      importReport.style.color = isSuccess ? '#85e085' : '#ff8585';
+      importReport.textContent = msg;
+    }
+
+    // Inspiration Modal
     const aiModal = document.getElementById('aiInspirationModal');
     const btnOpenInspiration = document.getElementById('btnOpenInspiration');
     const closeAiModalBtn = document.getElementById('closeAiModalBtn');
     const btnCancelAiModal = document.getElementById('btnCancelAiModal');
     const btnGenerateAiTemplate = document.getElementById('btnGenerateAiTemplate');
+    const aiConceptInput = document.getElementById('aiConceptInput');
+    const aiStyleSelect = document.getElementById('aiStyleSelect');
 
-    if (btnOpenInspiration) btnOpenInspiration.onclick = () => aiModal.classList.add('active');
-    if (closeAiModalBtn) closeAiModalBtn.onclick = () => aiModal.classList.remove('active');
-    if (btnCancelAiModal) btnCancelAiModal.onclick = () => aiModal.classList.remove('active');
+    function openAiModal() {
+      if (aiModal) aiModal.classList.add('active');
+    }
+    function closeAiModal() {
+      if (aiModal) aiModal.classList.remove('active');
+    }
+
+    if (btnOpenInspiration) btnOpenInspiration.onclick = openAiModal;
+    if (closeAiModalBtn) closeAiModalBtn.onclick = closeAiModal;
+    if (btnCancelAiModal) btnCancelAiModal.onclick = closeAiModal;
 
     if (btnGenerateAiTemplate) {
-      btnGenerateAiTemplate.onclick = async () => {
-        const concept = document.getElementById('aiConceptInput').value.trim() || 'Our Favorite Ordinary Days';
-        const style = document.getElementById('aiStyleSelect').value;
-        btnGenerateAiTemplate.innerHTML = '<span class="paperly-loading">✦ Composing Layout…</span>';
-
-        // Select closest template as baseline
-        const styleMap = {
-          minimalist: 'minimalist-living',
-          vogue: 'fashion',
-          romantic: 'couple',
-          monochrome: 'monochrome',
-          indie: 'indie-culture'
-        };
-        const templateKey = styleMap[style] || 'best-friend';
+      btnGenerateAiTemplate.onclick = () => {
+        const concept = aiConceptInput.value.trim() || 'A Quiet Summer in Southern France';
+        const style = aiStyleSelect.value || 'minimalist';
+        btnGenerateAiTemplate.innerHTML = '<span class="spinner"></span> Composing Layout…';
+        btnGenerateAiTemplate.disabled = true;
 
         setTimeout(() => {
-          window.location.href = `create.html?template=${templateKey}&title=${encodeURIComponent(concept)}`;
+          const map = {
+            'minimalist': 'lifestyle-1-the-art-of-slow-living',
+            'vogue': 'fashion-1-the-unhurried-season',
+            'romantic': 'personal-memory-1-forever-sisters',
+            'monochrome': 'photography-1-monochrome-solitude',
+            'indie': 'lifestyle-3-kinfolk-table'
+          };
+          const templateKey = map[style] || 'fashion-1-the-unhurried-season';
+          window.location.href = `studio.html?template=${templateKey}&title=${encodeURIComponent(concept)}`;
         }, 600);
       };
     }
@@ -614,33 +1559,35 @@
 
       modalTitle.textContent = ed.name;
       modalCat.textContent = `${ed.category} Edition`;
-      modalDesc.textContent = ed.description;
-      modalUseBtn.href = `create.html?template=${key}`;
-      document.getElementById('modalPagesCount').textContent = `${ed.pages.length} Pages Included · Fully Editable`;
+      modalDesc.textContent = ed.description || `${ed.category} editorial edition designed for PAPERLY.`;
+      modalUseBtn.href = `studio.html?template=${key}`;
+      document.getElementById('modalPagesCount').textContent = `${ed.pages ? ed.pages.length : ed.pageCount} Pages Included · Fully Editable`;
 
       modalSpreads.innerHTML = '';
-      ed.pages.forEach((p, idx) => {
-        const frame = document.createElement('div');
-        frame.className = 'preview-page-frame';
-        frame.style.background = p.bg;
+      if (ed.pages) {
+        ed.pages.forEach((p, idx) => {
+          const frame = document.createElement('div');
+          frame.className = 'preview-page-frame';
+          frame.style.background = p.bg || '#111';
 
-        let titleText = `Page ${idx + 1}`;
-        const firstText = p.els.find(e => e.t === 'text');
-        if (firstText && firstText.text) {
-          titleText = firstText.text;
-        }
+          let titleText = `Page ${idx + 1}`;
+          const firstText = (p.els || []).find(e => e.t === 'text' || e.type === 'text');
+          if (firstText && firstText.text) {
+            titleText = firstText.text;
+          }
 
-        frame.innerHTML = `
-          <div style="padding: 18px; color: ${p.bg === '#0c0b0a' ? '#f4ede0' : '#111'};">
-            <span style="font-size: 9px; letter-spacing: 0.1em; opacity: 0.6; text-transform: uppercase;">Page ${idx + 1}</span>
-            <p class="font-serif" style="font-size: 15px; font-weight: 700; margin-top: 6px; line-height: 1.2;">${titleText}</p>
-          </div>
-          <div style="position: absolute; bottom: 8px; right: 10px; font-size: 9px; opacity: 0.5;">
-            PAPERLY.
-          </div>
-        `;
-        modalSpreads.appendChild(frame);
-      });
+          frame.innerHTML = `
+            <div style="padding: 18px; color: ${p.bg === '#0c0b0a' || p.bg === '#14100d' || p.bg === '#181412' ? '#f4ede0' : '#111'};">
+              <span style="font-size: 9px; letter-spacing: 0.1em; opacity: 0.6; text-transform: uppercase;">Page ${idx + 1}</span>
+              <p class="font-serif" style="font-size: 15px; font-weight: 700; margin-top: 6px; line-height: 1.2;">${titleText}</p>
+            </div>
+            <div style="position: absolute; bottom: 8px; right: 10px; font-size: 9px; opacity: 0.5;">
+              PAPERLY.
+            </div>
+          `;
+          modalSpreads.appendChild(frame);
+        });
+      }
 
       modal.classList.add('active');
     }
@@ -648,11 +1595,12 @@
     function closeModal() {
       modal.classList.remove('active');
     }
-    }
 
-    modalCloseBtn.onclick = closeModal;
-    closeModalBtn.onclick = closeModal;
-    modal.onclick = e => { if (e.target === modal) closeModal(); };
+    if (modalCloseBtn) modalCloseBtn.onclick = closeModal;
+    if (closeModalBtn) closeModalBtn.onclick = closeModal;
+    if (modal) {
+      modal.onclick = e => { if (e.target === modal) closeModal(); };
+    }
 
     container.addEventListener('click', e => {
       const prevBtn = e.target.closest('[data-preview]');
@@ -663,15 +1611,6 @@
         openModal(cover.dataset.key);
       }
     });
-
-    // Mobile menu toggle
-    const menuBtn = document.getElementById('menuBtn');
-    const mobDrawer = document.getElementById('mobDrawer');
-    if (menuBtn && mobDrawer) {
-      menuBtn.addEventListener('click', () => {
-        mobDrawer.style.display = mobDrawer.style.display === 'flex' ? 'none' : 'flex';
-      });
-    }
 
     // Check query params (e.g. ?category=Travel)
     const urlParams = new URLSearchParams(window.location.search);
@@ -685,8 +1624,8 @@
       }
     }
 
-    renderTemplates();
+    updateCounts();
+    renderTemplates(true);
   </script>
 </body>
 </html>
-

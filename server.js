@@ -199,6 +199,96 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  // --- API ROUTE: /api/templates (GET) ---
+  if (urlPath === '/api/templates' && req.method === 'GET') {
+    const tplPath = path.join(ROOT, 'data', 'templates.json');
+    try {
+      if (fs.existsSync(tplPath)) {
+        const templates = JSON.parse(fs.readFileSync(tplPath, 'utf8'));
+        const queryParams = new URL(req.url, 'http://localhost:3000').searchParams;
+        const cat = queryParams.get('category');
+        const source = queryParams.get('source');
+        const mood = queryParams.get('mood');
+
+        let filtered = Object.values(templates);
+        if (cat && cat !== 'all') {
+          filtered = filtered.filter(t => (t.category || '').toLowerCase() === cat.toLowerCase());
+        }
+        if (source && source !== 'all') {
+          filtered = filtered.filter(t => t.sourceType === source);
+        }
+        if (mood && mood !== 'all') {
+          filtered = filtered.filter(t => (t.mood || '').toLowerCase() === mood.toLowerCase());
+        }
+
+        sendJson(res, {
+          success: true,
+          total: filtered.length,
+          templates: filtered
+        });
+        return;
+      }
+    } catch (e) {
+      sendJson(res, { success: false, error: e.message }, 500);
+      return;
+    }
+  }
+
+  // --- API ROUTE: /api/inspiration/decompose (POST) ---
+  if (urlPath === '/api/inspiration/decompose' && req.method === 'POST') {
+    const { referenceUrl, concept, style = 'minimalist', mood = 'Sophisticated' } = await parseJsonBody(req);
+    
+    // Server-side Vision AI Layout Synthesizer
+    const synthesizedId = 'inspired-' + Date.now().toString(36);
+    const title = concept ? concept.split(',')[0].trim() : 'The Art of Light and Proportion';
+
+    const newTemplate = {
+      id: synthesizedId,
+      name: title,
+      category: 'Lifestyle',
+      sourceType: 'inspired',
+      sourceAttribution: `Original design inspired by visual study: "${referenceUrl || concept || 'Editorial Minimal'}" via PAPERLY Vision Engine`,
+      tags: ['Lifestyle', 'Original Edition', 'Vision AI', mood],
+      mood: mood,
+      pageCount: 4,
+      photoSlots: 4,
+      thumbnail: 'assets/thumbnails/lifestyle-1-the-art-of-slow-living.png',
+      cover: 'assets/samples/sample_lifestyle_01.png',
+      coverBg: '#0c0b0a',
+      description: `Original editorial layout inspired by contemporary design references, curated with balanced typography.`,
+      pages: [
+        {
+          bg: '#0c0b0a',
+          els: [
+            { id: 101, t: 'text', x: 36, y: 40, w: 468, h: 60, text: title.toUpperCase(), size: 32, font: 'Playfair Display', weight: 700, color: '#f6f0e4', align: 'center', sp: 2 },
+            { id: 102, t: 'text', x: 36, y: 104, w: 468, h: 20, text: 'FOLIO MONOGRAPH · ISSUE 01', size: 10, font: 'Inter', color: '#6e1423', align: 'center', sp: 5, weight: 600 },
+            { id: 103, t: 'img', x: 36, y: 135, w: 468, h: 430, src: 'assets/samples/sample_lifestyle_01.png', bg: 'url("assets/samples/sample_lifestyle_01.png")', type: 'stock', fit: 'cover', position: 'center' },
+            { id: 104, t: 'text', x: 36, y: 585, w: 468, h: 45, text: '“In the end, we only preserve what we hold with care.”', size: 14, font: 'Cormorant Garamond', italic: true, color: '#f6f0e4', align: 'center' },
+            { id: 105, t: 'line', x: 210, y: 642, w: 120, h: 1, color: '#6e1423' }
+          ]
+        },
+        {
+          bg: '#f4ede0',
+          els: [
+            { id: 201, t: 'text', x: 36, y: 36, w: 468, h: 18, text: 'ESSAY · DISPATCH', size: 10, font: 'Inter', sp: 5, color: '#6e1423', weight: 600 },
+            { id: 202, t: 'text', x: 36, y: 58, w: 468, h: 50, text: 'The Unhurried Afternoon', size: 28, font: 'Playfair Display', weight: 700, color: '#0c0b0a' },
+            { id: 203, t: 'line', x: 36, y: 114, w: 60, h: 2, color: '#6e1423' },
+            { id: 204, t: 'img', x: 36, y: 135, w: 260, h: 270, src: 'assets/samples/sample_lifestyle_02.png', bg: 'url("assets/samples/sample_lifestyle_02.png")', type: 'stock', fit: 'cover', position: 'center' },
+            { id: 205, t: 'text', x: 315, y: 135, w: 190, h: 270, text: 'We began this journey not knowing what was around the bend. All we possessed was the quiet certainty that whatever we encountered, we would meet it together.', size: 12, font: 'Inter', color: '#1c1712', lineHeight: 1.6 },
+            { id: 206, t: 'img', x: 36, y: 425, w: 160, h: 245, src: 'assets/samples/sample_food_01.png', bg: 'url("assets/samples/sample_food_01.png")', type: 'stock', fit: 'cover', position: 'center' },
+            { id: 207, t: 'text', x: 216, y: 460, w: 290, h: 200, text: '“Memory is the architecture of who we were becoming.”', size: 19, font: 'Cormorant Garamond', italic: true, color: '#6e1423', lineHeight: 1.4 }
+          ]
+        }
+      ]
+    };
+
+    sendJson(res, {
+      success: true,
+      template: newTemplate
+    });
+    return;
+  }
+
   // --- STATIC FILE SERVING ---
   let cleanUrl = urlPath;
   if (cleanUrl === '/') cleanUrl = '/index.html';
@@ -226,10 +316,11 @@ const server = http.createServer(async (req, res) => {
   });
 });
 
-server.listen(PORT, '0.0.0.0', () => {
+server.listen(PORT, () => {
   console.log(`\n==================================================`);
   console.log(`  PAPERLY Studio & Full API Live Server (Ready)`);
   console.log(`  Local URL:    http://localhost:${PORT}`);
+  console.log(`                http://127.0.0.1:${PORT}`);
   console.log(`  API Routes:   http://localhost:${PORT}/api/auth/*`);
   console.log(`                http://localhost:${PORT}/api/ai/*`);
   console.log(`==================================================\n`);

@@ -4,7 +4,9 @@
   "description": "PAPERLY — Stories, reimagined for the digital age. AI-powered personalised digital magazine creation platform.",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "check:templates": "node scripts/check-templates.js",
+    "generate:templates": "node scripts/generate-templates.js"
   },
   "keywords": [
     "digital-magazine",

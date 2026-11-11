@@ -555,6 +555,9 @@
       <b></b><span id="sv">Saved</span>
     </span>
 
+    <button id="btnAiArrangeHeader" style="background: var(--burg); color: #fff; border: 1px solid #8a2434; font-weight: 600; padding: 0.35rem 0.8rem; border-radius: 3px; cursor: pointer;" title="AI Auto-Arranger: Fixes text collisions & balances photos">✦ AI Arrange Page</button>
+    <button id="btnSaveTemplateHeader" style="background: #1a1715; color: #e3d5bd; border: 1px solid #3a2e28; padding: 0.35rem 0.8rem; border-radius: 3px; cursor: pointer;" title="Save current publication as a reusable template">Save as Template</button>
+
     <button id="btnSaveJson" title="Download project JSON file to your device">Save File</button>
     <button id="btnLoadJson" title="Open project JSON file">Load</button>
     <input type="file" id="jsonFileInput" accept=".json,.paperly" style="display: none;">
@@ -713,6 +716,8 @@
   </div>
 
   <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="js/image-store.js"></script>
   <script src="js/design-tokens.js"></script>
   <script src="js/auth.js"></script>
@@ -848,6 +853,10 @@
           img.style.height = "100%";
           img.style.objectFit = e.fit || "cover";
           img.style.objectPosition = e.position || "center";
+          if (e.rotation) {
+            img.style.transform = `rotate(${e.rotation}deg)`;
+            img.style.transformOrigin = "center center";
+          }
           img.style.display = "block";
           img.style.pointerEvents = "none";
 
@@ -994,14 +1003,37 @@
             <input type="file" accept="image/*" id="fi">
           </label>
           <div style="margin-bottom: 12px;">
-            <span style="font-size:11px;color:var(--mut);display:block;margin-bottom:6px;">Or Choose Editorial Photography</span>
+            <span style="font-size:11px;color:var(--mut);display:block;margin-bottom:6px;">Orientation & Rotation</span>
+            <div class="row">
+              <button id="btnRotCW" type="button" style="font-size: 11px;">Rotate 90° ↷</button>
+              <button id="btnRotCCW" type="button" style="font-size: 11px;">Rotate -90° ↶</button>
+              <button id="btnResetRot" type="button" style="font-size: 11px;">Reset (0°)</button>
+            </div>
+          </div>
+          <div class="g2" style="margin-bottom: 12px;">
+            <label><span>Fitting</span>
+              <select data-k="fit">
+                <option value="cover"${e.fit !== 'contain' ? ' selected' : ''}>Fill & Crop (Cover)</option>
+                <option value="contain"${e.fit === 'contain' ? ' selected' : ''}>Fit Whole (Contain)</option>
+              </select>
+            </label>
+            <label><span>Position</span>
+              <select data-k="position">
+                <option value="center"${e.position === 'center' || !e.position ? ' selected' : ''}>Center</option>
+                <option value="top"${e.position === 'top' ? ' selected' : ''}>Top</option>
+                <option value="bottom"${e.position === 'bottom' ? ' selected' : ''}>Bottom</option>
+              </select>
+            </label>
+          </div>
+          <div style="margin-bottom: 12px;">
+            <span style="font-size:11px;color:var(--mut);display:block;margin-bottom:6px;">Editorial Photography Library</span>
             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
-              <button class="stock-photo-btn" data-url="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80" style="padding:4px;font-size:10px;">Coast</button>
-              <button class="stock-photo-btn" data-url="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=800&q=80" style="padding:4px;font-size:10px;">Sisters</button>
-              <button class="stock-photo-btn" data-url="https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80" style="padding:4px;font-size:10px;">Lisbon</button>
-              <button class="stock-photo-btn" data-url="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=800&q=80" style="padding:4px;font-size:10px;">Coffee</button>
-              <button class="stock-photo-btn" data-url="https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=800&q=80" style="padding:4px;font-size:10px;">Celebrate</button>
-              <button class="stock-photo-btn" data-url="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=800&q=80" style="padding:4px;font-size:10px;">Minimal</button>
+              <button class="stock-photo-btn" data-url="assets/samples/sample_travel_01.png" style="padding:4px;font-size:10px;">Coast</button>
+              <button class="stock-photo-btn" data-url="assets/samples/sample_memory_01.png" style="padding:4px;font-size:10px;">Portrait</button>
+              <button class="stock-photo-btn" data-url="assets/samples/sample_fashion_01.png" style="padding:4px;font-size:10px;">Fashion</button>
+              <button class="stock-photo-btn" data-url="assets/samples/sample_food_01.png" style="padding:4px;font-size:10px;">Coffee</button>
+              <button class="stock-photo-btn" data-url="assets/samples/sample_wedding_01.png" style="padding:4px;font-size:10px;">Wedding</button>
+              <button class="stock-photo-btn" data-url="assets/samples/sample_lifestyle_01.png" style="padding:4px;font-size:10px;">Minimal</button>
             </div>
           </div>
           <div class="row">
@@ -1130,7 +1162,14 @@
         } else if (a === "t") {
           e = E("text", 36, 280, 320, 90, { text: "Write your memory or story here…", size: 14, font: "Inter" });
         } else if (a === "p") {
-          e = E("img", 100, 180, 340, 340, { bg: PAPERLY_TEMPLATES.art(Math.floor(Math.random() * 6)) });
+          e = E("img", 100, 180, 340, 340, {
+            src: "",
+            bg: "",
+            type: "upload",
+            fit: "cover",
+            position: "center",
+            rotation: 0
+          });
         } else {
           e = E("line", 36, 280, 80, 2, { color: "#6e1423" });
         }
@@ -1385,6 +1424,50 @@
         showToast("Photo updated");
       });
       r.readAsDataURL(f);
+    });
+
+    // Image Inspector Quick Controls (Rotate, Fit, Stock Photos)
+    document.addEventListener("click", ev => {
+      const target = ev.target;
+      if (!target) return;
+      if (target.id === "btnRotCW") {
+        chg(() => {
+          const el = SE();
+          if (el && el.t === 'img') {
+            el.rotation = ((el.rotation || 0) + 90) % 360;
+            showToast(`Photo rotated to ${el.rotation}°`);
+          }
+        });
+      } else if (target.id === "btnRotCCW") {
+        chg(() => {
+          const el = SE();
+          if (el && el.t === 'img') {
+            el.rotation = ((el.rotation || 0) + 270) % 360;
+            showToast(`Photo rotated to ${el.rotation}°`);
+          }
+        });
+      } else if (target.id === "btnResetRot") {
+        chg(() => {
+          const el = SE();
+          if (el && el.t === 'img') {
+            el.rotation = 0;
+            showToast("Photo rotation reset to 0°");
+          }
+        });
+      } else if (target.classList && target.classList.contains("stock-photo-btn")) {
+        const url = target.dataset.url;
+        if (url) {
+          chg(() => {
+            const el = SE();
+            if (el && el.t === 'img') {
+              el.src = url;
+              el.bg = `url("${url}")`;
+              el.type = "stock";
+              showToast("Applied editorial photograph");
+            }
+          });
+        }
+      }
     });
 
     // Tab Switching
@@ -1732,67 +1815,92 @@
         const imgEls = els.filter(e => e.t === 'img');
         const lineEls = els.filter(e => e.t === 'line');
 
-        const titleEl = textEls.find(e => e.size >= 28 || (e.font && e.font.includes('Playfair') && e.size >= 24));
-        const tagEl = textEls.find(e => e.size <= 12 && e.y < 80);
-        const bodyEls = textEls.filter(e => e !== titleEl && e !== tagEl);
-
         let fixedCount = 0;
 
-        // 1. Tag & Title Vertical Separation (prevent text overlapping title)
+        // 0. Clean any legacy SVG / abstract shapes into real editorial photography
+        imgEls.forEach(img => {
+          if (img.bg && img.bg.includes('<svg')) {
+            img.bg = 'url("assets/samples/sample_lifestyle_01.png")';
+            img.src = 'assets/samples/sample_lifestyle_01.png';
+            img.type = 'stock';
+            fixedCount++;
+          }
+        });
+
+        // 1. Identify key editorial elements
+        const titleEl = textEls.find(e => (e.size || 14) >= 24);
+        const tagEl = textEls.find(e => (e.size || 14) <= 12 && e.y < 80 && e !== titleEl);
+
+        // 2. Multiline Title Height & Font Auto-Scaling (protecting portrait faces)
+        if (titleEl && titleEl.text) {
+          const len = titleEl.text.length;
+          const charsPerLine = Math.max(10, Math.floor((titleEl.w || 468) / ((titleEl.size || 28) * 0.58)));
+          const estimatedLines = Math.max(1, Math.ceil(len / charsPerLine));
+          if (len > 32 && titleEl.size > 24) {
+            titleEl.size = 24;
+            fixedCount++;
+          } else if (len > 20 && titleEl.size > 30) {
+            titleEl.size = 30;
+            fixedCount++;
+          }
+          const calcH = Math.max(50, Math.round(estimatedLines * (titleEl.size || 28) * 1.3));
+          if (titleEl.h < calcH) {
+            titleEl.h = calcH;
+            fixedCount++;
+          }
+        }
+
+        // 3. Tag & Title Vertical Separation (prevent tag/title collision)
         if (tagEl && titleEl) {
           tagEl.y = 36;
-          const safeTitleY = tagEl.y + (tagEl.h || 20) + 8;
+          const safeTitleY = tagEl.y + (tagEl.h || 18) + 10;
           if (titleEl.y < safeTitleY) {
             titleEl.y = safeTitleY;
             fixedCount++;
           }
         }
 
-        // 2. Title Auto-Scaling (prevent long titles from covering face or extending into photos)
-        if (titleEl && titleEl.text) {
-          const len = titleEl.text.length;
-          if (len > 30 && titleEl.size > 26) {
-            titleEl.size = 26;
-            titleEl.h = 64;
-            fixedCount++;
-          } else if (len > 20 && titleEl.size > 32) {
-            titleEl.size = 32;
-            titleEl.h = 60;
-            fixedCount++;
+        // 4. Line divider placement directly below title
+        if (titleEl && lineEls.length > 0) {
+          lineEls[0].y = titleEl.y + (titleEl.h || 50) + 8;
+        }
+
+        // 5. Stack overlapping text elements in the same horizontal column
+        textEls.sort((a, b) => a.y - b.y);
+        for (let i = 0; i < textEls.length - 1; i++) {
+          const t1 = textEls[i];
+          const t2 = textEls[i + 1];
+          const xOverlap = Math.max(0, Math.min(t1.x + t1.w, t2.x + t2.w) - Math.max(t1.x, t2.x));
+          if (xOverlap > 40) {
+            const t1Chars = Math.max(10, Math.floor(t1.w / ((t1.size || 14) * 0.55)));
+            const t1Lines = Math.max(1, Math.ceil((t1.text || '').length / t1Chars));
+            const t1ActualH = Math.max(t1.h || 20, Math.round(t1Lines * (t1.size || 14) * 1.35));
+            t1.h = t1ActualH;
+
+            const safeT2Y = t1.y + t1ActualH + 14;
+            if (t2.y < safeT2Y) {
+              t2.y = safeT2Y;
+              fixedCount++;
+            }
           }
         }
 
-        // 3. Clear title from photos (uncover face)
+        // 6. Clear title from photos (uncover faces completely)
         if (titleEl && imgEls.length > 0) {
-          const titleBottom = titleEl.y + (titleEl.h || 60);
+          const titleBottom = titleEl.y + (titleEl.h || 60) + 12;
           imgEls.forEach(img => {
-            if (img.y < titleBottom + 12 && img.x < titleEl.x + titleEl.w && img.x + img.w > titleEl.x) {
-              const newY = titleBottom + 16;
-              img.y = newY;
-              if (img.y + img.h > 700) {
-                img.h = Math.max(180, 700 - newY - 10);
+            const xOverlap = Math.max(0, Math.min(titleEl.x + titleEl.w, img.x + img.w) - Math.max(titleEl.x, img.x));
+            if (xOverlap > 50 && img.y < titleBottom) {
+              img.y = titleBottom;
+              if (img.y + img.h > 695) {
+                img.h = Math.max(160, 695 - img.y);
               }
               fixedCount++;
             }
           });
         }
 
-        // 4. Line divider placement
-        if (titleEl && lineEls.length > 0) {
-          lineEls[0].y = titleEl.y + (titleEl.h || 60) + 6;
-        }
-
-        // 5. Body story separation from title
-        if (titleEl && bodyEls.length > 0) {
-          bodyEls.forEach(b => {
-            if (b.x < titleEl.x + titleEl.w && b.x + b.w > titleEl.x && b.y < titleEl.y + (titleEl.h || 60)) {
-              b.y = titleEl.y + (titleEl.h || 60) + 16;
-              fixedCount++;
-            }
-          });
-        }
-
-        showToast(fixedCount > 0 ? `✦ AI resolved ${fixedCount} layout collisions!` : "✦ Page layout is perfectly balanced!");
+        showToast(fixedCount > 0 ? `✦ AI Arranged: resolved ${fixedCount} overlaps & protected faces!` : "✦ Page layout is perfectly balanced!");
       });
     }
 
@@ -2000,6 +2108,8 @@
 
           <h4 style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #888; margin-bottom: 0.75rem;">Photo Controls</h4>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <button id="btnRotatePhoto" style="padding: 8px; background: #1a1715; border: 1px solid #2e2823; border-radius: 4px; color: #e3d5bd; font-size: 12px; cursor: pointer;">Rotate 90° ↷</button>
+            <button id="btnFitPhoto" style="padding: 8px; background: #1a1715; border: 1px solid #2e2823; border-radius: 4px; color: #e3d5bd; font-size: 12px; cursor: pointer;">Toggle Fit/Fill</button>
             <button id="btnCenterPhoto" style="padding: 8px; background: #1a1715; border: 1px solid #2e2823; border-radius: 4px; color: #e3d5bd; font-size: 12px; cursor: pointer;">Center Photo</button>
             <button id="btnPushPhotoDown" style="padding: 8px; background: #1a1715; border: 1px solid #2e2823; border-radius: 4px; color: #e3d5bd; font-size: 12px; cursor: pointer;">Uncover Face</button>
             <button id="btnScaleTitle" style="padding: 8px; background: #1a1715; border: 1px solid #2e2823; border-radius: 4px; color: #e3d5bd; font-size: 12px; cursor: pointer;">Fit Headline</button>
@@ -2013,6 +2123,24 @@
       pl.querySelectorAll(".layout-preset-btn").forEach(btn => {
         btn.onclick = () => applyLayoutPreset(btn.dataset.preset);
       });
+
+      const bRot = $("#btnRotatePhoto");
+      if (bRot) bRot.onclick = () => {
+        const hero = (P().els || []).find(e => e.t === 'img');
+        if (hero) {
+          chg(() => { hero.rotation = ((hero.rotation || 0) + 90) % 360; });
+          showToast(`Photo rotated to ${hero.rotation}°`);
+        }
+      };
+
+      const bFit = $("#btnFitPhoto");
+      if (bFit) bFit.onclick = () => {
+        const hero = (P().els || []).find(e => e.t === 'img');
+        if (hero) {
+          chg(() => { hero.fit = hero.fit === 'contain' ? 'cover' : 'contain'; });
+          showToast(`Photo fit mode: ${hero.fit}`);
+        }
+      };
 
       $("#btnCenterPhoto").onclick = () => {
         const hero = (P().els || []).find(e => e.t === 'img');
@@ -2050,6 +2178,43 @@
             page.els.unshift(hero);
           });
           showToast("Photo sent to background");
+        }
+      };
+    }
+
+    const btnAiArrangeHeader = $("#btnAiArrangeHeader");
+    if (btnAiArrangeHeader) {
+      btnAiArrangeHeader.onclick = () => {
+        autoFixOverlaps();
+      };
+    }
+
+    const btnSaveTemplateHeader = $("#btnSaveTemplateHeader");
+    if (btnSaveTemplateHeader) {
+      btnSaveTemplateHeader.onclick = () => {
+        const tplName = prompt("Name this custom template:", $("#pname").value || "Custom Magazine Template");
+        if (!tplName) return;
+        const cat = prompt("Category (Fashion, Travel, Lifestyle, Wedding, Business, Portfolio, Food, Photography, Personal/Memory, Education):", "Lifestyle") || "Lifestyle";
+        const id = 'custom-' + Date.now();
+        const customRecord = {
+          id,
+          name: tplName,
+          category: cat,
+          tags: [cat, 'Custom'],
+          mood: 'Sophisticated',
+          pageCount: S.pages.length,
+          photoSlots: S.pages.reduce((cnt, p) => cnt + (p.els || []).filter(e => e.t === 'img').length, 0),
+          thumbnail: 'assets/thumbnails/fashion-1-the-unhurried-season.png',
+          description: `Custom ${cat} template created in PAPERLY Studio.`,
+          pages: JSON.parse(JSON.stringify(S.pages))
+        };
+        try {
+          const userTemplates = JSON.parse(localStorage.getItem('paperly_user_templates') || '{}');
+          userTemplates[id] = customRecord;
+          localStorage.setItem('paperly_user_templates', JSON.stringify(userTemplates));
+          showToast(`✓ Saved "${tplName}" as custom template!`);
+        } catch (e) {
+          showToast("Failed to save template: " + e.message);
         }
       };
     }
@@ -2122,13 +2287,20 @@
 
     $("#exp").onclick = async () => {
       const expBtn = $("#exp");
-      const originalText = expBtn.textContent;
+      const originalText = expBtn.innerHTML;
       expBtn.innerHTML = '<span>✦ Preparing PDF…</span>';
       expBtn.disabled = true;
 
       const a = $("#pa");
       a.innerHTML = "";
       S.pages.forEach(p => a.appendChild(page(p, false)));
+
+      // Temporarily position offscreen for html2canvas rendering
+      a.style.display = "block";
+      a.style.position = "fixed";
+      a.style.left = "-9999px";
+      a.style.top = "0";
+      a.style.zIndex = "-100";
 
       try {
         // 1. Wait for web fonts to load
@@ -2143,26 +2315,71 @@
           return new Promise(res => {
             img.onload = res;
             img.onerror = res;
-            setTimeout(res, 2000);
+            setTimeout(res, 2500);
           });
         }));
 
-        // 3. Set document title for clean PDF filename
-        const oldTitle = document.title;
-        const safeTitle = ($("#pname").value || "PAPERLY-Magazine").replace(/[/\\?%*:|"<>]/g, '-');
-        document.title = `${safeTitle}.pdf`;
+        const safeTitle = ($("#pname").value || "PAPERLY-Magazine").replace(/[/\\?%*:|"<>]/g, '-').trim() || "PAPERLY-Magazine";
 
-        // Small timeout for browser layout flush
-        await new Promise(r => setTimeout(r, 180));
+        // Check if jsPDF & html2canvas are available for direct multi-page PDF compilation
+        if (window.jspdf && window.jspdf.jsPDF && window.html2canvas) {
+          const { jsPDF } = window.jspdf;
+          const pdf = new jsPDF({
+            orientation: 'portrait',
+            unit: 'pt',
+            format: [540, 720]
+          });
 
-        // 4. Trigger print
-        window.print();
+          const pageNodes = Array.from(a.querySelectorAll(".pg"));
+          const totalPages = pageNodes.length;
 
-        document.title = oldTitle;
+          for (let i = 0; i < totalPages; i++) {
+            expBtn.innerHTML = `<span>✦ Rendering ${i + 1}/${totalPages}…</span>`;
+            if (i > 0) {
+              pdf.addPage([540, 720], 'portrait');
+            }
+
+            const canvas = await window.html2canvas(pageNodes[i], {
+              scale: 2,
+              useCORS: true,
+              allowTaint: true,
+              logging: false,
+              backgroundColor: '#0c0b0a'
+            });
+
+            const imgData = canvas.toDataURL('image/jpeg', 0.95);
+            pdf.addImage(imgData, 'JPEG', 0, 0, 540, 720);
+          }
+
+          expBtn.innerHTML = '<span>✦ Saving file…</span>';
+          pdf.save(`${safeTitle}.pdf`);
+          showToast(`Exported "${safeTitle}.pdf" (${totalPages} pages)`);
+        } else {
+          // Fallback to browser system print dialog
+          const oldTitle = document.title;
+          document.title = `${safeTitle}.pdf`;
+          a.style.position = "";
+          a.style.left = "";
+          a.style.top = "";
+          a.style.zIndex = "";
+          await new Promise(r => setTimeout(r, 200));
+          window.print();
+          document.title = oldTitle;
+        }
       } catch (err) {
-        console.error("PDF export prep error:", err);
+        console.error("PDF export error:", err);
+        showToast("Direct PDF failed; launching print dialog...");
+        a.style.position = "";
+        a.style.left = "";
+        a.style.top = "";
+        a.style.zIndex = "";
         window.print();
       } finally {
+        a.style.display = "";
+        a.style.position = "";
+        a.style.left = "";
+        a.style.top = "";
+        a.style.zIndex = "";
         expBtn.innerHTML = originalText;
         expBtn.disabled = false;
       }
@@ -2234,11 +2451,40 @@
         } catch (e) {}
       }
 
-      // ?template=birthday — load from templates library
+      // ?template=xxx — load from templates library
       if (tplParam && PAPERLY_TEMPLATES.EDITIONS[tplParam]) {
         const ed = PAPERLY_TEMPLATES.EDITIONS[tplParam];
         S.pages = JSON.parse(JSON.stringify(ed.pages));
         $("#pname").value = ed.name;
+        return true;
+      }
+
+      // Check user-created templates in localStorage
+      if (tplParam) {
+        try {
+          const userTpls = JSON.parse(localStorage.getItem('paperly_user_templates') || '{}');
+          if (userTpls[tplParam] && userTpls[tplParam].pages) {
+            S.pages = JSON.parse(JSON.stringify(userTpls[tplParam].pages));
+            $("#pname").value = userTpls[tplParam].name || "Custom Template";
+            return true;
+          }
+        } catch(e) {}
+      }
+
+      // ?mode=template-builder — initialize clean canvas
+      if (params.get("mode") === "template-builder") {
+        $("#pname").value = "New Custom Template";
+        S.pages = [
+          {
+            bg: "#0c0b0a",
+            els: [
+              { id: 1001, t: "text", x: 36, y: 50, w: 468, h: 60, text: "CUSTOM TEMPLATE TITLE", size: 36, font: "Playfair Display", weight: 700, color: "#f6f0e4", align: "center", sp: 1 },
+              { id: 1002, t: "img", x: 36, y: 140, w: 468, h: 420, src: "assets/samples/sample_fashion_01.png", bg: "url('assets/samples/sample_fashion_01.png')", type: "stock", fit: "cover", position: "center" },
+              { id: 1003, t: "text", x: 36, y: 590, w: 468, h: 30, text: "A study in form, proportion, and balance.", size: 12, font: "Cormorant Garamond", italic: true, color: "#e3d5bd", align: "center" }
+            ]
+          }
+        ];
+        showToast("Template Builder: design your layout and click 'Save as Template'");
         return true;
       }
       return false;
@@ -2260,9 +2506,11 @@
 
       // Default fallback if empty
       if (!S.pages || !S.pages.length) {
-        const defaultEd = PAPERLY_TEMPLATES.EDITIONS["best-friend"];
-        S.pages = JSON.parse(JSON.stringify(defaultEd.pages));
-        $("#pname").value = defaultEd.name;
+        const defaultEd = PAPERLY_TEMPLATES.EDITIONS["best-friend"] || Object.values(PAPERLY_TEMPLATES.EDITIONS)[0];
+        if (defaultEd && defaultEd.pages) {
+          S.pages = JSON.parse(JSON.stringify(defaultEd.pages));
+          $("#pname").value = defaultEd.name;
+        }
       }
 
       updateAiKeyStatus();

@@ -258,3 +258,4 @@ const PAPERLY_AUTH = (() => {
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = PAPERLY_AUTH;
 }
+
