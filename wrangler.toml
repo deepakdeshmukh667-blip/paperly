@@ -12,7 +12,7 @@ binding = "ASSETS"
 [[d1_databases]]
 binding = "DB"
 database_name = "paperly-d1"
-database_id = "local-d1-placeholder"
+database_id = "538f5e5d-8f05-4529-91bb-cb7e93a10508"
 migrations_dir = "migrations"
 
 # Cloudflare R2 Object Storage (Private user photos & assets)
