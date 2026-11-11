@@ -15,10 +15,10 @@ database_name = "paperly-d1"
 database_id = "538f5e5d-8f05-4529-91bb-cb7e93a10508"
 migrations_dir = "migrations"
 
-# Cloudflare R2 Object Storage (Private user photos & assets)
-[[r2_buckets]]
-binding = "R2_BUCKET"
-bucket_name = "paperly-uploads"
+# Cloudflare R2 Object Storage (Private user photos & assets) - enable once created
+# [[r2_buckets]]
+# binding = "R2_BUCKET"
+# bucket_name = "paperly-uploads"
 
 # Cloudflare KV (Session cache & temporary state)
 [[kv_namespaces]]
