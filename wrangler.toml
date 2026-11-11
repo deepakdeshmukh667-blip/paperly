@@ -7,6 +7,8 @@ compatibility_flags = ["nodejs_compat"]
 [assets]
 directory = "./"
 binding = "ASSETS"
+# Exclude non-public files from asset upload
+not_found_handling = "single-page-application"
 
 # Cloudflare D1 Relational SQL Database
 [[d1_databases]]
@@ -30,8 +32,8 @@ id = "4576a211e64e4f18ba30493d8c2c9a46"
 binding = "AI"
 
 [vars]
-ENVIRONMENT = "development"
+ENVIRONMENT = "production"
 APP_NAME = "PAPERLY"
-APP_URL = "http://localhost:3000"
+APP_URL = "https://paperly.workers.dev"
 JWT_SECRET = "paperly-dev-secret-key-change-in-production-only"
 
