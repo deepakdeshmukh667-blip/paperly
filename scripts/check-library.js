@@ -10,6 +10,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 
 const ROOT = path.resolve(__dirname, '..');
 const IMAGES_JSON = path.join(ROOT, 'data', 'images.json');
@@ -58,6 +59,7 @@ function runCheck() {
   const errors = [];
   const seenIds = new Set();
   const seenUrls = new Set();
+  const seenHashes = new Map();
 
   images.forEach((img, idx) => {
     const loc = `Image #${idx + 1} (id: ${img.id || 'N/A'})`;
@@ -107,7 +109,7 @@ function runCheck() {
       errors.push(`${loc}: Resolution too low (${img.width}x${img.height}), must be >= 1200px on long side`);
     }
 
-    // 7. Local File Validation
+    // 7. Local File Validation & Content Uniqueness (Zero duplicates)
     if (!img.localPath) {
       errors.push(`${loc}: Missing localPath`);
     } else {
@@ -116,8 +118,16 @@ function runCheck() {
         errors.push(`${loc}: File not found on disk at '${img.localPath}'`);
       } else {
         const stats = fs.statSync(fullPath);
-        if (stats.size === 0) {
-          errors.push(`${loc}: File on disk is 0 bytes at '${img.localPath}'`);
+        if (stats.size < 5000) {
+          errors.push(`${loc}: File on disk is too small (${stats.size} bytes) at '${img.localPath}'`);
+        } else {
+          const fileBuf = fs.readFileSync(fullPath);
+          const hash = crypto.createHash('md5').update(fileBuf).digest('hex');
+          if (seenHashes.has(hash)) {
+            errors.push(`${loc}: DUPLICATE PHOTO DETECTED — Exact same image as ${seenHashes.get(hash)}`);
+          } else {
+            seenHashes.set(hash, loc);
+          }
         }
       }
     }
