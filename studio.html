@@ -468,6 +468,10 @@
 
     /* Print Output */
     #pa { display: none; }
+    @page {
+      size: 540pt 720pt;
+      margin: 0;
+    }
     @media print {
       html, body {
         margin: 0 !important;
@@ -483,8 +487,8 @@
         padding: 0 !important;
       }
       #pa .pg {
-        width: 540px !important;
-        height: 720px !important;
+        width: 540pt !important;
+        height: 720pt !important;
         box-shadow: none !important;
         page-break-after: always !important;
         break-after: page !important;
@@ -495,10 +499,6 @@
         overflow: hidden !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
-      }
-      @page {
-        size: 540px 720px;
-        margin: 0;
       }
     }
 
@@ -874,6 +874,28 @@
             }
           };
           d.appendChild(img);
+
+          if (e.credit || e.photographer) {
+            const creditTag = document.createElement("span");
+            creditTag.className = "photo-credit-tag";
+            creditTag.textContent = `Photo: ${e.credit || e.photographer}`;
+            Object.assign(creditTag.style, {
+              position: "absolute",
+              right: "6px",
+              bottom: "6px",
+              fontSize: "9px",
+              fontFamily: "'Inter', system-ui, sans-serif",
+              background: "rgba(12, 11, 10, 0.75)",
+              color: "#f6f0e4",
+              padding: "2px 6px",
+              borderRadius: "2px",
+              pointerEvents: "none",
+              zIndex: "3",
+              lineHeight: "1.2",
+              letterSpacing: "0.02em"
+            });
+            d.appendChild(creditTag);
+          }
         } else {
           renderEmptySlot(d, e);
         }
@@ -2285,43 +2307,99 @@
       }
     });
 
+    // Multi-page Base64 Image Resolver to prevent canvas tainting & CORS issues
+    async function resolvePageImages(pageData) {
+      if (!pageData || !pageData.els) return;
+      for (const el of pageData.els) {
+        if (el.t === "img") {
+          let src = el.src || "";
+          if (!src && el.bg) {
+            const m = el.bg.match(/url\(["']?([^"']+)["']?\)/);
+            if (m) src = m[1];
+          }
+          if (!src && el.imageId && window.PAPERLY_IMAGE_STORE) {
+            try {
+              const rec = await window.PAPERLY_IMAGE_STORE.getImage(el.imageId);
+              if (rec && rec.src) src = rec.src;
+            } catch (e) {}
+          }
+          if (src && !src.startsWith("data:")) {
+            try {
+              const resp = await fetch(src, { mode: "cors" });
+              if (resp.ok) {
+                const blob = await resp.blob();
+                const dataUrl = await new Promise((res) => {
+                  const reader = new FileReader();
+                  reader.onloadend = () => res(reader.result);
+                  reader.onerror = () => res(src);
+                  reader.readAsDataURL(blob);
+                });
+                if (dataUrl && dataUrl.startsWith("data:")) {
+                  el.src = dataUrl;
+                }
+              }
+            } catch (e) {
+              // Keep original src if fetch is blocked
+            }
+          } else if (src) {
+            el.src = src;
+          }
+        }
+      }
+    }
+
     $("#exp").onclick = async () => {
       const expBtn = $("#exp");
       const originalText = expBtn.innerHTML;
       expBtn.innerHTML = '<span>✦ Preparing PDF…</span>';
       expBtn.disabled = true;
 
-      const a = $("#pa");
-      a.innerHTML = "";
-      S.pages.forEach(p => a.appendChild(page(p, false)));
+      const totalPages = S.pages.length;
+      if (totalPages === 0) {
+        showToast("No pages to export.");
+        expBtn.innerHTML = originalText;
+        expBtn.disabled = false;
+        return;
+      }
 
-      // Temporarily position offscreen for html2canvas rendering
-      a.style.display = "block";
-      a.style.position = "fixed";
-      a.style.left = "-9999px";
-      a.style.top = "0";
-      a.style.zIndex = "-100";
+      // Clone saved project data to preserve isolation
+      const exportPages = JSON.parse(JSON.stringify(S.pages));
+      const safeTitle = ($("#pname").value || "PAPERLY-Magazine").replace(/[/\\?%*:|"<>]/g, '-').trim() || "PAPERLY-Magazine";
+
+      // Isolated zero-offset single-page staging host
+      const staging = document.createElement("div");
+      staging.id = "paperly-pdf-staging";
+      Object.assign(staging.style, {
+        position: "fixed",
+        left: "0px",
+        top: "0px",
+        width: "540px",
+        height: "720px",
+        overflow: "hidden",
+        zIndex: "-9999",
+        pointerEvents: "none",
+        opacity: "0",
+        transform: "none",
+        margin: "0",
+        padding: "0",
+        boxSizing: "border-box",
+        background: "#0c0b0a"
+      });
+      document.body.appendChild(staging);
 
       try {
-        // 1. Wait for web fonts to load
+        // Pre-convert images across all pages to Data URLs
+        expBtn.innerHTML = '<span>✦ Preloading assets…</span>';
+        for (let i = 0; i < totalPages; i++) {
+          await resolvePageImages(exportPages[i]);
+        }
+
+        // Wait for typography fonts
         if (document.fonts && document.fonts.ready) {
           await document.fonts.ready;
         }
 
-        // 2. Wait for all print images to decode
-        const imgs = Array.from(a.querySelectorAll("img"));
-        await Promise.all(imgs.map(img => {
-          if (img.complete && img.naturalWidth > 0) return Promise.resolve();
-          return new Promise(res => {
-            img.onload = res;
-            img.onerror = res;
-            setTimeout(res, 2500);
-          });
-        }));
-
-        const safeTitle = ($("#pname").value || "PAPERLY-Magazine").replace(/[/\\?%*:|"<>]/g, '-').trim() || "PAPERLY-Magazine";
-
-        // Check if jsPDF & html2canvas are available for direct multi-page PDF compilation
+        // Check if jsPDF & html2canvas are available
         if (window.jspdf && window.jspdf.jsPDF && window.html2canvas) {
           const { jsPDF } = window.jspdf;
           const pdf = new jsPDF({
@@ -2330,24 +2408,60 @@
             format: [540, 720]
           });
 
-          const pageNodes = Array.from(a.querySelectorAll(".pg"));
-          const totalPages = pageNodes.length;
-
           for (let i = 0; i < totalPages; i++) {
-            expBtn.innerHTML = `<span>✦ Rendering ${i + 1}/${totalPages}…</span>`;
-            if (i > 0) {
-              pdf.addPage([540, 720], 'portrait');
-            }
+            expBtn.innerHTML = `<span>✦ Page ${i + 1} of ${totalPages}…</span>`;
+            staging.innerHTML = "";
 
-            const canvas = await window.html2canvas(pageNodes[i], {
+            const pData = exportPages[i];
+            const pageEl = page(pData, false);
+            Object.assign(pageEl.style, {
+              width: "540px",
+              height: "720px",
+              position: "absolute",
+              left: "0px",
+              top: "0px",
+              transform: "none",
+              margin: "0",
+              boxShadow: "none"
+            });
+            staging.appendChild(pageEl);
+
+            // Wait for image decoding on this page
+            const imgs = Array.from(staging.querySelectorAll("img"));
+            await Promise.all(imgs.map(async img => {
+              try {
+                if (img.decode) {
+                  await img.decode();
+                } else if (!img.complete) {
+                  await new Promise(r => { img.onload = r; img.onerror = r; setTimeout(r, 2000); });
+                }
+              } catch (e) {}
+            }));
+
+            // Settle paint
+            await new Promise(r => setTimeout(r, 60));
+
+            // Capture exact zero-offset 540x720 canvas
+            const canvas = await window.html2canvas(staging, {
               scale: 2,
               useCORS: true,
-              allowTaint: true,
+              allowTaint: false,
               logging: false,
-              backgroundColor: '#0c0b0a'
+              width: 540,
+              height: 720,
+              x: 0,
+              y: 0,
+              scrollX: 0,
+              scrollY: 0,
+              windowWidth: 540,
+              windowHeight: 720,
+              backgroundColor: pData.bg || '#0c0b0a'
             });
 
             const imgData = canvas.toDataURL('image/jpeg', 0.95);
+            if (i > 0) {
+              pdf.addPage([540, 720], 'portrait');
+            }
             pdf.addImage(imgData, 'JPEG', 0, 0, 540, 720);
           }
 
@@ -2355,31 +2469,26 @@
           pdf.save(`${safeTitle}.pdf`);
           showToast(`Exported "${safeTitle}.pdf" (${totalPages} pages)`);
         } else {
-          // Fallback to browser system print dialog
+          // Fallback to print dialog
+          const a = $("#pa");
+          a.innerHTML = "";
+          exportPages.forEach(p => a.appendChild(page(p, false)));
           const oldTitle = document.title;
           document.title = `${safeTitle}.pdf`;
-          a.style.position = "";
-          a.style.left = "";
-          a.style.top = "";
-          a.style.zIndex = "";
-          await new Promise(r => setTimeout(r, 200));
           window.print();
           document.title = oldTitle;
         }
       } catch (err) {
         console.error("PDF export error:", err);
-        showToast("Direct PDF failed; launching print dialog...");
-        a.style.position = "";
-        a.style.left = "";
-        a.style.top = "";
-        a.style.zIndex = "";
+        showToast("Direct PDF compilation encountered an issue; launching print dialog...");
+        const a = $("#pa");
+        a.innerHTML = "";
+        exportPages.forEach(p => a.appendChild(page(p, false)));
         window.print();
       } finally {
-        a.style.display = "";
-        a.style.position = "";
-        a.style.left = "";
-        a.style.top = "";
-        a.style.zIndex = "";
+        if (staging && staging.parentNode) {
+          staging.parentNode.removeChild(staging);
+        }
         expBtn.innerHTML = originalText;
         expBtn.disabled = false;
       }
