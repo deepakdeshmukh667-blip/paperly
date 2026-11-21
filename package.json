@@ -7,7 +7,9 @@
     "dev": "node server.js",
     "check:templates": "node scripts/check-templates.js",
     "generate:templates": "node scripts/generate-templates.js",
-    "test:export": "node scripts/test-export.js"
+    "test:export": "node scripts/test-export.js",
+    "import:content": "node scripts/import-content.js",
+    "check:library": "node scripts/check-library.js"
   },
   "keywords": [
     "digital-magazine",

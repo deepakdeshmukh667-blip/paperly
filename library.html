@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Inspiration Boards & Library — PAPERLY.</title>
+  <meta name="description" content="Browse 600+ curated high-resolution editorial photographs, mood boards, and aesthetic palettes for your digital magazines.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230c0b0a'/><text x='35' y='68' font-family='Georgia,serif' font-size='56' font-weight='bold' fill='%23f6f0e4'>P</text><circle cx='68' cy='63' r='6' fill='%236e1423'/></svg>">
+  <meta name="theme-color" content="#6e1423">
+
+  <!-- Immediate Theme Initializer -->
+  <script>
+    (function() {
+      try {
+        var saved = localStorage.getItem('paperly_theme');
+        var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (saved === 'dark' || (!saved && prefersDark)) {
+          document.documentElement.classList.add('dark');
+          document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      } catch (e) {}
+    })();
+  </script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600;700&display=swap">
+  <link rel="stylesheet" href="css/paperly.css">
+
+  <style>
+    :root {
+      --bg: #0c0b0a;
+      --card-bg: #151311;
+      --card-border: #24201c;
+      --card-hover: #1c1916;
+      --ivory: #f6f0e4;
+      --beige: #e3d5bd;
+      --burgundy: #6e1423;
+      --burgundy-light: #8a2434;
+      --muted: #8e8476;
+      --font-serif: 'Playfair Display', Georgia, serif;
+      --font-quote: 'Cormorant Garamond', Georgia, serif;
+      --font-sans: 'Inter', system-ui, sans-serif;
+    }
+
+    [data-theme="light"], html:not(.dark) {
+      --bg: #f6f0e4;
+      --card-bg: #ffffff;
+      --card-border: rgba(0, 0, 0, 0.1);
+      --card-hover: #fcf9f2;
+      --ivory: #0c0b0a;
+      --beige: #4a4137;
+      --muted: #6b6357;
+    }
+
+    *, ::after, ::before { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg);
+      color: var(--ivory);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: background-color 0.2s, color 0.2s;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; cursor: pointer; }
+
+    /* Top Navigation */
+    .dash-nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(12, 11, 10, 0.95);
+      border-bottom: 1px solid var(--card-border);
+      backdrop-filter: blur(12px);
+      padding: 0.85rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    [data-theme="light"] .dash-nav {
+      background: rgba(246, 240, 228, 0.95);
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 2.5rem;
+    }
+
+    .brand-logo {
+      font-family: var(--font-serif);
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--ivory);
+    }
+    .brand-logo span { color: var(--burgundy); }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      list-style: none;
+    }
+
+    .nav-link {
+      font-size: 0.85rem;
+      color: var(--muted);
+      transition: color 0.15s;
+      padding: 0.35rem 0.6rem;
+    }
+    .nav-link:hover, .nav-link.active {
+      color: var(--ivory);
+    }
+    .nav-link.active {
+      font-weight: 600;
+      border-bottom: 2px solid var(--burgundy);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .btn-create-mag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--ivory);
+      color: var(--bg);
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 0.45rem 1rem;
+      border-radius: 3px;
+      transition: opacity 0.2s;
+    }
+    .btn-create-mag:hover { opacity: 0.9; }
+
+    /* Main Container */
+    .lib-container {
+      max-width: 1360px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 5rem;
+      flex: 1;
+    }
+
+    /* Hero Header */
+    .lib-hero {
+      margin-bottom: 2rem;
+      text-align: left;
+    }
+    .lib-tagline {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--burgundy-light);
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+    }
+    .lib-title {
+      font-family: var(--font-serif);
+      font-size: 2.4rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.5rem;
+    }
+    .lib-sub {
+      color: var(--muted);
+      font-size: 0.95rem;
+      max-width: 680px;
+      line-height: 1.5;
+    }
+
+    /* Filter & Search Bar */
+    .filter-panel {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      padding: 1.25rem;
+      margin-bottom: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .filter-row-top {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .search-box {
+      flex: 1;
+      min-width: 260px;
+      position: relative;
+    }
+    .search-box input {
+      width: 100%;
+      padding: 0.65rem 1rem 0.65rem 2.4rem;
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--card-border);
+      border-radius: 4px;
+      color: var(--ivory);
+      font-size: 0.88rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-box input:focus { border-color: var(--burgundy); }
+    .search-box svg {
+      position: absolute;
+      left: 0.8rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      pointer-events: none;
+    }
+
+    .select-dropdown {
+      padding: 0.65rem 1rem;
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--card-border);
+      border-radius: 4px;
+      color: var(--ivory);
+      font-size: 0.85rem;
+      outline: none;
+      cursor: pointer;
+    }
+
+    /* Category Filter Pills */
+    .pills-scroll {
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: none;
+    }
+    .pills-scroll::-webkit-scrollbar { display: none; }
+
+    .pill-btn {
+      white-space: nowrap;
+      padding: 0.4rem 0.85rem;
+      font-size: 0.78rem;
+      font-weight: 500;
+      background: transparent;
+      border: 1px solid var(--card-border);
+      color: var(--muted);
+      border-radius: 20px;
+      transition: all 0.15s ease;
+    }
+    .pill-btn:hover {
+      color: var(--ivory);
+      border-color: var(--muted);
+    }
+    .pill-btn.active {
+      background: var(--burgundy);
+      color: #fff;
+      border-color: var(--burgundy);
+    }
+
+    /* Active Stats Bar */
+    .stats-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    /* Gallery Grid */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .photo-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .photo-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 36px rgba(0,0,0,0.5);
+    }
+
+    .photo-thumb-wrap {
+      position: relative;
+      aspect-ratio: 3/4;
+      overflow: hidden;
+      background: #111;
+    }
+    .photo-thumb-wrap.landscape {
+      aspect-ratio: 4/3;
+    }
+
+    .photo-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.4s ease;
+    }
+    .photo-card:hover .photo-img {
+      transform: scale(1.03);
+    }
+
+    /* Subtle Credit Overlay */
+    .photo-credit-badge {
+      position: absolute;
+      left: 8px;
+      bottom: 8px;
+      font-size: 10px;
+      background: rgba(12, 11, 10, 0.75);
+      color: #f6f0e4;
+      padding: 3px 8px;
+      border-radius: 3px;
+      backdrop-filter: blur(4px);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .photo-meta {
+      padding: 0.85rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .meta-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .meta-cat {
+      font-size: 0.7rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--burgundy-light);
+      font-weight: 600;
+    }
+
+    .meta-license {
+      font-size: 0.68rem;
+      color: var(--muted);
+    }
+
+    .meta-title {
+      font-family: var(--font-serif);
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--ivory);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .meta-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 0.4rem;
+      padding-top: 0.6rem;
+      border-top: 1px solid var(--card-border);
+    }
+
+    .color-dots {
+      display: flex;
+      gap: 4px;
+    }
+    .color-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+
+    .btn-use-studio {
+      background: transparent;
+      border: 1px solid var(--card-border);
+      color: var(--beige);
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 3px;
+      transition: all 0.15s;
+    }
+    .btn-use-studio:hover {
+      background: var(--burgundy);
+      color: #fff;
+      border-color: var(--burgundy);
+    }
+
+    /* Infinite Scroll Sentinel */
+    #sentinel {
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="dash-nav">
+    <div class="brand-wrap">
+      <a href="index.html" class="brand-logo">PAPERLY<span>.</span></a>
+      <ul class="nav-links">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="dashboard.html" class="nav-link">Overview</a></li>
+        <li><a href="templates.html" class="nav-link">Templates</a></li>
+        <li><a href="library.html" class="nav-link active">Inspiration Library</a></li>
+        <li><a href="studio.html" class="nav-link">Studio</a></li>
+      </ul>
+    </div>
+
+    <div class="nav-actions">
+      <a href="create.html" class="btn-create-mag">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        <span>+ Create Magazine</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="lib-container">
+    <header class="lib-hero">
+      <p class="lib-tagline">Licence-Safe Editorial Imagery</p>
+      <h1 class="lib-title">Inspiration Boards & Visual Library</h1>
+      <p class="lib-sub">Discover 600+ curated high-resolution editorial photographs, mood boards, and aesthetic palettes with full photographer credits. Ready to use in your PAPERLY magazines.</p>
+    </header>
+
+    <!-- Filter & Search Controls -->
+    <section class="filter-panel">
+      <div class="filter-row-top">
+        <div class="search-box">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="text" id="searchInput" placeholder="Search by topic, photographer, mood, or tags…">
+        </div>
+
+        <select id="moodSelect" class="select-dropdown">
+          <option value="all">All Moods</option>
+          <option value="Minimalist">Minimalist</option>
+          <option value="Editorial">Editorial</option>
+          <option value="Moody Noir">Moody Noir</option>
+          <option value="Golden Hour">Golden Hour</option>
+          <option value="Poetic Grain">Poetic Grain</option>
+          <option value="Vibrant Warm">Vibrant Warm</option>
+        </select>
+
+        <select id="orientationSelect" class="select-dropdown">
+          <option value="all">All Orientations</option>
+          <option value="portrait">Portrait (3:4)</option>
+          <option value="landscape">Landscape (4:3)</option>
+        </select>
+      </div>
+
+      <!-- Category Filter Pills -->
+      <div class="pills-scroll" id="catPills">
+        <button class="pill-btn active" data-cat="all">All (600)</button>
+        <button class="pill-btn" data-cat="Fashion">Fashion</button>
+        <button class="pill-btn" data-cat="Travel">Travel</button>
+        <button class="pill-btn" data-cat="Lifestyle">Lifestyle</button>
+        <button class="pill-btn" data-cat="Wedding">Wedding</button>
+        <button class="pill-btn" data-cat="Business">Business</button>
+        <button class="pill-btn" data-cat="Portfolio">Portfolio</button>
+        <button class="pill-btn" data-cat="Food">Food</button>
+        <button class="pill-btn" data-cat="Photography">Photography</button>
+        <button class="pill-btn" data-cat="Personal/Memory">Personal/Memory</button>
+        <button class="pill-btn" data-cat="Education">Education</button>
+      </div>
+    </section>
+
+    <!-- Results Status Bar -->
+    <div class="stats-bar">
+      <span id="resultsCount">Showing 24 of 600 photographs</span>
+      <span style="font-size: 0.75rem; color: var(--muted);">100% Attribution & Licence Guaranteed</span>
+    </div>
+
+    <!-- Gallery Grid -->
+    <div class="gallery-grid" id="galleryGrid"></div>
+
+    <!-- Infinite Scroll Sentinel -->
+    <div id="sentinel">Loading more editorial inspiration…</div>
+  </main>
+
+  <script>
+    let allImages = [];
+    let filteredImages = [];
+    let displayedCount = 0;
+    const PAGE_SIZE = 24;
+
+    const grid = document.getElementById('galleryGrid');
+    const searchInput = document.getElementById('searchInput');
+    const moodSelect = document.getElementById('moodSelect');
+    const orientationSelect = document.getElementById('orientationSelect');
+    const catPills = document.getElementById('catPills');
+    const resultsCount = document.getElementById('resultsCount');
+    const sentinel = document.getElementById('sentinel');
+
+    let activeCategory = 'all';
+
+    // 1. Fetch data/images.json
+    async function loadLibrary() {
+      try {
+        const resp = await fetch('data/images.json');
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        allImages = await resp.json();
+        applyFilters();
+      } catch (err) {
+        console.error('Failed to load images.json:', err);
+        grid.innerHTML = '<p style="color:var(--muted); text-align:center; grid-column: 1/-1;">Unable to load library data.</p>';
+        sentinel.style.display = 'none';
+      }
+    }
+
+    // 2. Filter logic
+    function applyFilters() {
+      const q = (searchInput.value || '').trim().toLowerCase();
+      const mood = moodSelect.value;
+      const orient = orientationSelect.value;
+
+      filteredImages = allImages.filter(img => {
+        // Category
+        if (activeCategory !== 'all' && img.category !== activeCategory) return false;
+        // Mood
+        if (mood !== 'all' && img.mood !== mood) return false;
+        // Orientation
+        if (orient !== 'all' && img.orientation !== orient) return false;
+        // Search query
+        if (q) {
+          const matchTitle = (img.title || '').toLowerCase().includes(q);
+          const matchPhotographer = (img.photographer || '').toLowerCase().includes(q);
+          const matchCategory = (img.category || '').toLowerCase().includes(q);
+          const matchTags = (img.tags || []).some(t => t.toLowerCase().includes(q));
+          if (!matchTitle && !matchPhotographer && !matchCategory && !matchTags) return false;
+        }
+        return true;
+      });
+
+      displayedCount = 0;
+      grid.innerHTML = '';
+      loadMore();
+    }
+
+    // 3. Batch render cards
+    function loadMore() {
+      if (displayedCount >= filteredImages.length) {
+        sentinel.textContent = 'End of library catalog.';
+        return;
+      }
+
+      const nextBatch = filteredImages.slice(displayedCount, displayedCount + PAGE_SIZE);
+      displayedCount += nextBatch.length;
+
+      nextBatch.forEach(img => {
+        const card = document.createElement('div');
+        card.className = 'photo-card';
+
+        const isLandscape = img.orientation === 'landscape';
+        const dotsHtml = (img.dominantColours || []).slice(0, 3).map(c => 
+          `<span class="color-dot" style="background:${c};" title="${c}"></span>`
+        ).join('');
+
+        card.innerHTML = `
+          <div class="photo-thumb-wrap ${isLandscape ? 'landscape' : ''}">
+            <img class="photo-img" src="${img.localPath}" alt="${img.title || 'Editorial Photograph'}" loading="lazy">
+            <span class="photo-credit-badge">Photo: ${img.photographer}</span>
+          </div>
+          <div class="photo-meta">
+            <div class="meta-header">
+              <span class="meta-cat">${img.category}</span>
+              <span class="meta-license">${img.license.split('(')[0].trim()}</span>
+            </div>
+            <h4 class="meta-title" title="${img.title}">${img.title}</h4>
+            <div class="meta-actions">
+              <div class="color-dots">${dotsHtml}</div>
+              <button type="button" class="btn-use-studio" onclick="useInStudio('${img.id}')">Use in Studio →</button>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+
+      resultsCount.textContent = `Showing ${displayedCount} of ${filteredImages.length} photographs`;
+      sentinel.textContent = displayedCount < filteredImages.length ? 'Scroll for more inspiration…' : 'All results loaded.';
+    }
+
+    // 4. Open photo in Studio
+    window.useInStudio = function(imgId) {
+      const img = allImages.find(i => i.id === imgId);
+      if (!img) return;
+
+      // Store as active template photo intent
+      try {
+        localStorage.setItem('paperly_studio_insert_photo', JSON.stringify({
+          src: img.localPath,
+          title: img.title,
+          photographer: img.photographer,
+          credit: img.photographer,
+          category: img.category
+        }));
+      } catch (e) {}
+
+      window.location.href = 'studio.html';
+    };
+
+    // 5. Infinite Scroll Observer
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && displayedCount < filteredImages.length) {
+        loadMore();
+      }
+    }, { rootMargin: '200px' });
+    observer.observe(sentinel);
+
+    // 6. Event listeners
+    searchInput.addEventListener('input', applyFilters);
+    moodSelect.addEventListener('change', applyFilters);
+    orientationSelect.addEventListener('change', applyFilters);
+
+    catPills.addEventListener('click', (e) => {
+      const btn = e.target.closest('.pill-btn');
+      if (!btn) return;
+      catPills.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeCategory = btn.dataset.cat;
+      applyFilters();
+    });
+
+    loadLibrary();
+  </script>
+</body>
+</html>

@@ -2622,6 +2622,36 @@
         }
       }
 
+      // Check for photo imported from Inspiration Library
+      try {
+        const rawPhoto = localStorage.getItem('paperly_studio_insert_photo');
+        if (rawPhoto) {
+          localStorage.removeItem('paperly_studio_insert_photo');
+          const photoData = JSON.parse(rawPhoto);
+          if (photoData && photoData.src && S.pages && S.pages.length) {
+            const curPage = P();
+            if (curPage) {
+              const newImgEl = {
+                id: 'el_' + Date.now().toString(36),
+                t: 'img',
+                x: 40,
+                y: 120,
+                w: 460,
+                h: 420,
+                src: photoData.src,
+                filename: photoData.title || 'Inspiration Photograph',
+                photographer: photoData.photographer || 'Editorial Contributor',
+                credit: photoData.credit || photoData.photographer || 'Editorial Contributor',
+                fit: 'cover'
+              };
+              curPage.els.push(newImgEl);
+              S.sel = newImgEl.id;
+              showToast(`Inserted photo by ${photoData.photographer} from Visual Library`);
+            }
+          }
+        }
+      } catch (e) {}
+
       updateAiKeyStatus();
       aiUI();
       render();
