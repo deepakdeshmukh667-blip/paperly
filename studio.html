@@ -846,7 +846,9 @@
         if (imgSrc) {
           const img = document.createElement("img");
           img.src = imgSrc;
-          img.crossOrigin = "anonymous";
+          if (imgSrc.startsWith("http") && typeof location !== 'undefined' && !imgSrc.includes(location.host)) {
+            img.crossOrigin = "anonymous";
+          }
           img.loading = "eager";
           img.alt = e.filename || "Editorial photograph";
           img.style.width = "100%";
@@ -2325,7 +2327,7 @@
           }
           if (src && !src.startsWith("data:")) {
             try {
-              const resp = await fetch(src, { mode: "cors" });
+              const resp = await fetch(src);
               if (resp.ok) {
                 const blob = await resp.blob();
                 const dataUrl = await new Promise((res) => {
@@ -2378,12 +2380,13 @@
         overflow: "hidden",
         zIndex: "-9999",
         pointerEvents: "none",
-        opacity: "0",
+        opacity: "1",
+        visibility: "visible",
         transform: "none",
         margin: "0",
         padding: "0",
         boxSizing: "border-box",
-        background: "#0c0b0a"
+        background: "#f4ede0"
       });
       document.body.appendChild(staging);
 
@@ -2413,6 +2416,7 @@
             staging.innerHTML = "";
 
             const pData = exportPages[i];
+            const pageBg = pData.bg || "#f4ede0";
             const pageEl = page(pData, false);
             Object.assign(pageEl.style, {
               width: "540px",
@@ -2422,12 +2426,15 @@
               top: "0px",
               transform: "none",
               margin: "0",
-              boxShadow: "none"
+              boxShadow: "none",
+              background: pageBg,
+              opacity: "1",
+              visibility: "visible"
             });
             staging.appendChild(pageEl);
 
             // Wait for image decoding on this page
-            const imgs = Array.from(staging.querySelectorAll("img"));
+            const imgs = Array.from(pageEl.querySelectorAll("img"));
             await Promise.all(imgs.map(async img => {
               try {
                 if (img.decode) {
@@ -2438,31 +2445,25 @@
               } catch (e) {}
             }));
 
-            // Settle paint
-            await new Promise(r => setTimeout(r, 60));
+            // Settle paint and layout
+            await new Promise(r => setTimeout(r, 120));
 
             // Capture exact zero-offset 540x720 canvas
-            const canvas = await window.html2canvas(staging, {
+            const canvas = await window.html2canvas(pageEl, {
               scale: 2,
               useCORS: true,
-              allowTaint: false,
+              allowTaint: true,
               logging: false,
               width: 540,
               height: 720,
-              x: 0,
-              y: 0,
-              scrollX: 0,
-              scrollY: 0,
-              windowWidth: 540,
-              windowHeight: 720,
-              backgroundColor: pData.bg || '#0c0b0a'
+              backgroundColor: pageBg
             });
 
             const imgData = canvas.toDataURL('image/jpeg', 0.95);
             if (i > 0) {
               pdf.addPage([540, 720], 'portrait');
             }
-            pdf.addImage(imgData, 'JPEG', 0, 0, 540, 720);
+            pdf.addImage(imgData, 'JPEG', 0, 0, 540, 720, undefined, 'FAST');
           }
 
           expBtn.innerHTML = '<span>✦ Saving file…</span>';

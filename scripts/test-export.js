@@ -184,6 +184,16 @@ async function runTestSuite() {
   const testCases = [1, 5, 10, 20];
   let allPassed = true;
 
+  // Staging audit: ensure studio.html never hides staging with opacity: 0
+  const studioHtmlPath = path.join(__dirname, '..', 'studio.html');
+  if (fs.existsSync(studioHtmlPath)) {
+    const studioHtml = fs.readFileSync(studioHtmlPath, 'utf8');
+    if (studioHtml.includes('paperly-pdf-staging') && studioHtml.includes('opacity: "0"')) {
+      console.error('❌ FAIL: studio.html has paperly-pdf-staging with opacity: "0", which causes html2canvas to render black pages!');
+      allPassed = false;
+    }
+  }
+
   for (const pageCount of testCases) {
     process.stdout.write(`• Testing ${pageCount}-page magazine export... `);
     const mock = createMockProject(pageCount);
