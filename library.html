@@ -582,7 +582,7 @@
 
         card.innerHTML = `
           <div class="photo-thumb-wrap ${isLandscape ? 'landscape' : ''}">
-            <img class="photo-img" src="${img.localPath}" alt="${img.title || 'Editorial Photograph'}" loading="lazy">
+            <img class="photo-img" src="${img.localPath}" onerror="if(this.dataset.fallback!=='1'){this.dataset.fallback='1';this.src='${img.downloadUrl}';}" alt="${img.title || 'Editorial Photograph'}" loading="lazy">
             <span class="photo-credit-badge">Photo: ${img.photographer}</span>
           </div>
           <div class="photo-meta">
@@ -649,3 +649,4 @@
   </script>
 </body>
 </html>
+
