@@ -302,7 +302,10 @@
       position: relative;
       aspect-ratio: 3/4;
       overflow: hidden;
-      background: #111;
+      background: #1e1b18;
+    }
+    [data-theme="light"] .photo-thumb-wrap {
+      background: #ede6d8;
     }
     .photo-thumb-wrap.landscape {
       aspect-ratio: 4/3;
@@ -580,9 +583,12 @@
           `<span class="color-dot" style="background:${c};" title="${c}"></span>`
         ).join('');
 
+        const c1 = (img.dominantColours && img.dominantColours[0]) || '#3a322d';
+        const c2 = (img.dominantColours && img.dominantColours[1]) || '#1a1614';
+
         card.innerHTML = `
-          <div class="photo-thumb-wrap ${isLandscape ? 'landscape' : ''}">
-            <img class="photo-img" src="${img.localPath}" onerror="if(this.dataset.fallback!=='1'){this.dataset.fallback='1';this.src='${img.downloadUrl}';}" alt="${img.title || 'Editorial Photograph'}" loading="lazy">
+          <div class="photo-thumb-wrap ${isLandscape ? 'landscape' : ''}" style="background: linear-gradient(135deg, ${c1}55, ${c2}88);">
+            <img class="photo-img" src="${img.localPath}" onerror="if(!this.dataset.fallback){this.dataset.fallback='1';this.src='${img.downloadUrl}';}" alt="${img.title || 'Editorial Photograph'}" loading="lazy">
             <span class="photo-credit-badge">Photo: ${img.photographer}</span>
           </div>
           <div class="photo-meta">

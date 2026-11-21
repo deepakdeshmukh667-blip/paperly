@@ -57,17 +57,26 @@ function runCheck() {
 
   const errors = [];
   const seenIds = new Set();
+  const seenUrls = new Set();
 
   images.forEach((img, idx) => {
     const loc = `Image #${idx + 1} (id: ${img.id || 'N/A'})`;
 
-    // 1. Unique ID
+    // 1. Unique ID & Unique URL
     if (!img.id || typeof img.id !== 'string') {
       errors.push(`${loc}: Missing or invalid 'id'`);
     } else if (seenIds.has(img.id)) {
       errors.push(`${loc}: Duplicate id '${img.id}'`);
     } else {
       seenIds.add(img.id);
+    }
+
+    if (img.downloadUrl) {
+      if (seenUrls.has(img.downloadUrl)) {
+        errors.push(`${loc}: Duplicate downloadUrl '${img.downloadUrl}'`);
+      } else {
+        seenUrls.add(img.downloadUrl);
+      }
     }
 
     // 2. Valid Category
@@ -151,3 +160,4 @@ function runCheck() {
 }
 
 runCheck();
+
