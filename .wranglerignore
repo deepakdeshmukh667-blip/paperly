@@ -1,0 +1,28 @@
+# Exclude heavy library images (34MB+ — exceeds 25MB Cloudflare asset limit)
+assets/library/
+assets/samples/
+
+# Keep data/*.json accessible (library.html fetches data/images.json)
+# data/ — NOT excluded, needed for frontend
+
+# Exclude development scripts and tooling
+scripts/
+adapters/
+migrations/
+
+# Exclude dev/build artifacts
+node_modules/
+*.log
+.users_db.json
+.git/
+.github/
+
+# Exclude dev config files
+GSD-STYLE.md
+PROJECT_RULES.md
+VERSION
+model_capabilities.yaml
+wrangler.toml
+package.json
+package-lock.json
+server.js

@@ -588,7 +588,7 @@
 
         card.innerHTML = `
           <div class="photo-thumb-wrap ${isLandscape ? 'landscape' : ''}" style="background: linear-gradient(135deg, ${c1}55, ${c2}88);">
-            <img class="photo-img" src="${img.localPath}" onerror="if(!this.dataset.fallback){this.dataset.fallback='1';this.src='${img.downloadUrl}';}" alt="${img.title || 'Editorial Photograph'}" loading="lazy">
+            <img class="photo-img" src="${img.previewUrl || img.localPath}" onerror="if(!this.dataset.fb2){this.dataset.fb2='1';this.src='${img.localPath}';}else if(!this.dataset.fb3){this.dataset.fb3='1';this.src='';}this.style.opacity='0.3';" alt="${img.title || 'Editorial Photograph'}" loading="lazy">
             <span class="photo-credit-badge">Photo: ${img.photographer}</span>
           </div>
           <div class="photo-meta">
