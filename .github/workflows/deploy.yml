@@ -27,6 +27,16 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
+      - name: Prepare deployment
+        run: |
+          # Remove files not needed for static site deployment
+          rm -rf node_modules .git .github scripts adapters migrations worker
+          rm -f server.js wrangler.toml package-lock.json .wranglerignore
+          rm -f GSD-STYLE.md PROJECT_RULES.md VERSION model_capabilities.yaml
+          rm -f .users_db.json
+          # Remove heavy library assets (served via CDN in production)
+          rm -rf assets/library
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
@@ -35,4 +45,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
