@@ -22,25 +22,41 @@ jobs:
       - name: Install dependencies
         run: npm ci --ignore-scripts
 
-      - name: Verify Cloudflare Credentials
+      - name: Sanitize and Verify Cloudflare Credentials
         env:
-          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          RAW_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          RAW_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
-          echo "=== 1. Checking Token Verification ==="
+          # 1. Clean token: strip leading 'Bearer ', quotes, and whitespace
+          CLEAN_TOKEN=$(echo "$RAW_TOKEN" | sed -e 's/^[bB][eE][aA][rR][eE][rR][[:space:]]*//' -e 's/^["'"'"']//' -e 's/["'"'"']$//' | tr -d '\r\n[:space:]')
+          CLEAN_ACCOUNT=$(echo "$RAW_ACCOUNT" | sed -e 's/^["'"'"']//' -e 's/["'"'"']$//' | tr -d '\r\n[:space:]')
+          
+          # Mask clean token in logs
+          echo "::add-mask::$CLEAN_TOKEN"
+          echo "::add-mask::$CLEAN_ACCOUNT"
+          
+          # Set for subsequent steps
+          echo "CF_CLEAN_TOKEN=$CLEAN_TOKEN" >> $GITHUB_ENV
+          echo "CF_CLEAN_ACCOUNT=$CLEAN_ACCOUNT" >> $GITHUB_ENV
+
+          echo "Token length: ${#CLEAN_TOKEN}"
+          echo "Account length: ${#CLEAN_ACCOUNT}"
+
+          echo "=== Testing Token Verification ==="
           curl -s -X GET "https://api.cloudflare.com/client/v4/user/tokens/verify" \
-            -H "Authorization: Bearer $CF_TOKEN" \
+            -H "Authorization: Bearer $CLEAN_TOKEN" \
             -H "Content-Type: application/json"
           echo ""
-          echo "=== 2. Checking Accounts List ==="
+
+          echo "=== Testing Accounts with Token ==="
           curl -s -X GET "https://api.cloudflare.com/client/v4/accounts" \
-            -H "Authorization: Bearer $CF_TOKEN" \
+            -H "Authorization: Bearer $CLEAN_TOKEN" \
             -H "Content-Type: application/json"
           echo ""
 
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v4
         with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          apiToken: ${{ env.CF_CLEAN_TOKEN }}
+          accountId: ${{ env.CF_CLEAN_ACCOUNT }}
           command: deploy
